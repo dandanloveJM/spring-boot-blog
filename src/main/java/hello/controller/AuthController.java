@@ -22,14 +22,12 @@ import hello.entity.User;
 @RestController
 public class AuthController {
     private UserService userService;
-    private UserDetailsService userDetailsService;
     private AuthenticationManager authenticationManager;
 
     @Inject
     public AuthController(UserDetailsService userDetailsService,
                           UserService userService,
                           AuthenticationManager authenticationManager) {
-        this.userDetailsService = userDetailsService;
         this.authenticationManager = authenticationManager;
         this.userService = userService;
     }
@@ -37,7 +35,8 @@ public class AuthController {
     @GetMapping("/auth")
     public Object auth() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (username.contains("anonymous")) {
+        User loggedInUser = userService.getUserByUsername(username);
+        if (loggedInUser == null) {
             return new Result("fail","用户没登录",false);
         } else {
             return new Result("ok",null,true, userService.getUserByUsername(username));
@@ -53,18 +52,19 @@ public class AuthController {
 
         UserDetails userDetails;
         try {
-           userDetails = userDetailsService.loadUserByUsername(username);
+           userDetails = userService.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {
             return new Result("fail", "用户不存在",false);
         }
 
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+        System.out.println("token");
         System.out.println(token);
         try {
             authenticationManager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(token);
-            return new Result("success","登录成功",true, new User(1, "张三","",password, Instant.now(), Instant.now()));
+            return new Result("success","登录成功",true, userService.getUserByUsername(username));
         } catch (BadCredentialsException e) {
             return new Result("fail", "密码不正确",false);
         }
