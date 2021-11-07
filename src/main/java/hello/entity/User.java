@@ -1,16 +1,24 @@
 package hello.entity;
 
-import java.time.Instant;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+
+import java.time.ZonedDateTime;
 
 public class User {
     Integer id;
     String username;
     String avatar;
-    Instant createdAt;
-    Instant updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonProperty("createdAt")
+    ZonedDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonProperty("updatedAt")
+    ZonedDateTime updatedAt;
     String password;
 
-    public User(Integer id, String username, String avatar, Instant createdAt, Instant updatedAt, String password) {
+    public User(Integer id, String username, String avatar, ZonedDateTime createdAt, ZonedDateTime updatedAt, String password) {
         this.id = id;
         this.username = username;
         this.avatar = avatar;
@@ -31,11 +39,11 @@ public class User {
         return avatar;
     }
 
-    public Instant getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public Instant getUpdatedAt() {
+    public ZonedDateTime getUpdatedAt() {
         return updatedAt;
     }
 
