@@ -7,7 +7,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-import java.time.Instant;
 import java.util.Map;
 import hello.entity.User;
 
@@ -25,8 +23,7 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Inject
-    public AuthController(UserDetailsService userDetailsService,
-                          UserService userService,
+    public AuthController(UserService userService,
                           AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
@@ -40,6 +37,19 @@ public class AuthController {
             return new Result("fail","用户没登录",false);
         } else {
             return new Result("ok",null,true, userService.getUserByUsername(username));
+        }
+
+    }
+
+    @GetMapping("/auth/logout")
+    public Object logout() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        if (loggedInUser == null) {
+            return new Result("fail","用户没登录",false);
+        } else {
+            SecurityContextHolder.clearContext();
+            return new Result("ok","已退出",false);
         }
 
     }
@@ -76,11 +86,26 @@ public class AuthController {
     public Object register(@RequestBody Map<String, String> usernameAndPassword){
         String username = usernameAndPassword.get("username");
         String password = usernameAndPassword.get("password");
+        if (username == null || password == null) {
+            return new Result("fail", "username/password == null", false);
+        }
+
+        if(username.length()<1 || username.length() > 15){
+            return new Result("fail", "invalid username", false);
+        }
 
         try{
-            userService.save(username, password);
-            User newUser = userService.getUserByUsername(username);
-            return new Result("ok","注册成功",null, newUser);
+            User user = userService.getUserByUsername(username);
+            if (user == null){
+                userService.save(username, password);
+                User newUser = userService.getUserByUsername(username);
+                return new Result("ok","注册成功",false, newUser);
+            } else {
+               return new Result("fail","用户名已存在", false);
+            }
+
+
+
         } catch (Exception e) {
             return new Result("fail","错误原因", null);
         }
