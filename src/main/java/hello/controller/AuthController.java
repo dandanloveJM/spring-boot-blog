@@ -72,6 +72,20 @@ public class AuthController {
 
     }
 
+    @PostMapping("/auth/register")
+    public Object register(@RequestBody Map<String, String> usernameAndPassword){
+        String username = usernameAndPassword.get("username");
+        String password = usernameAndPassword.get("password");
+
+        try{
+            userService.save(username, password);
+            User newUser = userService.getUserByUsername(username);
+            return new Result("ok","注册成功",null, newUser);
+        } catch (Exception e) {
+            return new Result("fail","错误原因", null);
+        }
+    }
+
     private static class Result {
         String status;
         String msg;
