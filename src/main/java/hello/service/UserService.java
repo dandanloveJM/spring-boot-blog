@@ -1,6 +1,7 @@
 package hello.service;
 
 
+import hello.mapper.UserMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,32 +19,31 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserService implements UserDetailsService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private Map<String, hello.entity.User> users = new ConcurrentHashMap<>();
+    private UserMapper userMapper;
 
 
     @Inject
-    public UserService(BCryptPasswordEncoder bCryptPasswordEncoder){
+    public UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
+                       UserMapper userMapper){
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        save("aaa","aaa");
+        this.userMapper = userMapper;
+//        save("aaa","aaa");
     }
 
     public void save(String username, String password) {
-        users.put(username, new hello.entity.User(1, username, null, bCryptPasswordEncoder.encode(password), Instant.now(), Instant.now()));
+        userMapper.save(username, bCryptPasswordEncoder.encode(password), null, Instant.now(), Instant.now());
     }
-//    public String getPassword(String username) {
-//        return users.get(username);
-//    }
 
     public hello.entity.User getUserByUsername(String username) {
-        return users.get(username);
+        return userMapper.findUserByUsername(username);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if(!users.containsKey(username)) {
+        hello.entity.User user = getUserByUsername(username);
+        if(user == null) {
             throw new UsernameNotFoundException(username+"不存在");
         }
-        hello.entity.User user = users.get(username);
-
         return new User(username, user.getPassword(), Collections.emptyList());
     }
 }

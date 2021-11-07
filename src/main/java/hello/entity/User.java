@@ -6,17 +6,17 @@ public class User {
     Integer id;
     String username;
     String avatar;
-    String password;
     Instant createdAt;
     Instant updatedAt;
+    String password;
 
-    public User(Integer id, String username, String avatar, String password, Instant createdAt, Instant updatedAt) {
+    public User(Integer id, String username, String avatar, Instant createdAt, Instant updatedAt, String password) {
         this.id = id;
         this.username = username;
         this.avatar = avatar;
-        this.password = password;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.password = password;
     }
 
     public Integer getId() {
@@ -31,15 +31,15 @@ public class User {
         return avatar;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public Instant getCreatedAt() {
         return createdAt;
     }
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
