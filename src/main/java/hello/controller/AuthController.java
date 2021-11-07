@@ -1,6 +1,7 @@
 package hello.controller;
 
 
+import hello.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,19 +21,28 @@ import hello.entity.User;
 
 @RestController
 public class AuthController {
+    private UserService userService;
     private UserDetailsService userDetailsService;
     private AuthenticationManager authenticationManager;
 
     @Inject
     public AuthController(UserDetailsService userDetailsService,
+                          UserService userService,
                           AuthenticationManager authenticationManager) {
         this.userDetailsService = userDetailsService;
         this.authenticationManager = authenticationManager;
+        this.userService = userService;
     }
 
     @GetMapping("/auth")
     public Object auth() {
-        return new Result("fail","用户没登录",false);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (username.contains("anonymous")) {
+            return new Result("fail","用户没登录",false);
+        } else {
+            return new Result("ok",null,true, userService.getUserByUsername(username));
+        }
+
     }
 
     @PostMapping("/auth/login")
@@ -65,21 +75,21 @@ public class AuthController {
     private static class Result {
         String status;
         String msg;
-        Boolean login;
+        Boolean isLogin;
         Object data;
 
 
         public Result(String status, String msg, Boolean login, Object data) {
             this.status = status;
             this.msg = msg;
-            this.login = login;
+            this.isLogin = login;
             this.data = data;
         }
 
         public Result(String status, String msg, Boolean login) {
             this.status = status;
             this.msg = msg;
-            this.login = login;
+            this.isLogin = login;
         }
 
         public String getStatus() {
@@ -90,8 +100,12 @@ public class AuthController {
             return msg;
         }
 
-        public Boolean getLogin() {
-            return login;
+        public Boolean getIsLogin() {
+            return isLogin;
+        }
+
+        public Object getData() {
+            return data;
         }
     }
 }

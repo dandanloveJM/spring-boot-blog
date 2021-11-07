@@ -1,7 +1,6 @@
 package hello.service;
 
 
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +32,10 @@ public class UserService implements UserDetailsService {
     }
     public String getPassword(String username) {
         return userPasswords.get(username);
+    }
+
+    public hello.entity.User getUserByUsername(String username) {
+        return new hello.entity.User(1,username,"",getPassword(username), Instant.now(), Instant.now());
     }
 
     @Override
