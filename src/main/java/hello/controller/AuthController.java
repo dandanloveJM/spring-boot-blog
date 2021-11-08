@@ -34,9 +34,9 @@ public class AuthController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User loggedInUser = userService.getUserByUsername(username);
         if (loggedInUser == null) {
-            return new Result("fail","用户没登录",false);
+            return Result.failure("用户没登录");
         } else {
-            return new Result("ok",null,true, userService.getUserByUsername(username));
+            return Result.success("登录成功", userService.getUserByUsername(username));
         }
 
     }
@@ -46,7 +46,7 @@ public class AuthController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User loggedInUser = userService.getUserByUsername(username);
         if (loggedInUser == null) {
-            return new Result("fail","用户没登录",false);
+            return Result.failure("用户没登录");
         } else {
             SecurityContextHolder.clearContext();
             return new Result("ok","已退出",false);
@@ -64,7 +64,7 @@ public class AuthController {
         try {
            userDetails = userService.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {
-            return new Result("fail", "用户不存在",false);
+            return Result.failure("用户不存在");
         }
 
 
@@ -74,9 +74,9 @@ public class AuthController {
         try {
             authenticationManager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(token);
-            return new Result("success","登录成功",true, userService.getUserByUsername(username));
+            return Result.success("登录成功", userService.getUserByUsername(username));
         } catch (BadCredentialsException e) {
-            return new Result("fail", "密码不正确",false);
+            return Result.failure("密码不正确");
         }
 
 
@@ -129,6 +129,14 @@ public class AuthController {
             this.status = status;
             this.msg = msg;
             this.isLogin = login;
+        }
+
+        public static Result failure(String message){
+           return new Result("fail", message, false);
+        }
+
+        public static Result success(String message, Object data){
+            return new Result("ok", message, true, data);
         }
 
         public String getStatus() {
