@@ -3,6 +3,7 @@ package hello.controller;
 
 import hello.entity.User;
 import hello.service.UserService;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -95,19 +96,11 @@ public class AuthController {
         }
 
         try{
-            User user = userService.getUserByUsername(username);
-            if (user == null){
-                userService.save(username, password);
-                User newUser = userService.getUserByUsername(username);
-                return new Result("ok","注册成功",false, newUser);
-            } else {
-               return new Result("fail","用户名已存在", false);
-            }
-
-
-
-        } catch (Exception e) {
-            return new Result("fail","错误原因", null);
+            userService.save(username, password);
+            User newUser = userService.getUserByUsername(username);
+            return new Result("ok","注册成功",false, newUser);
+        } catch (DuplicateKeyException e) {
+            return new Result("fail","用户名已存在", false);
         }
     }
 
