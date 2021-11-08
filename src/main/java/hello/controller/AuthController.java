@@ -1,6 +1,7 @@
 package hello.controller;
 
 
+import hello.entity.Result;
 import hello.entity.User;
 import hello.service.UserService;
 import org.springframework.dao.DuplicateKeyException;
@@ -20,8 +21,8 @@ import java.util.Map;
 
 @RestController
 public class AuthController {
-    private UserService userService;
-    private AuthenticationManager authenticationManager;
+    private final UserService userService;
+    private final AuthenticationManager authenticationManager;
 
     @Inject
     public AuthController(UserService userService,
@@ -88,11 +89,11 @@ public class AuthController {
         String username = usernameAndPassword.get("username");
         String password = usernameAndPassword.get("password");
         if (username == null || password == null) {
-            return new Result("fail", "username/password == null", false);
+            return Result.failure("username/password == null");
         }
 
         if(username.length()<1 || username.length() > 15){
-            return new Result("fail", "invalid username", false);
+            return Result.failure("invalid username");
         }
 
         try{
@@ -100,52 +101,8 @@ public class AuthController {
             User newUser = userService.getUserByUsername(username);
             return new Result("ok","注册成功",false, newUser);
         } catch (DuplicateKeyException e) {
-            return new Result("fail","用户名已存在", false);
+            return Result.failure("用户名已存在");
         }
     }
 
-    private static class Result {
-        String status;
-        String msg;
-        Boolean isLogin;
-        Object data;
-
-
-        public Result(String status, String msg, Boolean login, Object data) {
-            this.status = status;
-            this.msg = msg;
-            this.isLogin = login;
-            this.data = data;
-        }
-
-        public Result(String status, String msg, Boolean login) {
-            this.status = status;
-            this.msg = msg;
-            this.isLogin = login;
-        }
-
-        public static Result failure(String message){
-           return new Result("fail", message, false);
-        }
-
-        public static Result success(String message, Object data){
-            return new Result("ok", message, true, data);
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public String getMsg() {
-            return msg;
-        }
-
-        public Boolean getIsLogin() {
-            return isLogin;
-        }
-
-        public Object getData() {
-            return data;
-        }
-    }
 }
