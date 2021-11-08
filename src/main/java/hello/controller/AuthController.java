@@ -1,6 +1,7 @@
 package hello.controller;
 
 
+import hello.entity.User;
 import hello.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
 import java.util.Map;
-import hello.entity.User;
 
 @RestController
 public class AuthController {
