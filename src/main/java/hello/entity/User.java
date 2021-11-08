@@ -1,6 +1,7 @@
 package hello.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -16,6 +17,7 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @JsonProperty("updatedAt")
     ZonedDateTime updatedAt;
+    @JsonIgnore
     String password;
 
     public User(Integer id, String username, String avatar, ZonedDateTime createdAt, ZonedDateTime updatedAt, String password) {

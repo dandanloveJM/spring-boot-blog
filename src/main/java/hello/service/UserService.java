@@ -27,7 +27,6 @@ public class UserService implements UserDetailsService {
                        UserMapper userMapper){
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userMapper = userMapper;
-//        save("aaa","aaa");
     }
 
     public void save(String username, String password) {
