@@ -12,13 +12,10 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class UserService implements UserDetailsService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private Map<String, hello.entity.User> users = new ConcurrentHashMap<>();
     private UserMapper userMapper;
 
 
@@ -30,7 +27,7 @@ public class UserService implements UserDetailsService {
     }
 
     public void save(String username, String password) {
-        userMapper.save(username, bCryptPasswordEncoder.encode(password), null, Instant.now(), Instant.now());
+        userMapper.save(username, bCryptPasswordEncoder.encode(password), null);
     }
 
     public hello.entity.User getUserByUsername(String username) {
