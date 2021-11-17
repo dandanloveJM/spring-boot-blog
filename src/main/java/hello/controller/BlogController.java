@@ -1,10 +1,7 @@
 package hello.controller;
 
 import hello.entity.BlogListResult;
-import hello.entity.Result;
-import hello.entity.User;
 import hello.service.BlogService;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
