@@ -3,11 +3,26 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.mybatis.example.BlogMapper">
-    <select id="selectBlog" resultType="hello.entity.Blog">
-        select * from blog
+    <select id="selectBlog" resultMap="blog" >
+        select
+        blog.id as 'blog_id',
+        blog.title as blog_title,
+        blog.description as blog_description,
+        blog.content as blog_content,
+        blog.updated_at as blog_updated_at,
+        blog.created_at as blog_created_at,
+        user.id as 'user_id',
+        user.username as user_username,
+        user.avatar as user_avatar,
+        user.created_at as user_created_at,
+        user.updated_at as user_updated_at
+        FROM blog
+        LEFT OUTER JOIN user
+        ON blog.user_id = user.id
         <if test="user_id != null">
-            where user_id = #{user_id}
+            WHERE blog.user_id = #{user_id}
         </if>
+        order by blog.updated_at desc
         limit ${offset}, #{limit}
     </select>
     <select id="countBlog" resultType="int">
@@ -16,4 +31,20 @@
             WHERE user_id = ${userId}
         </if>
     </select>
+
+    <resultMap id="blog" type="hello.entity.Blog">
+        <id property="id" column="blog_id"/>
+        <result property="title" column="blog_title"/>
+        <result property="description" column="blog_description"/>
+        <result property="content" column="blog_content"/>
+        <result property="updatedAt" column="blog_updated_at"/>
+        <result property="createdAt" column="blog_created_at"/>
+        <association property="user" javaType="hello.entity.User">
+            <id property="id" column="user_id"/>
+            <result property="username" column="user_username"/>
+            <result property="avatar" column="user_avatar"/>
+            <result property="createdAt" column="user_created_at"/>
+            <result property="updatedAt" column="user_updated_at"/>
+        </association>
+    </resultMap>
 </mapper>
