@@ -14,7 +14,7 @@ public class BlogServiceTest {
     @Inject
     BlogDao blogDao;
     @InjectMocks
-    BlogService blogService = new BlogService();
+    BlogService blogService;
 
     @Test
     public void getBlogsFromDb(){
