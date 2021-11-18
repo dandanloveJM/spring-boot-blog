@@ -36,4 +36,8 @@ public class BlogDao {
     public int count(Integer userId){
         return sqlSession.selectOne("countBlog", asMap("userId", userId));
     }
+
+    public Blog getBlogById(Integer blogId){
+        return sqlSession.selectOne("getBlogById", asMap("blogId",blogId));
+    }
 }

@@ -3,6 +3,7 @@ package hello.service;
 import hello.dao.BlogDao;
 import hello.entity.Blog;
 import hello.entity.BlogListResult;
+import hello.entity.BlogResult;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -25,6 +26,15 @@ public class BlogService {
             return BlogListResult.success(blogs, count, page, pageCount);
         } catch (Exception e) {
             return BlogListResult.failure("系统异常");
+        }
+    }
+
+    public BlogResult getBlogById(Integer blogId){
+        try {
+            Blog blog = blogDao.getBlogById(blogId);
+            return BlogResult.success("获取成功", blog);
+        } catch (Exception e) {
+            return BlogResult.failure("系统异常");
         }
     }
 

@@ -1,8 +1,10 @@
 package hello.controller;
 
 import hello.entity.BlogListResult;
+import hello.entity.BlogResult;
 import hello.service.BlogService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,4 +26,11 @@ public class BlogController {
        }
        return blogService.getBlogs(page, 10, userId);
     }
+
+    @GetMapping("/blog/{blogId}")
+    public BlogResult getBlog(@PathVariable("blogId") int blogId){
+        return blogService.getBlogById(blogId);
+    }
+
+
 }
