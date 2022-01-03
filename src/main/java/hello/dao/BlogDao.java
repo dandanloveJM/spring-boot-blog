@@ -40,4 +40,18 @@ public class BlogDao {
     public Blog getBlogById(Integer blogId){
         return sqlSession.selectOne("getBlogById", asMap("blogId",blogId));
     }
+
+    public Blog insertBlog(Blog newBlog){
+        sqlSession.insert("insertBlog", newBlog);
+        return getBlogById(newBlog.getId());
+    }
+
+    public Blog updateBlog(Blog newBlog){
+        sqlSession.update("updateBlog", newBlog);
+        return getBlogById(newBlog.getId());
+    }
+
+    public void deleteBlog(int blogId){
+        sqlSession.delete("deleteBlog", blogId);
+    }
 }

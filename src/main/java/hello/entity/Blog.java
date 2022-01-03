@@ -19,7 +19,6 @@ public class Blog {
         this.id = id;
     }
 
-
     public String getTitle() {
         return title;
     }
@@ -66,5 +65,9 @@ public class Blog {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Integer getUserId(){
+        return user == null ? null : user.getId();
     }
 }

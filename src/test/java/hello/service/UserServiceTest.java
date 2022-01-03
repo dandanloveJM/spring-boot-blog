@@ -26,7 +26,6 @@ public class UserServiceTest {
 
     @InjectMocks
     UserService userService;
-    private Object UsernameNotFoundException;
 
     @Test
     public void testSave(){

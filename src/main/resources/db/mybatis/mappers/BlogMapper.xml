@@ -48,6 +48,25 @@
         where blog.id = ${blogId}
     </select>
 
+    <insert id="insertBlog" parameterType="hello.entity.Blog" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
+        INSERT INTO blog (user_id, title, description, content, created_at, updated_at)
+        VALUES (#{userId}, #{title}, #{description}, #{content}, now(), now())
+    </insert>
+
+    <update id="updateBlog" parameterType="hello.entity.Blog">
+        UPDATE blog
+        SET content=${content}, description=${description}, title=${title}, updated_at=now()
+        where blog.id = ${id}
+    </update>
+
+    <delete id="deleteBlog" parameterType="int">
+        DELETE
+        FROM blog
+        WHERE blog.id = ${id}
+    </delete>
+
+
     <resultMap id="blog" type="hello.entity.Blog">
         <id property="id" column="blog_id"/>
         <result property="title" column="blog_title"/>
