@@ -92,7 +92,11 @@
 			<artifactId>maven-surefire-plugin</artifactId>
 			<version>2.22.2</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-spring-boot-starter-process</artifactId>
+			<version>6.7.2</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/processdef">
+    <process id="Leave" name="LeaveProcess" isExecutable="true">
+        <userTask id="leaveTask" name="请假" flowable:assignee="${leaveTask}"/>
+        <userTask id="managerTask" name="经理审核"/>
+        <exclusiveGateway id="managerJudgeTask"/>
+        <endEvent id="endLeave" name="结束"/>
+        <startEvent id="startLeave" name="开始"/>
+        <sequenceFlow id="modeFlow" sourceRef="leaveTask" targetRef="managerTask"/>
+        <sequenceFlow id="flowStart" sourceRef="startLeave" targetRef="leaveTask"/>
+        <sequenceFlow id="jugdeFlow" sourceRef="managerTask" targetRef="managerJudgeTask"/>
+        <sequenceFlow id="flowEnd" name="通过" sourceRef="managerJudgeTask" targetRef="endLeave">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${checkResult=='通过'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="rejectFlow" name="驳回" sourceRef="managerJudgeTask"
+                      targetRef="endLeave">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${checkResult=='驳回'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+    </process>
+</definitions>
