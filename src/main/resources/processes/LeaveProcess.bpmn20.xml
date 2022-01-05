@@ -4,25 +4,52 @@
              xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
              typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="http://www.flowable.org/processdef">
-    <process id="Leave" name="LeaveProcess" isExecutable="true">
-        <userTask id="leaveTask" name="请假" flowable:assignee="${leaveTask}"/>
-        <userTask id="managerTask" name="经理审核"/>
-        <exclusiveGateway id="managerJudgeTask"/>
-        <endEvent id="endLeave" name="结束"/>
-        <startEvent id="startLeave" name="开始"/>
-        <sequenceFlow id="modeFlow" sourceRef="leaveTask" targetRef="managerTask"/>
-        <sequenceFlow id="flowStart" sourceRef="startLeave" targetRef="leaveTask"/>
-        <sequenceFlow id="jugdeFlow" sourceRef="managerTask" targetRef="managerJudgeTask"/>
-        <sequenceFlow id="flowEnd" name="通过" sourceRef="managerJudgeTask" targetRef="endLeave">
-            <conditionExpression xsi:type="tFormalExpression">
-                <![CDATA[${checkResult=='通过'}]]>
-            </conditionExpression>
+    <process id="a10001" name="value" isExecutable="true">
+        <startEvent id="startEvent1" flowable:formFieldValidation="true"/>
+        <userTask id="uploadTask" name="R2上传任务"
+                  flowable:assignee="${valueTask}"/>
+        <sequenceFlow id="flow1" sourceRef="startEvent1"
+                      targetRef="uploadTask"/>
+        <userTask id="fillNumbers" name="R2/R1填写产值分配建议"
+                  flowable:assignee="${valueTask}"/>
+        <sequenceFlow id="flow2" sourceRef="uploadTask"
+                      targetRef="fillNumbers"/>
+        <userTask id="R3check" name="R3审核" flowable:formFieldValidation="true"/>
+        <sequenceFlow id="flow3" sourceRef="fillNumbers"
+                      targetRef="R3check"/>
+        <exclusiveGateway id="sid-244677E7-6805-455A-8001-556D8CB1D3DC"/>
+        <sequenceFlow id="sid-2012C3AB-0FEE-40D0-AAE3-E8BA6310F24F" sourceRef="R3check"
+                      targetRef="sid-244677E7-6805-455A-8001-556D8CB1D3DC"/>
+        <userTask id="R4check" name="R4审核" flowable:formFieldValidation="true"/>
+        <sequenceFlow id="sid-83B6BCC8-E016-4B07-ADCF-57D1C62D15B9" sourceRef="sid-244677E7-6805-455A-8001-556D8CB1D3DC" targetRef="fillNumbers">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkResult=='驳回'}]]></conditionExpression>
         </sequenceFlow>
-        <sequenceFlow id="rejectFlow" name="驳回" sourceRef="managerJudgeTask"
-                      targetRef="endLeave">
-            <conditionExpression xsi:type="tFormalExpression">
-                <![CDATA[${checkResult=='驳回'}]]>
-            </conditionExpression>
+        <sequenceFlow id="sid-F7FE93CC-28BC-4A73-8944-205622B9C334" sourceRef="sid-244677E7-6805-455A-8001-556D8CB1D3DC" targetRef="R4check">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkResult=='通过'}]]></conditionExpression>
         </sequenceFlow>
+        <exclusiveGateway id="sid-B037103B-205C-4E1F-B2EF-A2F66F912079"/>
+        <userTask id="A1check" name="A1审核" flowable:formFieldValidation="true"/>
+        <sequenceFlow id="sid-89B3AEE3-F176-48DF-9824-47E45A08A3BB" sourceRef="R4check"
+                      targetRef="sid-B037103B-205C-4E1F-B2EF-A2F66F912079"/>
+        <sequenceFlow id="sid-1F72E78B-64AA-4664-AFA0-F271222C6A68" sourceRef="sid-B037103B-205C-4E1F-B2EF-A2F66F912079" targetRef="R3check">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkResult=='驳回'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="sid-B78480F5-10CF-4808-A1BF-AA8081638FBB" sourceRef="sid-B037103B-205C-4E1F-B2EF-A2F66F912079" targetRef="A1check">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkResult=='通过'}]]></conditionExpression>
+        </sequenceFlow>
+        <exclusiveGateway id="sid-2CBE15FB-5805-4F9C-B977-02CF01FE2C29"/>
+        <sequenceFlow id="sid-7E60DC07-E2B9-4E3D-A17D-7FC9B0341850" sourceRef="A1check"
+                      targetRef="sid-2CBE15FB-5805-4F9C-B977-02CF01FE2C29"/>
+        <userTask id="A1fill" name="A1填写产值" flowable:formFieldValidation="true"/>
+        <sequenceFlow id="sid-7AEFE61F-20E7-44B9-98A7-D7B4EC2574BE" sourceRef="sid-2CBE15FB-5805-4F9C-B977-02CF01FE2C29" targetRef="A1fill">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkResult=='通过'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="sid-8E00BD1A-B136-46BC-8091-A866546AD70D" sourceRef="sid-2CBE15FB-5805-4F9C-B977-02CF01FE2C29" targetRef="R4check">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${checkResult=='驳回'}]]></conditionExpression>
+        </sequenceFlow>
+        <endEvent id="sid-D0AAC8CD-449E-4464-B9E2-49C8E058AD25"></endEvent>
+        <sequenceFlow id="sid-E938D1EF-9495-4475-9D9E-72BE695F9C12" sourceRef="A1fill" targetRef="sid-D0AAC8CD-449E-4464-B9E2-49C8E058AD25"></sequenceFlow>
     </process>
+
+
 </definitions>
