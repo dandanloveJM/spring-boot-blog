@@ -1,28 +1,21 @@
 package hello.controller;
 
-import org.flowable.bpmn.model.BpmnModel;
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.image.ProcessDiagramGenerator;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.flowable.task.api.Task;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class FlowController {
+    private final List<String> ACTIVITY_ID_LIST= new ArrayList<>(Arrays. asList("uploadTask", "fillNumbers","R3check","R4check","A1fill"));
 
     private final RuntimeService runtimeService;
 
@@ -56,10 +49,12 @@ public class FlowController {
         return tasks.get(0).getId();
     }
 
+
+
     @GetMapping("start")
     public String startLeaveProcess(String staffId) {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("valueTask", staffId);
+        map.put("R2", staffId);
         this.userId=staffId;
         map.put("taskName","任务一");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("a10001", map);
@@ -74,6 +69,26 @@ public class FlowController {
         return sb.toString();
     }
 
+    @GetMapping("getTasksByAssignee")
+    public Object getTasksByAssignee(String staffId){
+        // 其他人员都需要查看历史的
+        // 正在办理的，和已经结束的 所以需要在history里找
+        List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
+                .taskAssignee(staffId).orderByHistoricActivityInstanceEndTime().desc().list();
+        return activities;
+//        List<Task> tasks = taskService.createTaskQuery().taskAssignee(staffId).orderByTaskCreateTime().desc().list();
+//        List<String> list = new ArrayList<>();
+////        for(Task task : tasks){
+////            list.add(task.toString());
+////        }
+//        for (Task task : tasks) {
+//            System.out.println(task.getId());
+//            list.add(task.getId());
+//        }
+//
+//        return list.toString();
+    }
+
     @GetMapping("uploadTaskInfo")
     public String uploadTaskInfo(String taskId) {
         Map<String,Object> map = new HashMap<>();
@@ -81,57 +96,94 @@ public class FlowController {
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        map.put("valueTask", this.userId);
+        map.put("fillPercent", "10002");
+//        taskService.setAssignee(taskId, "10002");
         taskService.complete(taskId, map);
         return "上传任务成功~";
     }
 
     @GetMapping("uploadOutputPercent")
-    public String uploadOutputPercent() {
-        String taskId = getLatestTaskId();
+    public String uploadOutputPercent(String taskId) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String,Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        map.put("valueTask", this.userId);
+        map.put("R3", "10003");
+//        map.put("fillPercent", "10002");
+//        taskService.setAssignee(taskId, "10002");
         taskService.complete(taskId, map);
         return "上传产值比例成功~";
     }
 
 
 
-    @GetMapping("applyTask")
-    public String applyTask() {
-        String taskId = getLatestTaskId();
+    @GetMapping("r3/approveTask")
+    public String checkTaskByR3(String taskId) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        Map<String,Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("checkResult", "通过");
+        map.put("R4", "10004");
+
         taskService.complete(taskId, map);
-        return "申请审核通过~";
+        return "R3审核通过~";
+    }
+
+    @GetMapping("r4/approveTask")
+    public String checkTaskByR4(String taskId) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        Map<String,Object> map = new HashMap<>();
+
+        if (task == null) {
+            throw new RuntimeException("流程不存在");
+        }
+        map.put("A1", "10005");
+        taskService.complete(taskId, map);
+        return "R4审核通过~";
     }
 
     @GetMapping("fillValue")
-    public String fillValue() {
-        String taskId = getLatestTaskId();
+    public String fillValue(String taskId) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        Map<String,Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        taskService.complete(taskId);
+//        map.put("A1", "10005");
+//        taskService.setAssignee(taskId, "10005");
+        taskService.complete(taskId, map);
         return "A1填写产值完毕~";
     }
 
     @GetMapping("/reject")
-    public String rejectTask() {
-        String taskId = getLatestTaskId();
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("checkResult", "驳回");
-        taskService.complete(taskId, map);
-        return "申请审核驳回~";
+    public String rejectTask(String taskId, String targetKey, String comment) {
+        Task nowTask = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (StringUtils.isNotEmpty(comment)) {
+            taskService.addComment(taskId, nowTask.getProcessInstanceId(), comment);
+        }
+
+        List<Execution> runExecutionList = runtimeService.createExecutionQuery()
+                .processInstanceId(nowTask.getProcessInstanceId()).list();
+        for (Execution execution:runExecutionList) {
+            if (ACTIVITY_ID_LIST.contains(execution.getActivityId())){
+                historyService.createNativeHistoricActivityInstanceQuery()
+                        .sql("UPDATE ACT_HI_ACTINST SET DELETE_REASON_ = 'Change activity to "+ targetKey +"'  " +
+                                "WHERE PROC_INST_ID_='"+ nowTask.getProcessInstanceId() +
+                                "' AND EXECUTION_ID_='"+ execution.getId()
+                                +"' AND ACT_ID_='"+ execution.getActivityId() +"'").singleResult();
+            }
+
+        }
+
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(nowTask.getProcessInstanceId())
+                .moveActivityIdTo(nowTask.getTaskDefinitionKey(), targetKey)
+                .changeState();
+
+        return "已退回";
     }
 
 
