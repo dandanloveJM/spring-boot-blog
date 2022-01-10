@@ -1,16 +1,21 @@
 package hello.controller;
 
+import hello.entity.*;
+import hello.service.ProjectService;
+import hello.service.UploadService;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
+import org.springframework.web.bind.annotation.*;
 import org.flowable.task.api.Task;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 @RestController
@@ -25,9 +30,13 @@ public class FlowController {
 
     private final ProcessEngine processEngine;
 
+    private final ProjectService projectService;
+
     private HistoryService historyService;
 
-    private String userId;
+    private final UploadService uploadService;
+
+    private final ServletWebServerApplicationContext context;
 
     private String processId;
 
@@ -35,12 +44,19 @@ public class FlowController {
     public FlowController(RuntimeService runtimeService, TaskService taskService,
                           RepositoryService repositoryService,
                           ProcessEngine processEngine,
-                          HistoryService historyService){
+                          HistoryService historyService,
+                          ProjectService projectService,
+                          UploadService uploadService,
+                          ServletWebServerApplicationContext context
+    ){
         this.runtimeService = runtimeService;
         this.taskService = taskService;
         this.repositoryService = repositoryService;
         this.processEngine = processEngine;
         this.historyService = historyService;
+        this.projectService = projectService;
+        this.uploadService = uploadService;
+        this.context = context;
     }
 
     public String getLatestTaskId(){
@@ -51,22 +67,54 @@ public class FlowController {
 
 
 
-    @GetMapping("start")
-    public String startLeaveProcess(String staffId) {
+    @PostMapping("start")
+    public ProjectResult startLeaveProcess(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam String ownerId,
+            @RequestParam String name,
+            @RequestParam String number,
+            @RequestParam String type) throws UnknownHostException {
+        String attachmentURL = null;
         HashMap<String, Object> map = new HashMap<>();
-        map.put("R2", staffId);
-        this.userId=staffId;
-        map.put("taskName","任务一");
+        map.put("R2", ownerId);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("a10001", map);
         StringBuilder sb = new StringBuilder();
         sb.append("创建产值流程 processId：" + processInstance.getId());
         this.processId = processInstance.getId();
-        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(staffId).orderByTaskCreateTime().desc().list();
-        for (Task task : tasks) {
-            System.out.println(task.getId());
-            sb.append("产值任务taskId:" + task.getId());
+
+        UploadResult uploadResult = this.uploadService.store(file);
+        if (uploadResult.getStatus().equals("ok")) {
+            String url = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + context.getWebServer().getPort() + "/files/";
+            attachmentURL = url + uploadResult.getMsg();
         }
-        return sb.toString();
+
+        Project newProject = buildParam(processInstance.getId(),name, number, type, attachmentURL, Integer.valueOf(ownerId));
+
+        try{
+            return this.projectService.addProject(newProject);
+        } catch (Exception e) {
+            return ProjectResult.failure("创建失败");
+        }
+
+
+//
+//        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(params.get("staffId")).orderByTaskCreateTime().desc().list();
+//        for (Task task : tasks) {
+//            System.out.println(task.getId());
+//            sb.append("产值任务taskId:" + task.getId());
+//        }
+//        return sb.toString();
+    }
+
+    private Project buildParam(String processId, String name, String number, String type, String attachment, Integer ownerId) {
+        Project project = new Project();
+        project.setProcessId(processId);
+        project.setName(name);
+        project.setNumber(number);
+        project.setType(Integer.valueOf(type));
+        project.setAttachment(attachment);
+        project.setOwnerId(ownerId);
+        return project;
     }
 
     @GetMapping("getTasksByAssignee")
