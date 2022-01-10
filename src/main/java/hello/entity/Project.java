@@ -1,12 +1,36 @@
 package hello.entity;
 
+import java.time.Instant;
+
+/**
+ * type值：
+ *  1:采集设计
+ * 2: 科研项目,
+ * 3: 现场处理,
+ * 4: 质量评价,
+ * 5: 资料分析,
+ * 6: 表层调查
+ * 7: 测量质控
+ * 8: 技术支持,
+ * 9: 现场支持
+ * 10: 党建工作
+ * */
+
+
 public class Project {
     private Integer id;
     private String processId;
     private String name;
     private String number;
-    private String type;
+    private Integer type;
     private String attachment;
+    private Integer ownerId;
+    private Integer productId;
+    private Instant createdAt;
+    private Instant updatedAt;
+
+    public Project(){}
+
 
     public Integer getId() {
         return id;
@@ -40,11 +64,11 @@ public class Project {
         this.number = number;
     }
 
-    public String getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
@@ -54,6 +78,38 @@ public class Project {
 
     public void setAttachment(String attachment) {
         this.attachment = attachment;
+    }
+
+    public Integer getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public Integer getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
 
