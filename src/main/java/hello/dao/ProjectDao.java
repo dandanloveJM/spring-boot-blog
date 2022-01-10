@@ -35,7 +35,7 @@ public class ProjectDao {
     }
 
     public int count(Integer userId){
-        return sqlSession.selectOne("countProject", asMap("ownerId", userId));
+        return sqlSession.selectOne("countProject", asMap("userId", userId));
     }
 
     public Project getProjectById(Integer projectId){

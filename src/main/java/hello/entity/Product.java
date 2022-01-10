@@ -3,6 +3,12 @@ package hello.entity;
 import java.math.BigDecimal;
 
 public class Product {
+    private Integer id;
+    private String processId;
+    private Integer userId;
+    private BigDecimal percentage;
+    private Integer product;
+
     public Integer getId() {
         return id;
     }
@@ -43,9 +49,5 @@ public class Product {
         this.product = product;
     }
 
-    private Integer id;
-    private String processId;
-    private Integer userId;
-    private BigDecimal percentage;
-    private Integer product;
+
 }

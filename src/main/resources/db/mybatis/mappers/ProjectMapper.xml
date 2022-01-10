@@ -16,16 +16,16 @@
         project.created_at,
         project.updated_at
         FROM project
-        <if test="user_id != null">
-            WHERE project.owner_id = #{user_id}
+        <if test="userId != null">
+            WHERE project.owner_id = #{userId}
         </if>
         order by project.updated_at desc
         limit ${offset}, #{limit}
     </select>
     <select id="countProject" resultType="int">
         select count(*) from project
-        <if test="owner_id != null">
-            WHERE owner_id = ${owner_id}
+        <if test="userId != null">
+            WHERE owner_id = ${userId}
         </if>
     </select>
     <select id="getProjectById" resultMap="project">
