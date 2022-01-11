@@ -7,6 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +53,13 @@ public class ProductDao {
         return "上传产值成功";
     }
 
-    public Product updateProduct(Product newProduct){
-        sqlSession.update("updateProduct", newProduct);
-        return getProductById(newProduct.getId());
+    public String updateProducts(BigDecimal totalProjectProduct, BigDecimal totalBonus, String processId){
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("totalProjectProduct", totalProjectProduct);
+        parameters.put("totalBonus",totalBonus);
+        parameters.put("processId", processId);
+        sqlSession.update("updateProducts", parameters);
+        return "财务分配产值成功";
     }
 
     public void deleteProductsByProcessId(String processId){

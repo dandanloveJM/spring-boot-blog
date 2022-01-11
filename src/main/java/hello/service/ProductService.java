@@ -3,15 +3,19 @@ package hello.service;
 import hello.dao.ProductDao;
 import hello.entity.Product;
 import hello.entity.ProductResult;
-import hello.entity.Result;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 public class ProductService {
     private final ProductDao productDao;
+
+    private final String PROJECT_BONUS_PROPORTION = "0.7";
+    private final String BONUS_PROPORTION = "0.3";
+
 
     @Inject
     public ProductService(ProductDao productDao) {
@@ -37,6 +41,17 @@ public class ProductService {
             return ProductResult.failure("修改产值失败");
         }
         return ProductResult.success("修改产值成功");
+    }
 
+    // A1填写总数与比例，更新每个人的产值
+    public ProductResult updateProducts(BigDecimal total, String processId){
+        BigDecimal totalProjectProduct = total.multiply(new BigDecimal(PROJECT_BONUS_PROPORTION));
+        BigDecimal totalBonus = total.multiply(new BigDecimal(BONUS_PROPORTION));
+        try {
+            productDao.updateProducts(totalProjectProduct, totalBonus, processId);
+        } catch (Exception e) {
+            return ProductResult.failure("财务分配产值失败");
+        }
+        return ProductResult.success("财务分配产值成功");
     }
 }

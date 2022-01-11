@@ -10,6 +10,8 @@ public class Product {
     private BigDecimal percentage;
     private BigDecimal product;
     private Instant updatedAt;
+    private BigDecimal bonus;
+
 
     public Integer getId() {
         return id;
@@ -57,5 +59,13 @@ public class Product {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public BigDecimal getBonus() {
+        return bonus;
+    }
+
+    public void setBonus(BigDecimal bonus) {
+        this.bonus = bonus;
     }
 }
