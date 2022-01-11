@@ -69,12 +69,8 @@ public class FlowController {
 
     @PostMapping("start")
     public ProjectResult startLeaveProcess(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam String ownerId,
-            @RequestParam String name,
-            @RequestParam String number,
-            @RequestParam String type) throws UnknownHostException {
-        String attachmentURL = null;
+            @RequestParam String ownerId) throws UnknownHostException {
+
         HashMap<String, Object> map = new HashMap<>();
         map.put("R2", ownerId);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("a10001", map);
@@ -82,28 +78,14 @@ public class FlowController {
         sb.append("创建产值流程 processId：" + processInstance.getId());
         this.processId = processInstance.getId();
 
-        UploadResult uploadResult = this.uploadService.store(file);
-        if (uploadResult.getStatus().equals("ok")) {
-            String url = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + context.getWebServer().getPort() + "/files/";
-            attachmentURL = url + uploadResult.getMsg();
-        }
 
-        Project newProject = buildParam(processInstance.getId(),name, number, type, attachmentURL, Integer.valueOf(ownerId));
-
-        try{
-            return this.projectService.addProject(newProject);
-        } catch (Exception e) {
-            return ProjectResult.failure("创建失败");
-        }
-
-
-//
-//        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(params.get("staffId")).orderByTaskCreateTime().desc().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(ownerId).orderByTaskCreateTime().desc().list();
 //        for (Task task : tasks) {
 //            System.out.println(task.getId());
 //            sb.append("产值任务taskId:" + task.getId());
 //        }
-//        return sb.toString();
+        sb.append("本次最新的taskId：" + tasks.get(0).getId());
+        return ProjectResult.success(sb.toString());
     }
 
     private Project buildParam(String processId, String name, String number, String type, String attachment, Integer ownerId) {
@@ -138,16 +120,38 @@ public class FlowController {
     }
 
     @GetMapping("uploadTaskInfo")
-    public String uploadTaskInfo(String taskId) {
+    public ProjectResult uploadTaskInfo(@RequestParam("file") MultipartFile file,
+                                 @RequestParam String ownerId,
+                                 @RequestParam String name,
+                                 @RequestParam String number,
+                                 @RequestParam String type,
+                                 @RequestParam String taskId,
+                                 @RequestParam String processId) throws UnknownHostException {
+        // 需要区分是需要新建任务 还是 修改任务，涉及到不同的数据库操作
+
         Map<String,Object> map = new HashMap<>();
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
         map.put("fillPercent", "10002");
 //        taskService.setAssignee(taskId, "10002");
         taskService.complete(taskId, map);
-        return "上传任务成功~";
+
+        String attachmentURL = null;
+        UploadResult uploadResult = this.uploadService.store(file);
+        if (uploadResult.getStatus().equals("ok")) {
+            String url = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + context.getWebServer().getPort() + "/files/";
+            attachmentURL = url + uploadResult.getMsg();
+        }
+        Project newProject = buildParam(task.getProcessInstanceId(),name, number, type, attachmentURL, Integer.valueOf(ownerId));
+
+        try{
+            return this.projectService.addProject(newProject);
+        } catch (Exception e) {
+            return ProjectResult.failure("创建失败");
+        }
     }
 
     @GetMapping("uploadOutputPercent")
@@ -225,6 +229,8 @@ public class FlowController {
 
         }
 
+        // TODO
+        // 增加一个记录回退的表格
 
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(nowTask.getProcessInstanceId())
