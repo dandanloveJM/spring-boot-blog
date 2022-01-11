@@ -203,14 +203,16 @@ public class FlowController {
 
 
 
-    @GetMapping("r3/approveTask")
-    public String checkTaskByR3(String taskId, String processId,  String comment) {
+    @PostMapping("r3/approveTask")
+    public String checkTaskByR3(@RequestParam String taskId,
+                                @RequestParam String processId,
+                                @RequestParam String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String,Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        map.put("R4", "10004");
+        map.put("R4", "5");
         if (StringUtils.isNotEmpty(comment)){
             taskService.addComment(taskId, processId, comment);
         }
@@ -219,15 +221,17 @@ public class FlowController {
         return "R3审核通过~";
     }
 
-    @GetMapping("r4/approveTask")
-    public String checkTaskByR4(String taskId, String processId,  String comment) {
+    @PostMapping("r4/approveTask")
+    public String checkTaskByR4(@RequestParam String taskId,
+                                @RequestParam String processId,
+                                @RequestParam String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String,Object> map = new HashMap<>();
 
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        map.put("A1", "10005");
+        map.put("A1", "7");
         if (StringUtils.isNotEmpty(comment)){
             taskService.addComment(taskId, processId, comment);
         }
@@ -235,8 +239,9 @@ public class FlowController {
         return "R4审核通过~";
     }
 
-    @GetMapping("fillValue")
-    public String fillValue(String taskId) {
+    @PostMapping("fillValue")
+    public String fillValue(@RequestParam String taskId, @RequestParam String processId,
+                            @RequestParam String Total, @RequestParam String ratio ) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String,Object> map = new HashMap<>();
         if (task == null) {
