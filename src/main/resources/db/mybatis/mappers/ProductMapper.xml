@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.ProductMapper">
+    <select id="selectProduct" resultMap="product" >
+        select
+        product.id as product_id,
+        product.process_id as process_id,
+        product.percentage as percentage,
+        product.product as product,
+        product.updated_at as product_updated_at,
+        user.id as user_id,
+        user.username as user_username
+        FROM product
+        LEFT OUTER JOIN user
+        ON product.user_id = user.id
+        <if test="user_id != null">
+            WHERE product.user_id = #{user_id}
+        </if>
+        order by product.updated_at desc
+        limit ${offset}, #{limit}
+    </select>
+    <select id="countProduct" resultType="int">
+        select count(*) from product
+        <if test="user_id != null">
+            WHERE user_id = ${userId}
+        </if>
+    </select>
+    <select id="getProductById" resultMap="product">
+        SELECT
+        product.id as product_id,
+        product.process_id as process_id,
+        product.percentage as percentage,
+        product.product as product,
+        product.updated_at as product_updated_at,
+        user.id as user_id,
+        user.username as user_username
+        FROM product
+        LEFT OUTER JOIN user
+        on product.user_id = user.id
+        where product.id = ${productId}
+    </select>
+
+    <insert id="insertProduct" parameterType="hello.entity.Product" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
+        INSERT INTO product (process_id, user_id, percentage, product, updated_at)
+        VALUES
+        <foreach collection="productList" item="product" separator=",">
+            (#{processId}, #{userId}, #{percentage}, #{product}, now())
+        </foreach>
+    </insert>
+
+    <update id="updateProduct" parameterType="hello.entity.Product">
+        UPDATE product
+        <trim prefix="SET" suffixOverrides=",">
+            updated_at=now(),
+            <if test="userId != null">
+                user_id=${userId},
+            </if>
+            <if test="percentage != null">
+                percentage=${percentage},
+            </if>
+            <if test="product != null">
+                product=${product},
+            </if>
+        </trim>
+        where product.process_id=${processId}
+    </update>
+
+    <delete id="deleteProduct" parameterType="int">
+        DELETE
+        FROM product
+        WHERE product.id = ${id}
+    </delete>
+
+
+    <resultMap id="product" type="hello.entity.Product">
+        <id property="id" column="product_id"/>
+        <result property="processId" column="process_id"/>
+        <result property="percentage" column="percentage"/>
+        <result property="product" column="product"/>
+        <result property="updatedAt" column="product_updated_at"/>
+        <association property="user" javaType="hello.entity.User">
+            <id property="id" column="user_id"/>
+            <result property="username" column="user_username"/>
+        </association>
+    </resultMap>
+</mapper>
