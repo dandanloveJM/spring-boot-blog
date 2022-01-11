@@ -52,21 +52,10 @@
         </foreach>
     </insert>
 
-    <update id="updateProduct" parameterType="hello.entity.Product">
+    <update id="updateProducts">
         UPDATE product
-        <trim prefix="SET" suffixOverrides=",">
-            updated_at=now(),
-            <if test="userId != null">
-                user_id=${userId},
-            </if>
-            <if test="percentage != null">
-                percentage=${percentage},
-            </if>
-            <if test="product != null">
-                product=${product},
-            </if>
-        </trim>
-        where product.process_id=${processId}
+        SET product=percentage*${totalProjectProduct}, bonus=percentage*${totalBonus}
+        where process_id=#{processId}
     </update>
 
     <delete id="deleteProduct" parameterType="int">
