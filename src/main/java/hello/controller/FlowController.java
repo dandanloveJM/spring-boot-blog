@@ -1,6 +1,10 @@
 package hello.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import hello.entity.*;
+import hello.service.ProductService;
 import hello.service.ProjectService;
 import hello.service.UploadService;
 import org.apache.commons.lang3.StringUtils;
@@ -14,9 +18,11 @@ import org.flowable.task.api.Task;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class FlowController {
@@ -36,6 +42,8 @@ public class FlowController {
 
     private final UploadService uploadService;
 
+    private final ProductService productService;
+
     private final ServletWebServerApplicationContext context;
 
     private String processId;
@@ -47,7 +55,8 @@ public class FlowController {
                           HistoryService historyService,
                           ProjectService projectService,
                           UploadService uploadService,
-                          ServletWebServerApplicationContext context
+                          ServletWebServerApplicationContext context,
+                          ProductService productService
     ){
         this.runtimeService = runtimeService;
         this.taskService = taskService;
@@ -57,6 +66,7 @@ public class FlowController {
         this.projectService = projectService;
         this.uploadService = uploadService;
         this.context = context;
+        this.productService = productService;
     }
 
     public String getLatestTaskId(){
@@ -119,7 +129,7 @@ public class FlowController {
 //        return list.toString();
     }
 
-    @GetMapping("uploadTaskInfo")
+    @PostMapping("uploadTaskInfo")
     public ProjectResult uploadTaskInfo(@RequestParam("file") MultipartFile file,
                                  @RequestParam String ownerId,
                                  @RequestParam String name,
@@ -135,17 +145,18 @@ public class FlowController {
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        map.put("fillPercent", "10002");
+        map.put("fillPercent", "1");
 //        taskService.setAssignee(taskId, "10002");
         taskService.complete(taskId, map);
 
+        // 以下是在处理上传数据、文件 -> 创建新project的逻辑
         String attachmentURL = null;
         UploadResult uploadResult = this.uploadService.store(file);
         if (uploadResult.getStatus().equals("ok")) {
             String url = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + context.getWebServer().getPort() + "/files/";
             attachmentURL = url + uploadResult.getMsg();
         }
-        Project newProject = buildParam(task.getProcessInstanceId(),name, number, type, attachmentURL, Integer.valueOf(ownerId));
+        Project newProject = buildParam(processId, name, number, type, attachmentURL, Integer.valueOf(ownerId));
 
         try{
             return this.projectService.addProject(newProject);
@@ -154,37 +165,62 @@ public class FlowController {
         }
     }
 
-    @GetMapping("uploadOutputPercent")
-    public String uploadOutputPercent(String taskId) {
+    @PostMapping("uploadOutputPercent")
+    public ProductResult uploadOutputPercent(@RequestParam String taskId,
+                                      @RequestParam String processId,
+                                      @RequestParam String data) {
+        // 流程逻辑
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String,Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        map.put("R3", "10003");
-//        map.put("fillPercent", "10002");
-//        taskService.setAssignee(taskId, "10002");
-        taskService.complete(taskId, map);
-        return "上传产值比例成功~";
+        map.put("R3", "3");
+
+
+        JSONArray data2 = JSON.parseArray(data);
+        List<Product> products = new ArrayList<>();
+
+        for (int i = 0; i < data2.size(); i++) {
+            JSONObject obj = data2.getJSONObject(i);
+            Product newProduct = new Product();
+            newProduct.setProcessId(processId);
+            String userid = (String) obj.get("userId");
+            String percentage = (String) obj.get("percentage");
+            newProduct.setUserId(Integer.valueOf(userid));
+            newProduct.setPercentage(new BigDecimal(percentage));
+            products.add(newProduct);
+        }
+
+
+        try {
+            taskService.complete(taskId, map);
+            return this.productService.addProducts(products);
+        } catch (Exception e) {
+            return ProductResult.failure("上传产值比例失败");
+        }
     }
 
 
 
     @GetMapping("r3/approveTask")
-    public String checkTaskByR3(String taskId) {
+    public String checkTaskByR3(String taskId, String processId,  String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String,Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
         map.put("R4", "10004");
+        if (StringUtils.isNotEmpty(comment)){
+            taskService.addComment(taskId, processId, comment);
+        }
 
         taskService.complete(taskId, map);
         return "R3审核通过~";
     }
 
     @GetMapping("r4/approveTask")
-    public String checkTaskByR4(String taskId) {
+    public String checkTaskByR4(String taskId, String processId,  String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String,Object> map = new HashMap<>();
 
@@ -192,6 +228,9 @@ public class FlowController {
             throw new RuntimeException("流程不存在");
         }
         map.put("A1", "10005");
+        if (StringUtils.isNotEmpty(comment)){
+            taskService.addComment(taskId, processId, comment);
+        }
         taskService.complete(taskId, map);
         return "R4审核通过~";
     }
