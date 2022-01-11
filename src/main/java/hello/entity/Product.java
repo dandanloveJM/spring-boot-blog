@@ -1,13 +1,15 @@
 package hello.entity;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 public class Product {
     private Integer id;
     private String processId;
     private Integer userId;
     private BigDecimal percentage;
-    private Integer product;
+    private BigDecimal product;
+    private Instant updatedAt;
 
     public Integer getId() {
         return id;
@@ -41,13 +43,19 @@ public class Product {
         this.percentage = percentage;
     }
 
-    public Integer getProduct() {
+    public BigDecimal getProduct() {
         return product;
     }
 
-    public void setProduct(Integer product) {
+    public void setProduct(BigDecimal product) {
         this.product = product;
     }
 
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
 
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
