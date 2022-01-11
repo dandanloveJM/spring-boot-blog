@@ -19,14 +19,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 public class FlowController {
     private final List<String> ACTIVITY_ID_LIST= new ArrayList<>(Arrays. asList("uploadTask", "fillNumbers","R3check","R4check","A1fill"));
+
 
     private final RuntimeService runtimeService;
 
@@ -240,17 +241,26 @@ public class FlowController {
     }
 
     @PostMapping("fillValue")
-    public String fillValue(@RequestParam String taskId, @RequestParam String processId,
-                            @RequestParam String Total, @RequestParam String ratio ) {
+    public ProductResult fillValue(@RequestParam String taskId, @RequestParam String processId,
+                            @RequestParam String total, @RequestParam String ratio ) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String,Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-//        map.put("A1", "10005");
-//        taskService.setAssignee(taskId, "10005");
-        taskService.complete(taskId, map);
-        return "A1填写产值完毕~";
+
+
+        BigDecimal newTotal = new BigDecimal(total);
+        BigDecimal newRatio = new BigDecimal(ratio);
+        BigDecimal finalTotal = newTotal.multiply(newRatio).divide(BigDecimal.valueOf(100), RoundingMode.DOWN);
+
+        try {
+            taskService.complete(taskId, map);
+            return this.productService.updateProducts(finalTotal, processId);
+        } catch (Exception e) {
+            return ProductResult.failure("财务更新产值失败");
+        }
+
     }
 
     @GetMapping("/reject")
@@ -282,6 +292,21 @@ public class FlowController {
                 .changeState();
 
         return "已退回";
+    }
+
+    @PostMapping("/resetValue")
+    public ProductResult resetValue(@RequestParam String processId,
+                                    @RequestParam String total,
+                                    @RequestParam String ratio ){
+        BigDecimal newTotal = new BigDecimal(total);
+        BigDecimal newRatio = new BigDecimal(ratio);
+        BigDecimal finalTotal = newTotal.multiply(newRatio).divide(BigDecimal.valueOf(100), RoundingMode.DOWN);
+
+        try {
+            return this.productService.updateProducts(finalTotal, processId);
+        } catch (Exception e) {
+            return ProductResult.failure("财务更新产值失败");
+        }
     }
 
 
