@@ -23,6 +23,6 @@
     <mappers>
         <mapper resource="db/mybatis/mappers/BlogMapper.xml"/>
         <mapper resource="db/mybatis/mappers/ProjectMapper.xml"/>
-<!--        <mapper resource="db/mybatis/mappers/ProjectMapper.xml"/>-->
+        <mapper resource="db/mybatis/mappers/ProductMapper.xml"/>
     </mappers>
 </configuration>
