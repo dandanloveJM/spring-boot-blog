@@ -11,6 +11,7 @@ public class Product {
     private BigDecimal product;
     private Instant updatedAt;
     private BigDecimal bonus;
+    private User user;
 
 
     public Integer getId() {
@@ -67,5 +68,13 @@ public class Product {
 
     public void setBonus(BigDecimal bonus) {
         this.bonus = bonus;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

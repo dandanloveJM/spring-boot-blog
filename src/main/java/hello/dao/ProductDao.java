@@ -2,7 +2,6 @@ package hello.dao;
 
 import hello.entity.Product;
 import hello.entity.Project;
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
 
@@ -47,10 +46,14 @@ public class ProductDao {
         return sqlSession.selectOne("getProductById", asMap("productId", productId));
     }
 
+    public List<Product> getProductByProcessId(String processId){
+        return sqlSession.selectList("getProductByProcessId", asMap("processId", processId));
+    }
+
     // 批量更新产值
-    public String insertProducts(List<Product> newProducts){
+    public List<Product> insertProducts(List<Product> newProducts){
         sqlSession.insert("insertProducts", newProducts);
-        return "上传产值成功";
+        return getProductByProcessId(newProducts.get(0).getProcessId());
     }
 
     public String updateProducts(BigDecimal totalProjectProduct, BigDecimal totalBonus, String processId){
@@ -63,7 +66,7 @@ public class ProductDao {
     }
 
     public void deleteProductsByProcessId(String processId){
-        sqlSession.delete("deleteProduct", processId);
+        sqlSession.delete("deleteProductsByProcessId", processId);
     }
 
 

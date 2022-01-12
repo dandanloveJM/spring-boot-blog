@@ -10,6 +10,10 @@ public class ProductResult extends Result<Product>{
         return new ProductResult("ok", message, null);
     }
 
+    public static ProductResult success(String message, Product data){
+        return new ProductResult("ok", message, data);
+    }
+
     public static ProductResult failure(String message){
         return new ProductResult("fail", message, null);
     }
