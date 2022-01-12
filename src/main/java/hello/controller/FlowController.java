@@ -8,6 +8,7 @@ import hello.service.ProductService;
 import hello.service.ProjectService;
 import hello.service.UploadService;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.Execution;
@@ -214,6 +215,7 @@ public class FlowController {
             throw new RuntimeException("流程不存在");
         }
         map.put("R4", "5");
+        Authentication.setAuthenticatedUserId("5");
         if (StringUtils.isNotEmpty(comment)){
             taskService.addComment(taskId, processId, comment);
         }
@@ -233,9 +235,11 @@ public class FlowController {
             throw new RuntimeException("流程不存在");
         }
         map.put("A1", "7");
+        Authentication.setAuthenticatedUserId("7");
         if (StringUtils.isNotEmpty(comment)){
             taskService.addComment(taskId, processId, comment);
         }
+
         taskService.complete(taskId, map);
         return "R4审核通过~";
     }
@@ -322,6 +326,7 @@ public class FlowController {
                 .processInstanceId(processId).activityType("userTask").finished()
                 .orderByHistoricActivityInstanceEndTime().desc().list();
         return activities;
+
     }
 
     /**
