@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import hello.entity.*;
 import hello.service.ProductService;
 import hello.service.ProjectService;
+import hello.service.RollbackService;
 import hello.service.UploadService;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -27,7 +28,7 @@ import java.util.*;
 
 @RestController
 public class FlowController {
-    private final List<String> ACTIVITY_ID_LIST= new ArrayList<>(Arrays. asList("uploadTask", "fillNumbers","R3check","R4check","A1fill"));
+    private final List<String> ACTIVITY_ID_LIST = new ArrayList<>(Arrays.asList("uploadTask", "fillNumbers", "R3check", "R4check", "A1fill"));
 
 
     private final RuntimeService runtimeService;
@@ -48,7 +49,8 @@ public class FlowController {
 
     private final ServletWebServerApplicationContext context;
 
-    private String processId;
+    private final RollbackService rollbackService;
+
 
     @Inject
     public FlowController(RuntimeService runtimeService, TaskService taskService,
@@ -58,8 +60,9 @@ public class FlowController {
                           ProjectService projectService,
                           UploadService uploadService,
                           ServletWebServerApplicationContext context,
-                          ProductService productService
-    ){
+                          ProductService productService,
+                          RollbackService rollbackService
+    ) {
         this.runtimeService = runtimeService;
         this.taskService = taskService;
         this.repositoryService = repositoryService;
@@ -69,14 +72,14 @@ public class FlowController {
         this.uploadService = uploadService;
         this.context = context;
         this.productService = productService;
+        this.rollbackService = rollbackService;
     }
 
-    public String getLatestTaskId(){
-        List<Task> tasks =  processEngine.getTaskService().createTaskQuery().processInstanceId(this.processId)
+    public String getLatestTaskId(String processId) {
+        List<Task> tasks = processEngine.getTaskService().createTaskQuery().processInstanceId(processId)
                 .orderByTaskCreateTime().desc().list();
         return tasks.get(0).getId();
     }
-
 
 
     @PostMapping("start")
@@ -88,7 +91,6 @@ public class FlowController {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("a10001", map);
         StringBuilder sb = new StringBuilder();
         sb.append("创建产值流程 processId：" + processInstance.getId());
-        this.processId = processInstance.getId();
 
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(ownerId).orderByTaskCreateTime().desc().list();
@@ -112,7 +114,7 @@ public class FlowController {
     }
 
     @GetMapping("getTasksByAssignee")
-    public Object getTasksByAssignee(String staffId){
+    public Object getTasksByAssignee(String staffId) {
         // 其他人员都需要查看历史的
         // 正在办理的，和已经结束的 所以需要在history里找
         List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
@@ -133,15 +135,15 @@ public class FlowController {
 
     @PostMapping("uploadTaskInfo")
     public ProjectResult uploadTaskInfo(@RequestParam("file") MultipartFile file,
-                                 @RequestParam String ownerId,
-                                 @RequestParam String name,
-                                 @RequestParam String number,
-                                 @RequestParam String type,
-                                 @RequestParam String taskId,
-                                 @RequestParam String processId) throws UnknownHostException {
+                                        @RequestParam String ownerId,
+                                        @RequestParam String name,
+                                        @RequestParam String number,
+                                        @RequestParam String type,
+                                        @RequestParam String taskId,
+                                        @RequestParam String processId) throws UnknownHostException {
         // 需要区分是需要新建任务 还是 修改任务，涉及到不同的数据库操作
 
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 
         if (task == null) {
@@ -149,7 +151,7 @@ public class FlowController {
         }
         map.put("fillPercent", "1");
 //        taskService.setAssignee(taskId, "10002");
-        taskService.complete(taskId, map);
+
 
         // 以下是在处理上传数据、文件 -> 创建新project的逻辑
         String attachmentURL = null;
@@ -160,24 +162,45 @@ public class FlowController {
         }
         Project newProject = buildParam(processId, name, number, type, attachmentURL, Integer.valueOf(ownerId));
 
-        try{
-            return this.projectService.addProject(newProject);
+        // 判断当前任务是否是退回过的
+        // 没有退回过--> 新增
+        // 退回过 --> 删除已有数据，重新保存新的数据
+
+        try {
+            ProjectResult projectResult = projectService.getProjectByProcessId(processId);
+            ProjectResult DBresult;
+            if (StringUtils.equals(projectResult.getStatus(), "fail")) {
+                throw new Exception("程序异常");
+            } else {
+                if (projectResult.getData() == null) {
+                    DBresult = projectService.addProject(newProject);
+                } else {
+                    // 如果能找到记录说明是退回回来的，需要 先删除
+                    // 退回过 --> 删除已有数据，重新保存新的数据
+                    DBresult = projectService.modifyProject(newProject);
+                }
+                taskService.complete(taskId, map);
+                return DBresult;
+            }
+
+
         } catch (Exception e) {
             return ProjectResult.failure("创建失败");
         }
+
     }
 
     @PostMapping("uploadOutputPercent")
-    public ProductResult uploadOutputPercent(@RequestParam String taskId,
-                                      @RequestParam String processId,
-                                      @RequestParam String data) {
+    public ProductListResult uploadOutputPercent(@RequestParam String taskId,
+                                             @RequestParam String processId,
+                                             @RequestParam String data) {
         // 流程逻辑
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        map.put("R3", "3");
+        map.put("R3", "3"); // TODO 改为从数据库里查询
 
 
         JSONArray data2 = JSON.parseArray(data);
@@ -194,29 +217,42 @@ public class FlowController {
             products.add(newProduct);
         }
 
-
         try {
-            taskService.complete(taskId, map);
-            return this.productService.addProducts(products);
+            ProductListResult productListResult = productService.getProductsByProcessId(processId);
+            ProductListResult DBResult;
+            if (StringUtils.equals(productListResult.getStatus(), "fail")) {
+                throw new Exception("程序异常");
+            } else {
+                if (productListResult.getData().size() == 0) {
+                    // 新数据
+                    DBResult = productService.addProducts(products);
+                } else {
+                    // 删除旧的，改新的
+                    DBResult = productService.modifyProducts(products);
+                }
+                taskService.complete(taskId, map);
+                return DBResult;
+            }
+
+
         } catch (Exception e) {
-            return ProductResult.failure("上传产值比例失败");
+            return ProductListResult.failure("上传产值比例失败");
         }
     }
-
 
 
     @PostMapping("r3/approveTask")
     public String checkTaskByR3(@RequestParam String taskId,
                                 @RequestParam String processId,
-                                @RequestParam String comment) {
+                                @RequestParam(required = false) String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
         map.put("R4", "5");
         Authentication.setAuthenticatedUserId("5");
-        if (StringUtils.isNotEmpty(comment)){
+        if (StringUtils.isNotEmpty(comment)) {
             taskService.addComment(taskId, processId, comment);
         }
 
@@ -227,16 +263,16 @@ public class FlowController {
     @PostMapping("r4/approveTask")
     public String checkTaskByR4(@RequestParam String taskId,
                                 @RequestParam String processId,
-                                @RequestParam String comment) {
+                                @RequestParam(required = false) String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
 
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
         map.put("A1", "7");
         Authentication.setAuthenticatedUserId("7");
-        if (StringUtils.isNotEmpty(comment)){
+        if (StringUtils.isNotEmpty(comment)) {
             taskService.addComment(taskId, processId, comment);
         }
 
@@ -246,9 +282,9 @@ public class FlowController {
 
     @PostMapping("fillValue")
     public ProductResult fillValue(@RequestParam String taskId, @RequestParam String processId,
-                            @RequestParam String total, @RequestParam String ratio ) {
+                                   @RequestParam String total, @RequestParam String ratio) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
@@ -256,7 +292,7 @@ public class FlowController {
 
         BigDecimal newTotal = new BigDecimal(total);
         BigDecimal newRatio = new BigDecimal(ratio);
-        BigDecimal finalTotal = newTotal.multiply(newRatio).divide(BigDecimal.valueOf(100), RoundingMode.DOWN);
+        BigDecimal finalTotal = newTotal.multiply(newRatio).divide(BigDecimal.valueOf(10000), RoundingMode.DOWN);
 
         try {
             taskService.complete(taskId, map);
@@ -267,44 +303,65 @@ public class FlowController {
 
     }
 
-    @GetMapping("/reject")
-    public String rejectTask(String taskId, String targetKey, String comment) {
+    @PostMapping("/reject")
+    public RollbackListResult rejectTask(@RequestParam String taskId,
+                                     @RequestParam String processId,
+                                     @RequestParam String targetKey,
+                                     @RequestParam(required = false) String comment) {
         Task nowTask = taskService.createTaskQuery().taskId(taskId).singleResult();
+        Authentication.setAuthenticatedUserId("7");// TODO 之后改为从cookie里读取
         if (StringUtils.isNotEmpty(comment)) {
             taskService.addComment(taskId, nowTask.getProcessInstanceId(), comment);
         }
+        String taskKey = nowTask.getTaskDefinitionKey();
 
-        List<Execution> runExecutionList = runtimeService.createExecutionQuery()
-                .processInstanceId(nowTask.getProcessInstanceId()).list();
-        for (Execution execution:runExecutionList) {
-            if (ACTIVITY_ID_LIST.contains(execution.getActivityId())){
-                historyService.createNativeHistoricActivityInstanceQuery()
-                        .sql("UPDATE ACT_HI_ACTINST SET DELETE_REASON_ = 'Change activity to "+ targetKey +"'  " +
-                                "WHERE PROC_INST_ID_='"+ nowTask.getProcessInstanceId() +
-                                "' AND EXECUTION_ID_='"+ execution.getId()
-                                +"' AND ACT_ID_='"+ execution.getActivityId() +"'").singleResult();
-            }
-
-        }
+//        List<Execution> runExecutionList = runtimeService.createExecutionQuery()
+//                .processInstanceId(nowTask.getProcessInstanceId()).list();
+//        for (Execution execution:runExecutionList) {
+//            if (ACTIVITY_ID_LIST.contains(execution.getActivityId())){
+//                historyService.createNativeHistoricActivityInstanceQuery()
+//                        .sql("UPDATE ACT_HI_ACTINST SET DELETE_REASON_ = 'Change activity to "+ targetKey +"'  " +
+//                                "WHERE PROC_INST_ID_='"+ nowTask.getProcessInstanceId() +
+//                                "' AND EXECUTION_ID_='"+ execution.getId()
+//                                +"' AND ACT_ID_='"+ execution.getActivityId() +"'").singleResult();
+//            }
+//
+//        }
 
         // TODO
         // 增加一个记录回退的表格
 
         runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(nowTask.getProcessInstanceId())
+                .processInstanceId(processId)
                 .moveActivityIdTo(nowTask.getTaskDefinitionKey(), targetKey)
                 .changeState();
 
-        return "已退回";
+        String currentTaskId = getLatestTaskId(processId);
+        Rollback rollback = new Rollback();
+        rollback.setProcessId(processId);
+        rollback.setUserId(3); // TODO 之后改为从cookie里读取
+        rollback.setTaskId(currentTaskId);
+        rollback.setTaskKey(taskKey);
+        if (StringUtils.isNotEmpty(comment)) {
+            rollback.setComment(comment);
+        }
+
+        try {
+            return rollbackService.addRollbackRecord(rollback);
+        } catch (Exception e) {
+            return RollbackListResult.failure("退回失败");
+        }
+
+
     }
 
     @PostMapping("/resetValue")
     public ProductResult resetValue(@RequestParam String processId,
                                     @RequestParam String total,
-                                    @RequestParam String ratio ){
+                                    @RequestParam String ratio) {
         BigDecimal newTotal = new BigDecimal(total);
         BigDecimal newRatio = new BigDecimal(ratio);
-        BigDecimal finalTotal = newTotal.multiply(newRatio).divide(BigDecimal.valueOf(100), RoundingMode.DOWN);
+        BigDecimal finalTotal = newTotal.multiply(newRatio).divide(BigDecimal.valueOf(10000), RoundingMode.DOWN);
 
         try {
             return this.productService.updateProducts(finalTotal, processId);
@@ -317,11 +374,12 @@ public class FlowController {
     /**
      * 获取流程的历史节点列表
      * 获取的是这个流程实例走过的节点，当然也可以获取到开始节点、网关、线等信息，下面是只过滤了用户任务节点"userTask"的信息
+     *
      * @param processId 流程ID
      * @return
      */
     @GetMapping("/history/list")
-    public List<HistoricActivityInstance> historyList(@RequestParam( value = "process_id") String processId){
+    public List<HistoricActivityInstance> historyList(@RequestParam(value = "process_id") String processId) {
         List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processId).activityType("userTask").finished()
                 .orderByHistoricActivityInstanceEndTime().desc().list();
@@ -376,8 +434,6 @@ public class FlowController {
 //            }
 //        }
 //    }
-
-
 
 
 }
