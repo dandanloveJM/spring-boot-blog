@@ -26,7 +26,8 @@ public class UserService implements UserDetailsService {
     }
 
     public void save(String username, String password) {
-        userMapper.save(username, bCryptPasswordEncoder.encode(password), null);
+//        userMapper.save(username, bCryptPasswordEncoder.encode(password), null);
+        userMapper.save(username, password, null);
     }
 
     public hello.entity.User getUserByUsername(String username) {
@@ -39,6 +40,7 @@ public class UserService implements UserDetailsService {
         if(user == null) {
             throw new UsernameNotFoundException(username+"不存在");
         }
+
         return new User(username, user.getPassword(), Collections.emptyList());
     }
 }

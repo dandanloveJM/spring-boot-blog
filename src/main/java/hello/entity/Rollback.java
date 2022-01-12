@@ -1,11 +1,14 @@
 package hello.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.Instant;
 
 public class Rollback {
     private Integer id;
     private String processId;
     private Integer userId;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Instant updatedAt;
     private String taskId;
     private String comment;

@@ -15,7 +15,7 @@ public class LoginResult extends Result<User>{
         return new LoginResult("fail", msg, null, false);
     }
 
-    public  static LoginResult success(String msg, User user){
+    public static LoginResult success(String msg, User user){
         return new LoginResult("ok", msg, user, true);
     }
 

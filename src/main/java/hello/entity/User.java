@@ -18,6 +18,7 @@ public class User {
     ZonedDateTime updatedAt;
     @JsonIgnore
     String password;
+    int roleId;
 
     public User(Integer id, String username, String avatar, ZonedDateTime createdAt, ZonedDateTime updatedAt, String password) {
         this.id = id;
@@ -54,5 +55,13 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public int getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(int roleId) {
+        this.roleId = roleId;
     }
 }
