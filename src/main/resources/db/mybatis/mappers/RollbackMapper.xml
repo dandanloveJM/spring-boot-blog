@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.RollbackMapper">
+    <select id="getRollbackByProcessId" resultMap="rollback_record">
+        SELECT id, process_id, user_id, updated_at, task_id, comment
+        FROM rollback
+        where process_id = #{processId}
+    </select>
+
+    <select id="getRollbackByProcessIdAndTaskId" resultMap="rollback_record">
+        SELECT id, process_id, user_id, updated_at, task_id, comment
+        FROM rollback
+        where process_id = #{processId} and task_id=#{taskId}
+    </select>
+
+    <insert id="insertRollback" useGeneratedKeys="true" parameterType="hello.entity.Rollback"
+            keyProperty="id" keyColumn="id">
+        INSERT INTO rollback (process_id, user_id, updated_at, task_id, comment)
+        VALUES
+        (#{processId}, #{userId}, now(), #{taskId}, #{comment})
+    </insert>
+
+    <resultMap id="rollback_record" type="hello.entity.Rollback">
+        <id property="id" column="id"/>
+        <result property="processId" column="process_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="taskId" column="task_id"/>
+        <result property="comment" column="comment"/>
+    </resultMap>
+</mapper>
