@@ -23,12 +23,12 @@
             WHERE blog.user_id = #{user_id}
         </if>
         order by blog.updated_at desc
-        limit ${offset}, #{limit}
+        limit #{offset}, #{limit}
     </select>
     <select id="countBlog" resultType="int">
         select count(*) from blog
         <if test="user_id != null">
-            WHERE user_id = ${userId}
+            WHERE user_id = #{userId}
         </if>
     </select>
     <select id="getBlogById" resultMap="blog">

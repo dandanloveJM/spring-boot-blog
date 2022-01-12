@@ -44,6 +44,22 @@
         where project.id = ${projectId}
     </select>
 
+    <select id="getProjectByProcessId" parameterType="String" resultMap="project">
+            SELECT
+            project.id,
+            project.process_id,
+            project.name,
+            project.number,
+            project.type,
+            project.attachment,
+            project.owner_id,
+            project.product_id,
+            project.created_at,
+            project.updated_at
+            FROM project
+            where project.process_id = #{processId}
+        </select>
+
     <insert id="insertProject" parameterType="hello.entity.Project" useGeneratedKeys="true"
             keyProperty="id" keyColumn="id">
         INSERT INTO project (process_id, name, number, type, attachment, owner_id, product_id, created_at, updated_at )
@@ -53,13 +69,19 @@
     <update id="updateProject" parameterType="hello.entity.Project">
         UPDATE project
         SET name=${name}, number=${number}, type=${type}, attachment=${attachment}, updated_at=now()
-        where project.id = ${id}
+        where project.id = #{id}
     </update>
 
     <delete id="deleteProject" parameterType="int">
         DELETE
         FROM project
-        WHERE project.id = ${id}
+        WHERE project.id = #{id}
+    </delete>
+
+    <delete id="deleteProjectByProcessId" parameterType="String">
+        DELETE
+        FROM project
+        WHERE project.process_id = #{processId}
     </delete>
 
 

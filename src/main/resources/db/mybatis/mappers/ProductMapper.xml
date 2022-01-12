@@ -19,13 +19,13 @@
             WHERE product.user_id = #{userId}
         </if>
         order by product.updated_at desc
-        limit ${offset}, #{limit}
+        limit #{offset}, #{limit}
     </select>
 
     <select id="countProduct" resultType="int">
         select count(*) from product
         <if test="user_id != null">
-            WHERE user_id = ${userId}
+            WHERE user_id = #{userId}
         </if>
     </select>
     <select id="getProductById" resultMap="product">
@@ -40,7 +40,21 @@
         FROM product
         LEFT OUTER JOIN user
         on product.user_id = user.id
-        where product.id = ${productId}
+        where product.id = #{productId}
+    </select>
+
+    <select id="getProductByProcessId" parameterType="String" resultMap="product">
+        SELECT
+            product.id as product_id,
+            product.process_id as process_id,
+            product.percentage as percentage,
+            product.product as product,
+            product.updated_at as product_updated_at,
+            user.id as user_id,
+            user.username as user_username
+        FROM product
+            LEFT OUTER JOIN user on product.user_id = user.id
+        where process_id = #{processId}
     </select>
 
     <insert id="insertProducts" useGeneratedKeys="true" parameterType="java.util.List"
@@ -61,13 +75,13 @@
     <delete id="deleteProduct" parameterType="int">
         DELETE
         FROM product
-        WHERE product.id = ${id}
+        WHERE product.id = #{id}
     </delete>
 
     <delete id="deleteProductsByProcessId" parameterType="String">
         DELETE
         FROM product
-        WHERE product.process_id = ${processId}
+        WHERE product.process_id = #{processId}
     </delete>
 
 
@@ -76,6 +90,7 @@
         <result property="processId" column="process_id"/>
         <result property="percentage" column="percentage"/>
         <result property="product" column="product"/>
+        <result property="userId" column="user_id"/>
         <result property="updatedAt" column="product_updated_at"/>
         <association property="user" javaType="hello.entity.User">
             <id property="id" column="user_id"/>

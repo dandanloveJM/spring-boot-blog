@@ -24,5 +24,6 @@
         <mapper resource="db/mybatis/mappers/BlogMapper.xml"/>
         <mapper resource="db/mybatis/mappers/ProjectMapper.xml"/>
         <mapper resource="db/mybatis/mappers/ProductMapper.xml"/>
+        <mapper resource="db/mybatis/mappers/RollbackMapper.xml"/>
     </mappers>
 </configuration>
