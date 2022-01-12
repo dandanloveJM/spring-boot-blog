@@ -33,7 +33,15 @@ public class ProjectService {
         try {
             return ProjectResult.success("ok", projectDao.getProjectById(projectId));
         } catch (Exception e) {
-            return ProjectResult.failure("没找到");
+            return ProjectResult.failure("程序异常");
+        }
+    }
+
+    public ProjectResult getProjectByProcessId(String processId){
+        try {
+            return ProjectResult.success("ok", projectDao.getProjectByProcessId(processId));
+        } catch (Exception e) {
+            return ProjectResult.failure("程序异常");
         }
     }
 
@@ -44,6 +52,19 @@ public class ProjectService {
             return ProjectResult.failure("新增项目失败");
         }
     }
+
+    public ProjectResult modifyProject(Project newProject){
+        try{
+            String processId = newProject.getProcessId();
+            projectDao.deleteProjectByProcessId(processId);
+            return ProjectResult.success("ok", projectDao.insertProject(newProject));
+        } catch (Exception e) {
+            return ProjectResult.failure("修改项目失败");
+        }
+    }
+
+
+
 
     public ProjectResult updateProject(int projectId, Project newProject){
         Project projectInDb = projectDao.getProjectById(projectId);

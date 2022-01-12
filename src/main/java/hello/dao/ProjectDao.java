@@ -42,6 +42,10 @@ public class ProjectDao {
         return sqlSession.selectOne("getProjectById", asMap("projectId",projectId));
     }
 
+    public Project getProjectByProcessId(String processId) {
+        return sqlSession.selectOne("getProjectByProcessId", asMap("processId", processId));
+    }
+
     public Project insertProject(Project newProject){
         sqlSession.insert("insertProject", newProject);
         return getProjectById(newProject.getId());
@@ -54,6 +58,10 @@ public class ProjectDao {
 
     public void deleteProject(int projectId){
         sqlSession.delete("deleteProject", projectId);
+    }
+
+    public void deleteProjectByProcessId(String processId){
+        sqlSession.delete("deleteProjectByProcessId", processId);
     }
 
 
