@@ -15,8 +15,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.authorizeRequests()
-                .antMatchers("/", "/auth/**").permitAll()
-                .antMatchers("/r4/approveTask").access("hasAuthority('ROLE_R4审核')");
+                .antMatchers("/", "/auth/**").permitAll();
+//                .antMatchers("/r4/approveTask").access("hasAuthority('ROLE_R4审核')");
     }
 
     @Bean
