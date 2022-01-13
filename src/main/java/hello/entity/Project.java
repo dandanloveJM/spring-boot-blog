@@ -2,6 +2,7 @@ package hello.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
@@ -32,6 +33,8 @@ public class Project {
     private Instant createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Instant updatedAt;
+    private BigDecimal total_product;
+    private BigDecimal total_percentage;
 
     public Project(){}
 
@@ -116,5 +119,19 @@ public class Project {
         this.updatedAt = updatedAt;
     }
 
+    public BigDecimal getTotal_product() {
+        return total_product;
+    }
 
+    public void setTotal_product(BigDecimal total_product) {
+        this.total_product = total_product;
+    }
+
+    public BigDecimal getTotal_percentage() {
+        return total_percentage;
+    }
+
+    public void setTotal_percentage(BigDecimal total_percentage) {
+        this.total_percentage = total_percentage;
+    }
 }
