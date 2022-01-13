@@ -68,9 +68,15 @@
 
     <update id="updateProject" parameterType="hello.entity.Project">
         UPDATE project
-        SET name=${name}, number=${number}, type=${type}, attachment=${attachment}, updated_at=now()
+        SET name=#{name}, number=#{number}, type=#{type}, attachment=#{attachment}, updated_at=now()
         where project.id = #{id}
     </update>
+
+    <update id="updateTotalProductOfProject" parameterType="hello.entity.Project">
+            UPDATE project
+            SET total_product=#{totalProduct}, total_percentage=#{totalPercentage}, updated_at=now()
+            where project.process_id = #{processId}
+     </update>
 
     <delete id="deleteProject" parameterType="int">
         DELETE

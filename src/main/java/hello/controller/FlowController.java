@@ -296,6 +296,7 @@ public class FlowController {
 
         try {
             taskService.complete(taskId, map);
+            projectService.updateTotalProductOfProject(newTotal, newRatio, processId);
             return this.productService.updateProducts(finalTotal, processId);
         } catch (Exception e) {
             return ProductResult.failure("财务更新产值失败");
@@ -362,6 +363,7 @@ public class FlowController {
         BigDecimal finalTotal = newTotal.multiply(newRatio).divide(BigDecimal.valueOf(10000), RoundingMode.DOWN);
 
         try {
+            projectService.updateTotalProductOfProject(newTotal, newRatio, processId);
             return this.productService.updateProducts(finalTotal, processId);
         } catch (Exception e) {
             return ProductResult.failure("财务更新产值失败");

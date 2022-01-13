@@ -5,6 +5,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,12 @@ public class ProjectDao {
         sqlSession.update("updateProject", newProject);
         return getProjectById(newProject.getId());
     }
+
+    public Project updateTotalProductOfProject(Project newProject){
+        sqlSession.update("updateTotalProductOfProject", newProject);
+        return getProjectByProcessId(newProject.getProcessId());
+    }
+
 
     public void deleteProject(int projectId){
         sqlSession.delete("deleteProject", projectId);

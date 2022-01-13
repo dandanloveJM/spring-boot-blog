@@ -1,10 +1,8 @@
 package hello.service;
 
 import hello.dao.ProductDao;
-import hello.entity.Product;
-import hello.entity.ProductListResult;
-import hello.entity.ProductResult;
-import hello.entity.ProjectResult;
+import hello.dao.ProjectDao;
+import hello.entity.*;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -50,6 +48,7 @@ public class ProductService {
     public ProductResult updateProducts(BigDecimal total, String processId){
         BigDecimal totalProjectProduct = total.multiply(new BigDecimal(PROJECT_BONUS_PROPORTION));
         BigDecimal totalBonus = total.multiply(new BigDecimal(BONUS_PROPORTION));
+
         try {
             productDao.updateProducts(totalProjectProduct, totalBonus, processId);
         } catch (Exception e) {

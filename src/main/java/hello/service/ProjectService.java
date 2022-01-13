@@ -7,11 +7,12 @@ import hello.entity.ProjectResult;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 public class ProjectService {
-    private ProjectDao projectDao;
+    private final ProjectDao projectDao;
 
     @Inject
     public ProjectService(ProjectDao projectDao){
@@ -60,6 +61,23 @@ public class ProjectService {
             return ProjectResult.success("ok", projectDao.insertProject(newProject));
         } catch (Exception e) {
             return ProjectResult.failure("修改项目失败");
+        }
+    }
+
+    public ProjectResult updateTotalProductOfProject(BigDecimal newTotal, BigDecimal newRatio, String processId) throws Exception {
+        Project projectInDb = projectDao.getProjectByProcessId(processId);
+        if (projectInDb == null) {
+            return ProjectResult.failure("项目不存在");
+        }
+
+        Project newProject = new Project();
+        newProject.setProcessId(processId);
+        newProject.setTotalProduct(newTotal);
+        newProject.setTotalPercentage(newRatio);
+        try{
+            return ProjectResult.success("更新任务的总产值和比例成功", projectDao.updateTotalProductOfProject(newProject) );
+        } catch (Exception e) {
+            throw new Exception("程序异常");
         }
     }
 
