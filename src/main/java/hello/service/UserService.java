@@ -2,6 +2,7 @@ package hello.service;
 
 
 import hello.dao.UserMapper;
+import hello.entity.UserListResult;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -55,5 +56,14 @@ public class UserService implements UserDetailsService {
         }
 
         return new User(username, user.getPassword(), authorities);
+    }
+
+    public UserListResult getAllR1R2R3Users(){
+        try {
+            return UserListResult.success("查询成功", userMapper.getAllR1R2R3Users());
+        } catch (Exception e){
+            System.out.println(e);
+            return UserListResult.failure("程序异常");
+        }
     }
 }

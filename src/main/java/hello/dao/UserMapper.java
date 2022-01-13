@@ -28,4 +28,7 @@ public interface UserMapper {
 
     @Select("SELECT name FROM permission where id=#{id}")
     String getPermissionById(@Param("id") int id);
+
+    @Select("SELECT id, username FROM user where role_id in (1,2,3)")
+    List<User> getAllR1R2R3Users();
 }
