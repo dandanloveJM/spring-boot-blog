@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.RoleMapper">
+    <select id="selectPermissionIds">
+        SELECT permission_ids
+        From user
+        left join role on user.role_id = role.id
+        where user.username=#{username}
+    </select>
+</mapper>

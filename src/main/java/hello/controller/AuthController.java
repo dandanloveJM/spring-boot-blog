@@ -76,6 +76,7 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(token);
             return LoginResult.success("登录成功", userService.getUserByUsername(username));
         } catch (BadCredentialsException e) {
+            System.out.println(e);
             return LoginResult.failure("密码不正确", false);
         }
 

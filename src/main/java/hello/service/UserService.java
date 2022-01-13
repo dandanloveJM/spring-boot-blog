@@ -2,6 +2,8 @@ package hello.service;
 
 
 import hello.dao.UserMapper;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,7 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.Collections;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -26,8 +29,8 @@ public class UserService implements UserDetailsService {
     }
 
     public void save(String username, String password) {
-//        userMapper.save(username, bCryptPasswordEncoder.encode(password), null);
-        userMapper.save(username, password, null);
+        userMapper.save(username, bCryptPasswordEncoder.encode(password), null);
+//        userMapper.save(username, password, null);
     }
 
     public hello.entity.User getUserByUsername(String username) {
@@ -41,6 +44,16 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException(username+"不存在");
         }
 
-        return new User(username, user.getPassword(), Collections.emptyList());
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        String permissionIds = userMapper.getRoleByUsername(username);
+        List<Integer> ids = Arrays.stream(permissionIds.split(","))
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
+
+        for (Integer id : ids) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + userMapper.getPermissionById(id)));
+        }
+
+        return new User(username, user.getPassword(), authorities);
     }
 }
