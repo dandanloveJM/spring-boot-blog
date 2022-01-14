@@ -3,11 +3,9 @@ package hello.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import hello.anno.ReadUserIdInSession;
 import hello.entity.*;
-import hello.service.ProductService;
-import hello.service.ProjectService;
-import hello.service.RollbackService;
-import hello.service.UploadService;
+import hello.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
@@ -51,6 +49,36 @@ public class FlowController {
 
     private final RollbackService rollbackService;
 
+    private final AuthService authService;
+
+
+    private final Map<String, String> R2ToR3UserIdMAP = Map.of(
+            "16", "14",
+            "17", "14",
+            "18", "15",
+            "19", "15");
+
+    private final Map<String, ArrayList> R2ToR4UserIdMap = Map.of(
+            "16", new ArrayList(Arrays.asList("27","11")),
+            "17", new ArrayList(Arrays.asList("27","11")),
+            "18", new ArrayList(Arrays.asList("12","13")),
+            "19", new ArrayList(Arrays.asList("12","13"))
+    );
+
+    private final Map<String, ArrayList> R3ToR2UserIdMap = Map.of(
+      "14", new ArrayList(Arrays.asList("16", "17")),
+      "15", new ArrayList(Arrays.asList("18","19"))
+    );
+
+    private final Map<String, ArrayList> R4ToR2UserIdMap = Map.of(
+            "27", new ArrayList(Arrays.asList("16","17")),
+            "11", new ArrayList(Arrays.asList("16","17")),
+            "12", new ArrayList(Arrays.asList("18","19")),
+            "13", new ArrayList(Arrays.asList("18","19"))
+    );
+
+
+
 
     @Inject
     public FlowController(RuntimeService runtimeService, TaskService taskService,
@@ -61,7 +89,8 @@ public class FlowController {
                           UploadService uploadService,
                           ServletWebServerApplicationContext context,
                           ProductService productService,
-                          RollbackService rollbackService
+                          RollbackService rollbackService,
+                          AuthService authService
     ) {
         this.runtimeService = runtimeService;
         this.taskService = taskService;
@@ -73,6 +102,7 @@ public class FlowController {
         this.context = context;
         this.productService = productService;
         this.rollbackService = rollbackService;
+        this.authService = authService;
     }
 
     public String getLatestTaskId(String processId) {
@@ -81,19 +111,17 @@ public class FlowController {
         return tasks.get(0).getId();
     }
 
-
+    @ReadUserIdInSession
     @PostMapping("start")
-    public ProjectResult startLeaveProcess(
-            @RequestParam String ownerId) throws UnknownHostException {
-
+    public ProjectResult startLeaveProcess(Integer ownerId) throws UnknownHostException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("R2", ownerId);
+        map.put("R2", ""+ownerId);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("a10001", map);
         StringBuilder sb = new StringBuilder();
         sb.append("创建产值流程 processId：" + processInstance.getId());
 
 
-        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(ownerId).orderByTaskCreateTime().desc().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(ownerId.toString()).orderByTaskCreateTime().desc().list();
 //        for (Task task : tasks) {
 //            System.out.println(task.getId());
 //            sb.append("产值任务taskId:" + task.getId());
