@@ -1,5 +1,6 @@
 package hello.utils;
 
+import hello.entity.ProjectResult;
 import hello.entity.User;
 import hello.service.AuthService;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -20,10 +21,11 @@ public class ReadUserIdInSessionAspect {
     }
 
     @Around("@annotation(hello.anno.ReadUserIdInSession)")
-    public void ReadUserIdInSession(ProceedingJoinPoint joinPoint) throws Throwable{
+    public Object ReadUserIdInSession(ProceedingJoinPoint joinPoint) throws Throwable{
         Object[] args = joinPoint.getArgs();
         args[0]=authService.getCurrentUser().map(User::getId).orElse(-1);
-        System.out.println(args);
-        joinPoint.proceed(args);
+        System.out.println("---args--");
+        System.out.println(args[0]);
+        return joinPoint.proceed(args);
     }
 }
