@@ -1,7 +1,10 @@
 package hello.service;
 
 
+import hello.dao.R4TypeMapper;
 import hello.dao.UserMapper;
+import hello.entity.R4TypeListResult;
+import hello.entity.R4TypeResult;
 import hello.entity.UserListResult;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,13 +23,16 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private UserMapper userMapper;
+    private R4TypeMapper r4TypeMapper;
 
 
     @Inject
     public UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
-                       UserMapper userMapper){
+                       UserMapper userMapper,
+                       R4TypeMapper r4TypeMapper){
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userMapper = userMapper;
+        this.r4TypeMapper = r4TypeMapper;
     }
 
     public void save(String username, String password) {
@@ -64,6 +70,24 @@ public class UserService implements UserDetailsService {
         } catch (Exception e){
             System.out.println(e);
             return UserListResult.failure("程序异常");
+        }
+    }
+
+    public R4TypeListResult getAllR4Type(){
+        try {
+            return R4TypeListResult.success("查询成功", r4TypeMapper.getAllR4TypeData());
+        } catch (Exception e) {
+            System.out.println(e);
+            return R4TypeListResult.failure("程序异常");
+        }
+    }
+
+    public R4TypeResult getR4IdByTypeId(Integer typeId){
+        try{
+            return R4TypeResult.success("查询成功", r4TypeMapper.getUserIdByTypeId(typeId));
+        } catch (Exception e){
+            System.out.println(e);
+            return R4TypeResult.failure("程序异常");
         }
     }
 }
