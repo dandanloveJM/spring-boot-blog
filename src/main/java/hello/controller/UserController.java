@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping("/r4Types")
-    public R4TypeResult getR4ByTypeId(@RequestParam("typeId") Integer typeId){
+    public R4TypeListResult getR4ByTypeId(@RequestParam("typeId") Integer typeId){
         return userService.getR4IdByTypeId(typeId);
     }
 

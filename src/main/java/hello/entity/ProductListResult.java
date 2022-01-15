@@ -14,6 +14,11 @@ public class ProductListResult extends Result<List<Product>>{
         return new ProductListResult("ok", message, products);
     }
 
+    public static ProductListResult success(String message) {
+        return new ProductListResult("ok", message, null);
+    }
+
+
     public static ProductListResult failure(String message) {
         return new ProductListResult("fail", message, null);
     }

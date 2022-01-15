@@ -82,12 +82,12 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public R4TypeResult getR4IdByTypeId(Integer typeId){
+    public R4TypeListResult getR4IdByTypeId(Integer typeId){
         try{
-            return R4TypeResult.success("查询成功", r4TypeMapper.getUserIdByTypeId(typeId));
+            return R4TypeListResult.success("查询成功", r4TypeMapper.getUserIdByTypeId(typeId));
         } catch (Exception e){
             System.out.println(e);
-            return R4TypeResult.failure("程序异常");
+            return R4TypeListResult.failure("程序异常");
         }
     }
 }

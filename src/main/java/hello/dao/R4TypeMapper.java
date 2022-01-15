@@ -11,7 +11,7 @@ public interface R4TypeMapper {
     List<R4Type> getAllR4TypeData();
 
     @Select("SELECT * FROM R4_type where type_id=#{typeId}")
-    R4Type getUserIdByTypeId(@Param("typeId") Integer typeId);
+    List<R4Type> getUserIdByTypeId(@Param("typeId") Integer typeId);
 
     @Insert("insert into `R4_type` (user_id, type_id) values (#{userId}, #{typeId})")
     R4Type addNewR4TypeData(@Param("userId") Integer userId,

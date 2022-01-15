@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +22,7 @@ import java.math.RoundingMode;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class FlowController {
@@ -51,6 +51,8 @@ public class FlowController {
 
     private final AuthService authService;
 
+    private final UserService userService;
+
 
     private final Map<String, String> R2ToR3UserIdMAP = Map.of(
             "16", "14",
@@ -58,23 +60,23 @@ public class FlowController {
             "18", "15",
             "19", "15");
 
-    private final Map<String, ArrayList> R2ToR4UserIdMap = Map.of(
-            "16", new ArrayList(Arrays.asList("27","11")),
-            "17", new ArrayList(Arrays.asList("27","11")),
-            "18", new ArrayList(Arrays.asList("12","13")),
-            "19", new ArrayList(Arrays.asList("12","13"))
+    private final Map<String, ArrayList<String>> R2ToR4UserIdMap = Map.of(
+            "16", new ArrayList<>(Arrays.asList("27", "11")),
+            "17", new ArrayList<>(Arrays.asList("27","11")),
+            "18", new ArrayList<>(Arrays.asList("12","13")),
+            "19", new ArrayList<>(Arrays.asList("12","13"))
     );
 
-    private final Map<String, ArrayList> R3ToR2UserIdMap = Map.of(
-      "14", new ArrayList(Arrays.asList("16", "17")),
-      "15", new ArrayList(Arrays.asList("18","19"))
+    private final Map<String, ArrayList<String>> R3ToR2UserIdMap = Map.of(
+      "14", new ArrayList<>(Arrays.asList("16", "17")),
+      "15", new ArrayList<>(Arrays.asList("18","19"))
     );
 
-    private final Map<String, ArrayList> R4ToR2UserIdMap = Map.of(
-            "27", new ArrayList(Arrays.asList("16","17")),
-            "11", new ArrayList(Arrays.asList("16","17")),
-            "12", new ArrayList(Arrays.asList("18","19")),
-            "13", new ArrayList(Arrays.asList("18","19"))
+    private final Map<String, ArrayList<String>> R4ToR2UserIdMap = Map.of(
+            "27", new ArrayList<>(Arrays.asList("16","17")),
+            "11", new ArrayList<>(Arrays.asList("16","17")),
+            "12", new ArrayList<>(Arrays.asList("18","19")),
+            "13", new ArrayList<>(Arrays.asList("18","19"))
     );
 
 
@@ -90,7 +92,8 @@ public class FlowController {
                           ServletWebServerApplicationContext context,
                           ProductService productService,
                           RollbackService rollbackService,
-                          AuthService authService
+                          AuthService authService,
+                          UserService userService
     ) {
         this.runtimeService = runtimeService;
         this.taskService = taskService;
@@ -103,6 +106,7 @@ public class FlowController {
         this.productService = productService;
         this.rollbackService = rollbackService;
         this.authService = authService;
+        this.userService = userService;
     }
 
     public String getLatestTaskId(String processId) {
@@ -161,9 +165,11 @@ public class FlowController {
 //        return list.toString();
     }
 
+    @ReadUserIdInSession
     @PostMapping("uploadTaskInfo")
-    public ProjectResult uploadTaskInfo(@RequestParam("file") MultipartFile file,
-                                        @RequestParam String ownerId,
+    public ProjectResult uploadTaskInfo(Integer ownerId,
+                                        @RequestParam("file") MultipartFile file,
+                                        @RequestParam String nextAssignee,
                                         @RequestParam String name,
                                         @RequestParam String number,
                                         @RequestParam String type,
@@ -177,7 +183,7 @@ public class FlowController {
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        map.put("fillPercent", "1");
+        map.put("fillPercent", nextAssignee);
 //        taskService.setAssignee(taskId, "10002");
 
 
@@ -188,7 +194,7 @@ public class FlowController {
             String url = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + context.getWebServer().getPort() + "/files/";
             attachmentURL = url + uploadResult.getMsg();
         }
-        Project newProject = buildParam(processId, name, number, type, attachmentURL, Integer.valueOf(ownerId));
+        Project newProject = buildParam(processId, name, number, type, attachmentURL, ownerId);
 
         // 判断当前任务是否是退回过的
         // 没有退回过--> 新增
@@ -228,7 +234,13 @@ public class FlowController {
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        map.put("R3", "3"); // TODO 改为从数据库里查询
+        try{
+            Integer ownerId = projectService.getProjectByProcessId(processId).getData().getOwnerId();
+            map.put("R3", R2ToR3UserIdMAP.get(ownerId.toString()));
+        } catch (Exception e) {
+            return ProductListResult.failure("上传产值比例失败");
+        }
+
 
 
         JSONArray data2 = JSON.parseArray(data);
@@ -270,7 +282,7 @@ public class FlowController {
 
 
     @PostMapping("r3/approveTask")
-    public String checkTaskByR3(@RequestParam String taskId,
+    public ProductListResult checkTaskByR3(@RequestParam String taskId,
                                 @RequestParam String processId,
                                 @RequestParam(required = false) String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -278,34 +290,69 @@ public class FlowController {
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        map.put("R4", "5");
+
         Authentication.setAuthenticatedUserId("5");
         if (StringUtils.isNotEmpty(comment)) {
             taskService.addComment(taskId, processId, comment);
         }
+        try{
+            Project projectInDB= projectService.getProjectByProcessId(processId).getData();
+            String ownerId = projectInDB.getOwnerId().toString();
+            String type = projectInDB.getType().toString();
+            ArrayList<String> R4List = R2ToR4UserIdMap.get(ownerId);
+            // R4绑定类型 找到唯一的那个R4
+            R4TypeListResult r4TypeListResult = userService.getR4IdByTypeId(Integer.valueOf(type));
+            if (Objects.equals(r4TypeListResult.getStatus(), "fail")){
+                return ProductListResult.failure("上传产值比例失败");
+            } else {
+                List<String> R4ListFindByType = r4TypeListResult.getData()
+                        .stream().map(item -> item.getUserId().toString())
+                        .filter(R4List::contains)
+                        .collect(Collectors.toList());
 
-        taskService.complete(taskId, map);
-        return "R3审核通过~";
+                if (R4ListFindByType.isEmpty()) {
+                    return ProductListResult.failure("上传产值比例失败");
+                }
+
+                Integer R4Id = Integer.valueOf(R4ListFindByType.get(0));
+                map.put("R4", R4Id);
+                taskService.complete(taskId, map);
+                return ProductListResult.success("室主任审核通过");
+            }
+
+        } catch (Exception e) {
+            return ProductListResult.failure("上传产值比例失败");
+        }
+
+
+
     }
 
     @PostMapping("r4/approveTask")
-    public String checkTaskByR4(@RequestParam String taskId,
+    public ProjectResult checkTaskByR4(@RequestParam String taskId,
                                 @RequestParam String processId,
                                 @RequestParam(required = false) String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String, Object> map = new HashMap<>();
 
         if (task == null) {
-            throw new RuntimeException("流程不存在");
-        }
-        map.put("A1", "7");
-        Authentication.setAuthenticatedUserId("7");
-        if (StringUtils.isNotEmpty(comment)) {
-            taskService.addComment(taskId, processId, comment);
+            return ProjectResult.failure("流程不存在");
         }
 
-        taskService.complete(taskId, map);
-        return "R4审核通过~";
+        try {
+            map.put("A1", "24");
+            Authentication.setAuthenticatedUserId("24");
+            if (StringUtils.isNotEmpty(comment)) {
+                taskService.addComment(taskId, processId, comment);
+            }
+
+            taskService.complete(taskId, map);
+            return ProjectResult.success("分管领导审核通过");
+        } catch (Exception e) {
+            return ProjectResult.failure("程序异常");
+        }
+
+
     }
 
     @PostMapping("fillValue")
@@ -332,13 +379,15 @@ public class FlowController {
 
     }
 
+    @ReadUserIdInSession
     @PostMapping("/reject")
-    public RollbackListResult rejectTask(@RequestParam String taskId,
+    public RollbackListResult rejectTask(Integer ownerId,
+                                     @RequestParam String taskId,
                                      @RequestParam String processId,
                                      @RequestParam String targetKey,
                                      @RequestParam(required = false) String comment) {
         Task nowTask = taskService.createTaskQuery().taskId(taskId).singleResult();
-        Authentication.setAuthenticatedUserId("7");// TODO 之后改为从cookie里读取
+        Authentication.setAuthenticatedUserId(ownerId.toString());
         if (StringUtils.isNotEmpty(comment)) {
             taskService.addComment(taskId, nowTask.getProcessInstanceId(), comment);
         }
@@ -366,7 +415,7 @@ public class FlowController {
         String currentTaskId = getLatestTaskId(processId);
         Rollback rollback = new Rollback();
         rollback.setProcessId(processId);
-        rollback.setUserId(3); // TODO 之后改为从cookie里读取
+        rollback.setUserId(ownerId);
         rollback.setTaskId(currentTaskId);
         rollback.setTaskKey(taskKey);
         if (StringUtils.isNotEmpty(comment)) {
