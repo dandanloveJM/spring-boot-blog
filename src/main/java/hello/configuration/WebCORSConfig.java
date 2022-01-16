@@ -15,6 +15,7 @@ public class WebCORSConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000")
                 .allowedHeaders("*")
                 .allowedMethods("*")
+                .allowCredentials(true)
                 .maxAge(30*1000);
     }
 }
