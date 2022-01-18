@@ -15,6 +15,8 @@ public class Product {
     private Instant updatedAt;
     private BigDecimal bonus;
     private User user;
+    private Project project;
+    private String taskId;
 
 
     public Integer getId() {
@@ -79,5 +81,21 @@ public class Product {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 }

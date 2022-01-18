@@ -72,7 +72,9 @@ public class ProjectDao {
     }
 
 
-
+    public List<Project> getProjectsByProcessIds(List<String> processIds){
+        return sqlSession.selectList("getProjectsByProcessIds", processIds);
+    }
 
 
 

@@ -69,6 +69,15 @@ public class ProductDao {
         sqlSession.delete("deleteProductsByProcessId", processId);
     }
 
+    public List<Product> getProductAndProjectByUserId(Integer userId){
+        return sqlSession.selectList("getProductAndProjectByUserId", userId);
+    }
+
+    public List<Product> getUnfinishedProjectsByUserId(Integer userId){
+        return sqlSession.selectList("getUnfinishedProjects", userId);
+    }
+
+
 
 
 

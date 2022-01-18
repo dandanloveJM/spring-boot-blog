@@ -35,6 +35,7 @@ public class Project {
     private Instant updatedAt;
     private BigDecimal totalProduct;
     private BigDecimal totalPercentage;
+    private String taskId;
 
     public Project(){}
 
@@ -133,5 +134,13 @@ public class Project {
 
     public void setTotalPercentage(BigDecimal totalPercentage) {
         this.totalPercentage = totalPercentage;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 }

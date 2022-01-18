@@ -19,6 +19,10 @@ public class ProjectListResult extends Result<List<Project>>{
         return new ProjectListResult("ok", "获取成功", data, total, page, totalPage);
     }
 
+    public static ProjectListResult success(List<Project> data) {
+        return new ProjectListResult("ok", "获取成功", data, data.size(), 1, 10);
+    }
+
     public static ProjectListResult failure(String msg){
         return new ProjectListResult("fail", msg, null, 0, 0, 0);
     }
