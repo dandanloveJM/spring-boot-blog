@@ -81,6 +81,14 @@ public class ProjectService {
         }
     }
 
+    public ProjectListResult getProjectsByProcessIds(List<String> processIds){
+        try{
+            return ProjectListResult.success(projectDao.getProjectsByProcessIds(processIds));
+        } catch (Exception e){
+            return ProjectListResult.failure("查询失败");
+        }
+    }
+
 
 
 

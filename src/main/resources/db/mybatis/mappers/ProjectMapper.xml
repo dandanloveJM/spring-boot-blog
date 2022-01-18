@@ -14,7 +14,9 @@
         project.owner_id,
         project.product_id,
         project.created_at,
-        project.updated_at
+        project.updated_at,
+        project.total_product,
+        project.total_percentage
         FROM project
         <if test="userId != null">
             WHERE project.owner_id = #{userId}
@@ -39,7 +41,9 @@
         project.owner_id,
         project.product_id,
         project.created_at,
-        project.updated_at
+        project.updated_at,
+        project.total_product,
+        project.total_percentage
         FROM project
         where project.id = ${projectId}
     </select>
@@ -55,10 +59,33 @@
             project.owner_id,
             project.product_id,
             project.created_at,
-            project.updated_at
+            project.updated_at,
+            project.total_product,
+            project.total_percentage
             FROM project
             where project.process_id = #{processId}
         </select>
+
+    <select id="getProjectsByProcessIds" parameterType="java.util.List" resultMap="project">
+            SELECT
+            project.id,
+            project.process_id,
+            project.name,
+            project.number,
+            project.type,
+            project.attachment,
+            project.owner_id,
+            project.product_id,
+            project.created_at,
+            project.updated_at,
+            project.total_product,
+            project.total_percentage
+            FROM project
+            where project.process_id in
+            <foreach collection="list" item="processId" index="index" open="(" separator="," close=")">
+               #{processId}
+            </foreach>
+    </select>
 
     <insert id="insertProject" parameterType="hello.entity.Project" useGeneratedKeys="true"
             keyProperty="id" keyColumn="id">
@@ -102,5 +129,8 @@
         <result property="productId" column="product_id"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="totalProduct" column="total_product"/>
+        <result property="totalPercentage" column="total_percentage"/>
     </resultMap>
 </mapper>

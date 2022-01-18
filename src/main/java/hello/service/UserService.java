@@ -6,6 +6,7 @@ import hello.dao.UserMapper;
 import hello.entity.R4TypeListResult;
 import hello.entity.R4TypeResult;
 import hello.entity.UserListResult;
+import hello.entity.UserResult;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -88,6 +89,14 @@ public class UserService implements UserDetailsService {
         } catch (Exception e){
             System.out.println(e);
             return R4TypeListResult.failure("程序异常");
+        }
+    }
+
+    public UserResult getUserById(Integer userId){
+        try {
+            return UserResult.success("获取用户信息成功", userMapper.getUserById(userId));
+        } catch (Exception e){
+            return UserResult.failure("获取用户信息失败");
         }
     }
 }

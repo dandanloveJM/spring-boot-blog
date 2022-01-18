@@ -11,7 +11,8 @@
         product.product as product,
         product.updated_at as product_updated_at,
         user.id as user_id,
-        user.username as user_username
+        user.username as user_username,
+        user.display_name as display_name
         FROM product
         LEFT OUTER JOIN user
         ON product.user_id = user.id
@@ -42,6 +43,8 @@
         on product.user_id = user.id
         where product.id = #{productId}
     </select>
+
+
 
     <select id="getProductByProcessId" parameterType="String" resultMap="product">
         SELECT
@@ -84,6 +87,31 @@
         WHERE product.process_id = #{processId}
     </delete>
 
+    <select id="getProductAndProjectByUserId" resultMap="complexProduct">
+        select product.id, product.process_id, product.user_id,
+               product.percentage, product.product, product.updated_at,
+               user.display_name, project.name, project.number,
+               project.total_product, project.total_percentage,
+               project.type
+        from product
+                 inner join user on product.user_id = user.id
+                 inner join project on product.process_id = project.process_id
+        where product.user_id=#{userId} and product.product > 0
+        order by product.updated_at
+    </select>
+
+    <select id="getUnfinishedProjects" resultMap="complexProduct">
+        select product.id, product.process_id, product.user_id,
+               product.percentage, product.product, product.updated_at,
+               user.display_name, project.name, project.number,
+               project.total_product, project.total_percentage,
+               project.type
+        from product
+                 inner join user on product.user_id = user.id
+                 inner join project on product.process_id = project.process_id
+        where product.user_id=#{userId} and product.product IS NULL order by product.updated_at
+    </select>
+
 
     <resultMap id="product" type="hello.entity.Product">
         <id property="id" column="product_id"/>
@@ -95,6 +123,27 @@
         <association property="user" javaType="hello.entity.User">
             <id property="id" column="user_id"/>
             <result property="username" column="user_username"/>
+            <result property="displayName" column="display_name"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="complexProduct" type="hello.entity.Product">
+        <id property="id" column="product_id"/>
+        <result property="processId" column="process_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="percentage" column="percentage"/>
+        <result property="product" column="product"/>
+        <result property="updatedAt" column="updated_at"/>
+        <association property="user" javaType="hello.entity.User">
+            <id property="id" column="user_id"/>
+            <result property="displayName" column="display_name"/>
+        </association>
+        <association property="project" javaType="hello.entity.Project">
+            <result property="name" column="name"/>
+            <result property="number" column="number"/>
+            <result property="type" column="type"/>
+            <result property="totalProduct" column="total_product"/>
+            <result property="totalPercentage" column="total_percentage"/>
         </association>
     </resultMap>
 </mapper>
