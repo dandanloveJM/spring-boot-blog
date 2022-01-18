@@ -1,9 +1,9 @@
 package hello.controller;
 
-import hello.entity.R4TypeListResult;
-import hello.entity.R4TypeResult;
-import hello.entity.UserListResult;
+import hello.anno.ReadUserIdInSession;
+import hello.entity.*;
 import hello.service.UserService;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +32,13 @@ public class UserController {
     @GetMapping("/r4Types")
     public R4TypeListResult getR4ByTypeId(@RequestParam("typeId") Integer typeId){
         return userService.getR4IdByTypeId(typeId);
+    }
+
+    @CrossOrigin
+    @ReadUserIdInSession
+    @GetMapping("/userInfo")
+    public UserResult getUserInfoById(Integer userId){
+        return userService.getUserById(userId);
     }
 
 }
