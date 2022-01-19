@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import hello.anno.ReadUserIdInSession;
 import hello.entity.*;
 import hello.service.*;
+import hello.utils.R2R3R4Relation;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
@@ -54,30 +55,6 @@ public class FlowController {
     private final UserService userService;
 
 
-    private final Map<String, String> R2ToR3UserIdMAP = Map.of(
-            "16", "14",
-            "17", "14",
-            "18", "15",
-            "19", "15");
-
-    private final Map<String, ArrayList<String>> R2ToR4UserIdMap = Map.of(
-            "16", new ArrayList<>(Arrays.asList("27", "11")),
-            "17", new ArrayList<>(Arrays.asList("27","11")),
-            "18", new ArrayList<>(Arrays.asList("12","13")),
-            "19", new ArrayList<>(Arrays.asList("12","13"))
-    );
-
-    private final Map<String, ArrayList<String>> R3ToR2UserIdMap = Map.of(
-      "14", new ArrayList<>(Arrays.asList("16", "17")),
-      "15", new ArrayList<>(Arrays.asList("18","19"))
-    );
-
-    private final Map<String, ArrayList<String>> R4ToR2UserIdMap = Map.of(
-            "27", new ArrayList<>(Arrays.asList("16","17")),
-            "11", new ArrayList<>(Arrays.asList("16","17")),
-            "12", new ArrayList<>(Arrays.asList("18","19")),
-            "13", new ArrayList<>(Arrays.asList("18","19"))
-    );
 
 
 
@@ -236,7 +213,7 @@ public class FlowController {
         }
         try{
             Integer ownerId = projectService.getProjectByProcessId(processId).getData().getOwnerId();
-            map.put("R3", R2ToR3UserIdMAP.get(ownerId.toString()));
+            map.put("R3", R2R3R4Relation.R2ToR3UserIdMAP.get(ownerId.toString()));
         } catch (Exception e) {
             return ProductListResult.failure("上传产值比例失败");
         }
@@ -301,7 +278,7 @@ public class FlowController {
             Project projectInDB= projectService.getProjectByProcessId(processId).getData();
             String ownerId = projectInDB.getOwnerId().toString();
             String type = projectInDB.getType().toString();
-            ArrayList<String> R4List = R2ToR4UserIdMap.get(ownerId);
+            ArrayList<String> R4List = R2R3R4Relation.R2ToR4UserIdMap.get(ownerId);
             // R4绑定类型 找到唯一的那个R4
             R4TypeListResult r4TypeListResult = userService.getR4IdByTypeId(Integer.valueOf(type));
             if (Objects.equals(r4TypeListResult.getStatus(), "fail")){

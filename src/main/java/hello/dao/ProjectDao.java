@@ -80,6 +80,8 @@ public class ProjectDao {
         return sqlSession.selectList("getProjectsByOwnerId", ownerId);
     }
 
-
+    public List<Project> getProjectsByOwnerIds(List<Integer> ownerIds){
+        return sqlSession.selectList("getProjectsByOwnerIds", ownerIds);
+    }
 
 }

@@ -8,10 +8,12 @@ import hello.entity.DisplayResult;
 import hello.entity.ProductListResult;
 import hello.entity.Project;
 import hello.entity.ProjectListResult;
+import hello.utils.R2R3R4Relation;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.ActivityInstance;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -89,20 +91,40 @@ public class DisplayService {
         Map<String, List<Project>> projects = new HashMap<>();
         try{
             List<Project> result = projectDao.getProjectsByOwnerId(userId);
-            if(result.isEmpty()){
-                projects.put("empty", Collections.emptyList());
-                return DisplayResult.success(projects);
-            }
-            List<Project> finished = result.stream().filter(item->item.getTotalProduct() != null).collect(Collectors.toList());
-            List<Project> unfinished = result.stream().filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
-            List<Project> finalUnfinished = generateUnfinishedProjects(unfinished, userId);
-
-            projects.put("finished", finished);
-            projects.put("unfinished", finalUnfinished);
-            return DisplayResult.success(projects);
+            return getDisplayResult(userId, projects, result);
         } catch (Exception e){
             return DisplayResult.failure("程序异常");
         }
+    }
+
+    public DisplayResult getAllR3Projects(Integer userId){
+        Map<String, List<Project>> projects = new HashMap<>();
+        // 传入R3ID,找到对应的R2ID
+        List<Integer> R2IdsFindByR3 = R2R3R4Relation.R3ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
+        try{
+            // 查出来所有的projects
+            List<Project> allProjects = projectDao.getProjectsByOwnerIds(R2IdsFindByR3);
+            return getDisplayResult(userId, projects, allProjects);
+
+        } catch (Exception e){
+            return DisplayResult.failure("程序异常");
+        }
+    }
+
+    @NotNull
+    private DisplayResult getDisplayResult(Integer userId, Map<String, List<Project>> projects, List<Project> allProjects) {
+        if(allProjects.isEmpty()){
+            projects.put("empty", Collections.emptyList());
+            return DisplayResult.success(projects);
+        }
+
+        List<Project> finished = allProjects.stream().filter(item->item.getTotalProduct() != null).collect(Collectors.toList());
+        List<Project> unfinished = allProjects.stream().filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
+        List<Project> finalUnfinished = generateUnfinishedProjects(unfinished, userId);
+
+        projects.put("finished", finished);
+        projects.put("unfinished", finalUnfinished);
+        return DisplayResult.success(projects);
     }
 
 

@@ -89,8 +89,8 @@
 
     <insert id="insertProject" parameterType="hello.entity.Project" useGeneratedKeys="true"
             keyProperty="id" keyColumn="id">
-        INSERT INTO project (process_id, name, number, type, attachment, owner_id, product_id, created_at, updated_at )
-        VALUES (#{processId}, #{name}, #{number}, #{type}, #{attachment}, #{ownerId}, #{productId}, now(), now())
+        INSERT INTO project (process_id, name, number, type, attachment, owner_id, owner_name, product_id, created_at, updated_at )
+        VALUES (#{processId}, #{name}, #{number}, #{type}, #{attachment}, #{ownerId}, #{owner_name},#{productId}, now(), now())
     </insert>
 
     <update id="updateProject" parameterType="hello.entity.Project">
@@ -116,6 +116,51 @@
         FROM project
         WHERE project.process_id = #{processId}
     </delete>
+
+    <select id="getProjectsByOwnerId" resultMap="R2Projects">
+        select project.id, project.process_id, project.name, project.number,
+               project.type, project.owner_id, project.attachment, project.updated_at,
+               project.total_product, project.total_percentage,
+               p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
+        from project
+        inner join product p on project.process_id = p.process_id
+        where project.owner_id = #{ownerId}
+        order by project.updated_at DESC
+    </select>
+
+    <select id="getProjectsByOwnerIds" parameterType="java.util.List" resultMap="R2Projects">
+            select project.id, project.process_id, project.name, project.number,
+                   project.type, project.owner_id, project.attachment, project.updated_at,
+                   project.total_product, project.total_percentage,
+                   p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
+            from project
+            inner join product p on project.process_id = p.process_id
+            where project.owner_id in
+            <foreach collection="list" item="ownerId" index="index" open="(" separator="," close=")">
+                 #{ownerId}
+            </foreach>
+
+    </select>
+
+    <resultMap id="R2Projects" type="hello.entity.Project">
+        <id property="id" column="id"/>
+        <result property="processId" column="process_id"/>
+        <result property="name" column="name"/>
+        <result property="number" column="number"/>
+        <result property="type" column="type"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="attachment" column="attachment"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="totalProduct" column="total_product"/>
+        <result property="totalPercentage" column="total_percentage"/>
+        <collection property="products" ofType="hello.entity.Product">
+             <id property="id" column="product_id"/>
+             <result property="userId" column="user_id"/>
+             <result property="displayName" column="display_name"/>
+             <result property="product" column="product"/>
+             <result property="percentage" column="percentage"/>
+        </collection>
+    </resultMap>
 
 
     <resultMap id="project" type="hello.entity.Project">
