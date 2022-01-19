@@ -7,6 +7,7 @@ import hello.entity.Product;
 import hello.entity.ProjectListResult;
 import hello.entity.ProjectResult;
 import hello.service.ProjectService;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,6 +42,10 @@ public class ProjectController {
         }
 
         return projectService.getProjectsByProcessIds(processIds);
+    }
 
+    @GetMapping("/getProjectsByOwnerId")
+    public ProjectListResult getProjectsByOwnerId(@RequestParam Integer ownerId){
+        return projectService.getProjectsByOwnerId(ownerId);
     }
 }

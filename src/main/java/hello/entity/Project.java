@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 /**
  * type值：
@@ -36,6 +37,8 @@ public class Project {
     private BigDecimal totalProduct;
     private BigDecimal totalPercentage;
     private String taskId;
+    private List<Product> products;
+
 
     public Project(){}
 
@@ -142,5 +145,13 @@ public class Project {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
     }
 }

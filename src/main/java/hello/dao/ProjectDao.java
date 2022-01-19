@@ -76,6 +76,10 @@ public class ProjectDao {
         return sqlSession.selectList("getProjectsByProcessIds", processIds);
     }
 
+    public List<Project> getProjectsByOwnerId(Integer ownerId){
+        return sqlSession.selectList("getProjectsByOwnerId", ownerId);
+    }
+
 
 
 }

@@ -106,67 +106,19 @@ public class DisplayController {
 //    @ReadUserIdInSession
     @GetMapping("/R1/displayUnfinishedProjects")
     public ProjectListResult getR1UnifishedProjectsByUserId(@RequestParam("userId") Integer userId){
-        try {
-            // 所有让R1填写的任务
-            List<HistoricActivityInstance> R1Allactivities = historyService.createHistoricActivityInstanceQuery()
-                    .taskAssignee(String.valueOf(userId)).orderByHistoricActivityInstanceEndTime().desc().list();
-
-            if(R1Allactivities.isEmpty()) {
-                return ProjectListResult.success( Collections.emptyList());
-            }
-
-            // 所有与R1有关的ProcessId 需要区分哪些是流程进行中（1.1 需要R1填写；1.2R1填完了，再走其他流程），哪些流程已结束
-            List<String> R1AllProcessIds = R1Allactivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
-            List<Project> R1AllProjects = projectService.getProjectsByProcessIds(R1AllProcessIds).getData();
-            // 筛选出没有最终产值的Project, 就是R1 相关的 还在流程中的 Project
-            List<Project> R1UnfinishedProjects = R1AllProjects.stream()
-                    .filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
-
-            List<String> R1UnfinishedProcessIds = R1UnfinishedProjects.stream().map(Project::getProcessId).collect(Collectors.toList());
-
-            Map<String, Project> processIdMap = new HashMap<>();
-            for(Project unFinishedProject: R1UnfinishedProjects){
-                processIdMap.put(unFinishedProject.getProcessId(), unFinishedProject);
-            }
-
-            List<Project> finalAllUnfinishedProjects = new ArrayList<>();
-
-            for(String processId: R1UnfinishedProcessIds){
-                ActivityInstance activeActivityInstance = runtimeService.createActivityInstanceQuery()
-                        .taskAssignee(String.valueOf(userId))
-                        .processInstanceId(processId)
-                        .unfinished()
-                        .singleResult();
-
-
-                // 深拷贝
-                Project oldProject = processIdMap.get(processId);
-                JSONObject newProject = JSON.parseObject(JSON.toJSONString(oldProject));
-                Project newProject2 = JSON.toJavaObject(newProject, Project.class);
-
-                if (activeActivityInstance != null) {
-                     // 需要R1操作, 需要加上taskId
-                    String taskId = activeActivityInstance.getTaskId();
-                    newProject2.setTaskId(taskId);
-                }
-
-                finalAllUnfinishedProjects.add(newProject2);
-            }
-            return ProjectListResult.success(finalAllUnfinishedProjects);
-        } catch (Exception e) {
-            return ProjectListResult.failure("程序异常");
-        }
-
+        return displayService.getR1UnfinishedProjectsByUserId(userId);
     }
 
 //    @ReadUserIdInSession
-    @GetMapping("/R1/displayfinishedProjects")
+    @GetMapping("/R1/displayFinishedProjects")
     public ProductListResult getR1FinishedProjects(@RequestParam("userId") Integer userId){
-        try {
-            // 只展示有产值的数据
-            return displayService.getFinishedProjectsByUserId(userId);
-        } catch (Exception e) {
-            return ProductListResult.failure("系统异常");
-        }
+        // 只展示有产值的数据
+        return displayService.getFinishedProjectsByUserId(userId);
     }
+
+    @GetMapping("/R2/Projects")
+    public DisplayResult getR2AllProjects(@RequestParam("userId") Integer userId){
+        return displayService.getAllR2Projects(userId);
+    }
+
 }

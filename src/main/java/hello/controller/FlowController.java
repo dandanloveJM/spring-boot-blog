@@ -252,8 +252,10 @@ public class FlowController {
             newProduct.setProcessId(processId);
             String userid = (String) obj.get("userId");
             String percentage = (String) obj.get("percentage");
+            String displayName = (String) obj.get("displayName");
             newProduct.setUserId(Integer.valueOf(userid));
             newProduct.setPercentage(new BigDecimal(percentage));
+            newProduct.setDisplayName(displayName);
             products.add(newProduct);
         }
 

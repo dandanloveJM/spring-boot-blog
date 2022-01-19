@@ -17,6 +17,7 @@ public class Product {
     private User user;
     private Project project;
     private String taskId;
+    private String displayName;
 
 
     public Integer getId() {
@@ -97,5 +98,13 @@ public class Product {
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }

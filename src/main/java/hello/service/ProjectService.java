@@ -38,6 +38,14 @@ public class ProjectService {
         }
     }
 
+    public ProjectListResult getProjectsByOwnerId(Integer ownerId){
+        try{
+            return ProjectListResult.success(projectDao.getProjectsByOwnerId(ownerId));
+        } catch (Exception e) {
+            return ProjectListResult.failure("程序异常");
+        }
+    }
+
     public ProjectResult getProjectByProcessId(String processId){
         try {
             return ProjectResult.success("ok", projectDao.getProjectByProcessId(processId));
