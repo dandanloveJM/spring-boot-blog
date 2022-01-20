@@ -32,5 +32,14 @@ public class UserRankDao {
         return sqlSession.selectList("selectR3Products");
     }
 
+    // 获得四个团队的groupby聚合值
+    public List<TeamRank> get4TeamsBonus(){
+        return sqlSession.selectList("select4TeamsBonus");
+    }
+
+    // 获得两个R3的groupby sum 奖金池的值
+    public List<TeamRank> get2R3Bonus(){
+        return sqlSession.selectList("selectR3Bonus");
+    }
 
 }

@@ -2,6 +2,7 @@ package hello.service;
 
 import hello.dao.UserRankDao;
 import hello.entity.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -10,6 +11,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +52,16 @@ public class RankService {
         }
     }
 
-    // R3的产值要均分给部门
+    public List<TeamRank> addHalfR3Product(BigDecimal R3Product, List<TeamRank> originData){
+        if(R3Product != null){
+            BigDecimal halfProduct = R3Product.divide(BigDecimal.valueOf(2), RoundingMode.UP);
+            return originData.stream().peek(item-> item.setProductSum(halfProduct.add(item.getProductSum()))).collect(Collectors.toList());
+        } else {
+            return originData;
+        }
+    }
+
+     // R3的产值要均分给部门
     public TeamRankListResult getTeamRank(){
         try{
             List<TeamRank> FourTeamsRanks = userRankDao.get4TeamsRank();
@@ -61,56 +72,71 @@ public class RankService {
             }
 
             // 筛选出Z1,Z2部门 和F1,F2的值
-            List<TeamRank> Z1Z2TeamRank = FourTeamsRanks.stream().filter(item->item.getTeamRank().contains("Z"))
+            List<TeamRank> Z1Z2TeamRank = FourTeamsRanks.stream()
+                    .filter(item->item.getTeamRank().contains("Z"))
                     .collect(Collectors.toList());
-            List<TeamRank> F1F2TeamRank = FourTeamsRanks.stream().filter(item->item.getTeamRank().contains("F"))
+            List<TeamRank> F1F2TeamRank = FourTeamsRanks.stream()
+                    .filter(item->item.getTeamRank().contains("F"))
                     .collect(Collectors.toList());
+
 
             // 筛选出Z，F部门R3的总产值
-            BigDecimal productOfTeamZ = null;
-            BigDecimal productOfTeamF = null;
-            for (TeamRank R3Rank: TwoR3Ranks) {
-                if(R3Rank.getTeamRank().equals("Z")){
-                    productOfTeamZ = R3Rank.getProductSum();
-                }else if(R3Rank.getTeamRank().equals("F")){
-                    productOfTeamF = R3Rank.getProductSum();
-                }
-            }
+            Map<String, BigDecimal> R3RankMap = TwoR3Ranks.stream()
+                    .collect(Collectors.toMap(TeamRank::getTeamRank, TeamRank::getProductSum));
 
 
+            F1F2TeamRank = addHalfR3Product(R3RankMap.get("F"), F1F2TeamRank);
+            Z1Z2TeamRank = addHalfR3Product(R3RankMap.get("Z"), Z1Z2TeamRank);
 
-            if(productOfTeamF != null){
-                BigDecimal halfProduct = productOfTeamF.divide(BigDecimal.valueOf(2), RoundingMode.UP);
-                F1F2TeamRank = F1F2TeamRank.stream().peek(item-> {
-                    item.setProductSum(halfProduct.add(item.getProductSum()));
-                }).collect(Collectors.toList());
-            }
 
-            if(productOfTeamZ != null) {
-                BigDecimal halfProduct = productOfTeamZ.divide(BigDecimal.valueOf(2), RoundingMode.UP);
-                Z1Z2TeamRank = Z1Z2TeamRank.stream().peek(item-> {
-                    item.setProductSum(halfProduct.add(item.getProductSum()));
-                }).collect(Collectors.toList());
-            }
-
-            List<TeamRank> finalTeamProducts = new ArrayList<>();
-            finalTeamProducts.addAll(F1F2TeamRank);
-            finalTeamProducts.addAll(Z1Z2TeamRank);
-            finalTeamProducts = finalTeamProducts.stream().peek(item->item.setProductSum(item.getProductSum()
-                    .setScale(0, RoundingMode.UP))).collect(Collectors.toList());
-
-            return TeamRankListResult.success(finalTeamProducts);
+            return getTeamRankListResult(Z1Z2TeamRank, F1F2TeamRank);
         } catch (Exception e){
             return TeamRankListResult.failure("获取部门排行程序异常");
         }
 
+    }
+
+    @NotNull
+    private TeamRankListResult getTeamRankListResult(List<TeamRank> z1Z2TeamRank, List<TeamRank> f1F2TeamRank) {
+        List<TeamRank> finalTeamProducts = new ArrayList<>();
+        finalTeamProducts.addAll(f1F2TeamRank);
+        finalTeamProducts.addAll(z1Z2TeamRank);
+        finalTeamProducts = finalTeamProducts.stream()
+                .peek(item->item.setProductSum(item.getProductSum()
+                .setScale(0, RoundingMode.UP)))
+                .collect(Collectors.toList());
+
+        return TeamRankListResult.success(finalTeamProducts);
+    }
+
+    public TeamRankListResult getTeamBonus(){
+        try{
+            List<TeamRank> FourTeamsBonus = userRankDao.get4TeamsBonus();
+            List<TeamRank> TwoR3Bonus = userRankDao.get2R3Bonus();
+
+            if(FourTeamsBonus.isEmpty() && TwoR3Bonus.isEmpty()){
+                return TeamRankListResult.success(Collections.emptyList());
+            }
+
+            // 筛选出Z1,Z2部门 和F1,F2的值
+            List<TeamRank> Z1Z2TeamBonus = FourTeamsBonus.stream().filter(item->item.getTeamRank().contains("Z"))
+                    .collect(Collectors.toList());
+            List<TeamRank> F1F2TeamBonus = FourTeamsBonus.stream().filter(item->item.getTeamRank().contains("F"))
+                    .collect(Collectors.toList());
 
 
+            // 筛选出Z，F部门R3的总奖金
+            Map<String, BigDecimal> R3BonusMap = TwoR3Bonus.stream().collect(Collectors
+                    .toMap(TeamRank::getTeamRank, TeamRank::getProductSum));
 
 
+            Z1Z2TeamBonus = addHalfR3Product(R3BonusMap.get("Z"), Z1Z2TeamBonus);
+            F1F2TeamBonus = addHalfR3Product(R3BonusMap.get("F"), F1F2TeamBonus);
 
+            return getTeamRankListResult(F1F2TeamBonus, Z1Z2TeamBonus);
 
-
-
+        } catch (Exception e){
+            return TeamRankListResult.failure("获取奖金排行异常");
+        }
     }
 }

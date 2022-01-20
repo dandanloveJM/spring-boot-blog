@@ -130,5 +130,10 @@ public class DisplayController {
         return rankService.getTeamRank();
     }
 
+    @GetMapping("/teamBonus")
+    public TeamRankListResult getTeamBonus(){
+        return rankService.getTeamBonus();
+    }
+
 
 }
