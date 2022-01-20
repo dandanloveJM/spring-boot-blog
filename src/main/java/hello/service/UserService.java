@@ -92,6 +92,15 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    public R4TypeListResult getTypeIdsByR4(Integer userId){
+        try{
+            return R4TypeListResult.success("查询成功", r4TypeMapper.getTypeIdsByUserId(userId));
+        } catch (Exception e){
+            System.out.println(e);
+            return R4TypeListResult.failure("程序异常");
+        }
+    }
+
     public UserResult getUserById(Integer userId){
         try {
             return UserResult.success("获取用户信息成功", userMapper.getUserById(userId));

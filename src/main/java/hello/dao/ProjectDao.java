@@ -84,4 +84,10 @@ public class ProjectDao {
         return sqlSession.selectList("getProjectsByOwnerIds", ownerIds);
     }
 
+    public List<Project> getProjectsByOwnerIdsByR4(List<Integer> R2IdsFindByR4, List<Integer> typeList) {
+        Map<String, List<Integer>> parameters = new HashMap<>();
+        parameters.put("R2Ids", R2IdsFindByR4);
+        parameters.put("typeIds", typeList);
+        return sqlSession.selectList("getProjectsByOwnerIdsByR4", parameters);
+    }
 }

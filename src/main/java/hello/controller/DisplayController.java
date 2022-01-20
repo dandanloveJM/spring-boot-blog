@@ -126,4 +126,8 @@ public class DisplayController {
         return displayService.getAllR3Projects(userId);
     }
 
+    @GetMapping("/R4/Projects")
+    public DisplayResult getR4AllProjects(@RequestParam("userId") Integer userId){
+        return displayService.getAllR4Projects(userId);
+    }
 }

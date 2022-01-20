@@ -152,6 +152,10 @@ public class FlowController {
                                         @RequestParam String type,
                                         @RequestParam String taskId,
                                         @RequestParam String processId) throws UnknownHostException {
+       if(ownerId == -1){
+           return ProjectResult.failure("请先登录");
+       }
+
         // 需要区分是需要新建任务 还是 修改任务，涉及到不同的数据库操作
 
         Map<String, Object> map = new HashMap<>();

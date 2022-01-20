@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import hello.dao.ProductDao;
 import hello.dao.ProjectDao;
-import hello.entity.DisplayResult;
-import hello.entity.ProductListResult;
-import hello.entity.Project;
-import hello.entity.ProjectListResult;
+import hello.entity.*;
 import hello.utils.R2R3R4Relation;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
@@ -27,17 +24,20 @@ public class DisplayService {
     private final RuntimeService runtimeService;
     private final HistoryService historyService;
     private final ProjectService projectService;
+    private final UserService userService;
 
     @Inject
     public DisplayService(ProductDao productDao, ProjectDao projectDao,
                           RuntimeService runtimeService,
                           HistoryService historyService,
-                          ProjectService projectService) {
+                          ProjectService projectService,
+                          UserService userService) {
         this.productDao = productDao;
         this.projectDao = projectDao;
         this.runtimeService = runtimeService;
         this.historyService = historyService;
         this.projectService = projectService;
+        this.userService = userService;
     }
 
     public ProductListResult getFinishedProjectsByUserId(Integer userId){
@@ -157,5 +157,19 @@ public class DisplayService {
             finalUnfinishedProjects.add(projectCopy);
         }
         return finalUnfinishedProjects;
+    }
+
+    public DisplayResult getAllR4Projects(Integer userId) {
+        Map<String, List<Project>> projects = new HashMap<>();
+        // 传入R4ID,找到对应的R2ID
+        List<Integer> R2IdsFindByR4 = R2R3R4Relation.R4ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
+        try{
+            List<Integer> typeIdsFindByR4Id = userService.getTypeIdsByR4(userId).getData().stream().map(R4Type::getTypeId).collect(Collectors.toList());
+            // 查出来所有的projects
+            List<Project> allProjects = projectDao.getProjectsByOwnerIdsByR4(R2IdsFindByR4, typeIdsFindByR4Id);
+            return getDisplayResult(userId, projects, allProjects);
+        } catch (Exception e){
+            return DisplayResult.failure("程序异常");
+        }
     }
 }
