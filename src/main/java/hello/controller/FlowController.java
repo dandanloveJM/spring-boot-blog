@@ -263,9 +263,10 @@ public class FlowController {
         }
     }
 
-
+    @ReadUserIdInSession
     @PostMapping("r3/approveTask")
-    public ProductListResult checkTaskByR3(@RequestParam String taskId,
+    public ProductListResult checkTaskByR3(Integer userId,
+                                @RequestParam String taskId,
                                 @RequestParam String processId,
                                 @RequestParam(required = false) String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -274,10 +275,7 @@ public class FlowController {
             throw new RuntimeException("流程不存在");
         }
 
-        Authentication.setAuthenticatedUserId("5");
-        if (StringUtils.isNotEmpty(comment)) {
-            taskService.addComment(taskId, processId, comment);
-        }
+
         try{
             Project projectInDB= projectService.getProjectByProcessId(processId).getData();
             String ownerId = projectInDB.getOwnerId().toString();
@@ -300,6 +298,10 @@ public class FlowController {
                 Integer R4Id = Integer.valueOf(R4ListFindByType.get(0));
                 map.put("R4", R4Id);
                 taskService.complete(taskId, map);
+                Authentication.setAuthenticatedUserId(String.valueOf(userId));
+                if (StringUtils.isNotEmpty(comment)) {
+                    taskService.addComment(taskId, processId, comment);
+                }
                 return ProductListResult.success("室主任审核通过");
             }
 
@@ -311,8 +313,10 @@ public class FlowController {
 
     }
 
+    @ReadUserIdInSession
     @PostMapping("r4/approveTask")
-    public ProjectResult checkTaskByR4(@RequestParam String taskId,
+    public ProjectResult checkTaskByR4(Integer userId,
+                                @RequestParam String taskId,
                                 @RequestParam String processId,
                                 @RequestParam(required = false) String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -324,9 +328,9 @@ public class FlowController {
 
         try {
             map.put("A1", "24");
-            Authentication.setAuthenticatedUserId("24");
+            Authentication.setAuthenticatedUserId(String.valueOf(userId));
             if (StringUtils.isNotEmpty(comment)) {
-                taskService.addComment(taskId, processId, comment);
+                taskService.addComment(taskId, processId, "通过, " + comment);
             }
 
             taskService.complete(taskId, map);
@@ -353,6 +357,8 @@ public class FlowController {
         BigDecimal finalTotal = newTotal.multiply(newRatio).divide(BigDecimal.valueOf(10000), RoundingMode.DOWN);
 
         try {
+            Authentication.setAuthenticatedUserId("24");
+            taskService.addComment(taskId, processId, "设置产值成功");
             taskService.complete(taskId, map);
             projectService.updateTotalProductOfProject(newTotal, newRatio, processId);
             return this.productService.updateProducts(finalTotal, processId);
@@ -372,7 +378,7 @@ public class FlowController {
         Task nowTask = taskService.createTaskQuery().taskId(taskId).singleResult();
         Authentication.setAuthenticatedUserId(ownerId.toString());
         if (StringUtils.isNotEmpty(comment)) {
-            taskService.addComment(taskId, nowTask.getProcessInstanceId(), comment);
+            taskService.addComment(taskId, nowTask.getProcessInstanceId(), "退回, " + comment);
         }
         String taskKey = nowTask.getTaskDefinitionKey();
 
@@ -439,11 +445,29 @@ public class FlowController {
      * @return
      */
     @GetMapping("/history/list")
-    public List<HistoricActivityInstance> historyList(@RequestParam(value = "process_id") String processId) {
+    public List<Activity> historyList(@RequestParam(value = "process_id") String processId) {
         List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processId).activityType("userTask").finished()
                 .orderByHistoricActivityInstanceEndTime().desc().list();
-        return activities;
+
+        List<Activity> nodes = new ArrayList<>();
+
+        for(HistoricActivityInstance activityInstance:activities){
+            Activity activity = new Activity();
+            String taskId = activityInstance.getTaskId();
+            Integer userId = Integer.valueOf(activityInstance.getAssignee());
+            String displayName = userService.getUserById(userId).getData().getDisplayName();
+            String comment = projectService.getComment(processId, taskId).getData();
+
+            activity.setProcessId(processId);
+            activity.setTaskId(taskId);
+            activity.setDisplayName(displayName);
+            activity.setActivityName(activityInstance.getActivityName());
+            activity.setComment(comment);
+            activity.setTime(activityInstance.getEndTime());
+            nodes.add(activity);
+        }
+        return nodes;
 
     }
 

@@ -142,4 +142,9 @@ public class DisplayController {
         return displayService.getA1AllProjects(userId);
     }
 
+    //TODO 1. processId审核历史 2.个人排行榜 3.部门排行榜R3的均分给两个部门
+    // 4.奖金展示（按部门统计，R3的均分给两个部门） 5.奖金分配
+    // TODO 6.根据角色设置路由, 然后就是写前端
+
+
 }
