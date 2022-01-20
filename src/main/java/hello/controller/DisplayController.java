@@ -130,4 +130,11 @@ public class DisplayController {
     public DisplayResult getR4AllProjects(@RequestParam("userId") Integer userId){
         return displayService.getAllR4Projects(userId);
     }
+
+    // R5和ADMIN可以看全部
+    @GetMapping("/allProjects")
+    public DisplayResult getAllProjects(){
+        return displayService.getAllProjects();
+    }
+
 }

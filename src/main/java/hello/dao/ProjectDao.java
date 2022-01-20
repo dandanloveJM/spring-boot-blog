@@ -90,4 +90,8 @@ public class ProjectDao {
         parameters.put("typeIds", typeList);
         return sqlSession.selectList("getProjectsByOwnerIdsByR4", parameters);
     }
+
+    public List<Project> getAllProjects(){
+        return sqlSession.selectList("getAllProjects");
+    }
 }

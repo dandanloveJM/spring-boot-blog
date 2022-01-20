@@ -88,23 +88,21 @@ public class DisplayService {
 
 
     public DisplayResult getAllR2Projects(Integer userId){
-        Map<String, List<Project>> projects = new HashMap<>();
         try{
             List<Project> result = projectDao.getProjectsByOwnerId(userId);
-            return getDisplayResult(userId, projects, result);
+            return getDisplayResult(userId, result);
         } catch (Exception e){
             return DisplayResult.failure("程序异常");
         }
     }
 
     public DisplayResult getAllR3Projects(Integer userId){
-        Map<String, List<Project>> projects = new HashMap<>();
         // 传入R3ID,找到对应的R2ID
         List<Integer> R2IdsFindByR3 = R2R3R4Relation.R3ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
         try{
             // 查出来所有的projects
             List<Project> allProjects = projectDao.getProjectsByOwnerIds(R2IdsFindByR3);
-            return getDisplayResult(userId, projects, allProjects);
+            return getDisplayResult(userId, allProjects);
 
         } catch (Exception e){
             return DisplayResult.failure("程序异常");
@@ -112,7 +110,8 @@ public class DisplayService {
     }
 
     @NotNull
-    private DisplayResult getDisplayResult(Integer userId, Map<String, List<Project>> projects, List<Project> allProjects) {
+    private DisplayResult getDisplayResult(Integer userId, List<Project> allProjects) {
+        Map<String, List<Project>> projects = new HashMap<>();
         if(allProjects.isEmpty()){
             projects.put("empty", Collections.emptyList());
             return DisplayResult.success(projects);
@@ -160,16 +159,39 @@ public class DisplayService {
     }
 
     public DisplayResult getAllR4Projects(Integer userId) {
-        Map<String, List<Project>> projects = new HashMap<>();
+
         // 传入R4ID,找到对应的R2ID
         List<Integer> R2IdsFindByR4 = R2R3R4Relation.R4ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
         try{
             List<Integer> typeIdsFindByR4Id = userService.getTypeIdsByR4(userId).getData().stream().map(R4Type::getTypeId).collect(Collectors.toList());
             // 查出来所有的projects
             List<Project> allProjects = projectDao.getProjectsByOwnerIdsByR4(R2IdsFindByR4, typeIdsFindByR4Id);
-            return getDisplayResult(userId, projects, allProjects);
+            return getDisplayResult(userId, allProjects);
         } catch (Exception e){
             return DisplayResult.failure("程序异常");
         }
     }
+
+    public DisplayResult getAllProjects(){
+        try {
+            Map<String, List<Project>> projects = new HashMap<>();
+            List<Project> allProjects = projectDao.getAllProjects();
+            if (allProjects.isEmpty()){
+                projects.put("empty", Collections.emptyList());
+                return DisplayResult.success(projects);
+            }
+
+            List<Project> finished = allProjects.stream().filter(item->item.getTotalProduct() != null).collect(Collectors.toList());
+            List<Project> unfinished = allProjects.stream().filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
+
+            projects.put("finished", finished);
+            projects.put("unfinished", unfinished);
+            return DisplayResult.success(projects);
+
+        } catch (Exception e){
+            return DisplayResult.failure("程序异常");
+        }
+    }
+
+
 }
