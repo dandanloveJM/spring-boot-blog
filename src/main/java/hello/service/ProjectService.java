@@ -98,6 +98,14 @@ public class ProjectService {
     }
 
 
+    public ProjectListResult getA1ProjectsByProcessIds(List<String> processIds){
+        try{
+            return ProjectListResult.success(projectDao.getA1ProjectsByProcessIds(processIds));
+        } catch (Exception e){
+            return ProjectListResult.failure("查询失败");
+        }
+    }
+
 
 
     public ProjectResult updateProject(int projectId, Project newProject){

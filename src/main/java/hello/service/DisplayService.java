@@ -172,26 +172,65 @@ public class DisplayService {
         }
     }
 
+    public Map<String, List<Project>> getAllProjectsMap(){
+        Map<String, List<Project>> projects = new HashMap<>();
+        List<Project> allProjects = projectDao.getAllProjects();
+        if (allProjects.isEmpty()){
+            projects.put("empty", Collections.emptyList());
+            return projects;
+        }
+
+        List<Project> finished = allProjects.stream().filter(item->item.getTotalProduct() != null).collect(Collectors.toList());
+        List<Project> unfinished = allProjects.stream().filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
+
+        projects.put("finished", finished);
+        projects.put("unfinished", unfinished);
+
+        return projects;
+    }
+
     public DisplayResult getAllProjects(){
         try {
-            Map<String, List<Project>> projects = new HashMap<>();
-            List<Project> allProjects = projectDao.getAllProjects();
-            if (allProjects.isEmpty()){
-                projects.put("empty", Collections.emptyList());
-                return DisplayResult.success(projects);
-            }
-
-            List<Project> finished = allProjects.stream().filter(item->item.getTotalProduct() != null).collect(Collectors.toList());
-            List<Project> unfinished = allProjects.stream().filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
-
-            projects.put("finished", finished);
-            projects.put("unfinished", unfinished);
+            Map<String, List<Project>> projects = getAllProjectsMap();
             return DisplayResult.success(projects);
-
         } catch (Exception e){
             return DisplayResult.failure("程序异常");
         }
     }
 
 
+    public DisplayResult getA1AllProjects(Integer userId) {
+        try{
+            List<HistoricActivityInstance> A1AllActivities = historyService.createHistoricActivityInstanceQuery()
+                    .taskAssignee(String.valueOf(userId)).orderByHistoricActivityInstanceEndTime().desc().list();
+            Map<String, List<Project>> projects = new HashMap<>();
+            if(A1AllActivities.isEmpty()) {
+                projects.put("empty", Collections.emptyList());
+                return DisplayResult.success(projects);
+            }
+
+
+
+            // 所有与A1有关的ProcessId 需要区分哪些是流程进行中（需要A1填写），哪些流程已结束(resetValue)
+            List<String> A1AllProcessIds = A1AllActivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
+            List<Project> A1AllProjects = projectService.getA1ProjectsByProcessIds(A1AllProcessIds).getData();
+
+            List<Project> finishedProjects = A1AllProjects.stream()
+                    .filter(item->item.getTotalProduct() != null)
+                    .collect(Collectors.toList());
+
+            // 筛选出没有最终产值的Project, 就是R1 相关的 还在流程中的 Project
+            List<Project> unfinishedProjects = A1AllProjects.stream()
+                    .filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
+
+            List<Project> finalAllUnfinishedProjects = generateUnfinishedProjects(unfinishedProjects, userId);
+
+            projects.put("finished", finishedProjects);
+            projects.put("unfinished", finalAllUnfinishedProjects);
+
+            return DisplayResult.success(projects);
+        } catch (Exception e){
+            return DisplayResult.failure("程序异常");
+        }
+    }
 }

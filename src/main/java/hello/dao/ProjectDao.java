@@ -94,4 +94,8 @@ public class ProjectDao {
     public List<Project> getAllProjects(){
         return sqlSession.selectList("getAllProjects");
     }
+
+    public List<Project> getA1ProjectsByProcessIds(List<String> processIds) {
+        return sqlSession.selectList("getA1ProjectsByProcessIds", processIds);
+    }
 }

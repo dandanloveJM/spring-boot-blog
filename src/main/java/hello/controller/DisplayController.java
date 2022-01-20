@@ -137,4 +137,9 @@ public class DisplayController {
         return displayService.getAllProjects();
     }
 
+    @GetMapping("/A1/Projects")
+    public DisplayResult getA1AllProjects(@RequestParam("userId") Integer userId){
+        return displayService.getA1AllProjects(userId);
+    }
+
 }
