@@ -1,0 +1,116 @@
+package hello.service;
+
+import hello.dao.UserRankDao;
+import hello.entity.*;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class RankService {
+    private final UserRankDao userRankDao;
+
+    @Inject
+    public RankService(UserRankDao userRankDao) {
+        this.userRankDao = userRankDao;
+    }
+
+    public UserRankListResult getUserRanks(){
+        try{
+            List<UserRank> userRankList = userRankDao.getUserRanks();
+            if (userRankList.isEmpty()){
+                return UserRankListResult.success(userRankList);
+            }
+
+            // 去掉是null的产值
+            List<UserRank> filteredUserRankList = userRankList
+                    .stream().filter(item->item.getProductSum()!=null)
+                    .collect(Collectors.toList());
+
+            int i =1;
+            for(UserRank userRank:filteredUserRankList){
+                userRank.setId(i);
+                userRank.setProductSum(userRank.getProductSum().setScale(0, RoundingMode.UP));
+                i++;
+            }
+
+            return UserRankListResult.success(filteredUserRankList);
+
+
+
+        } catch (Exception e){
+            System.out.println(e);
+            return UserRankListResult.failure("查询用户个人排名失败");
+        }
+    }
+
+    // R3的产值要均分给部门
+    public TeamRankListResult getTeamRank(){
+        try{
+            List<TeamRank> FourTeamsRanks = userRankDao.get4TeamsRank();
+            List<TeamRank> TwoR3Ranks = userRankDao.get2R3Rank();
+
+            if(FourTeamsRanks.isEmpty() && TwoR3Ranks.isEmpty()){
+                return TeamRankListResult.success(Collections.emptyList());
+            }
+
+            // 筛选出Z1,Z2部门 和F1,F2的值
+            List<TeamRank> Z1Z2TeamRank = FourTeamsRanks.stream().filter(item->item.getTeamRank().contains("Z"))
+                    .collect(Collectors.toList());
+            List<TeamRank> F1F2TeamRank = FourTeamsRanks.stream().filter(item->item.getTeamRank().contains("F"))
+                    .collect(Collectors.toList());
+
+            // 筛选出Z，F部门R3的总产值
+            BigDecimal productOfTeamZ = null;
+            BigDecimal productOfTeamF = null;
+            for (TeamRank R3Rank: TwoR3Ranks) {
+                if(R3Rank.getTeamRank().equals("Z")){
+                    productOfTeamZ = R3Rank.getProductSum();
+                }else if(R3Rank.getTeamRank().equals("F")){
+                    productOfTeamF = R3Rank.getProductSum();
+                }
+            }
+
+
+
+            if(productOfTeamF != null){
+                BigDecimal halfProduct = productOfTeamF.divide(BigDecimal.valueOf(2), RoundingMode.UP);
+                F1F2TeamRank = F1F2TeamRank.stream().peek(item-> {
+                    item.setProductSum(halfProduct.add(item.getProductSum()));
+                }).collect(Collectors.toList());
+            }
+
+            if(productOfTeamZ != null) {
+                BigDecimal halfProduct = productOfTeamZ.divide(BigDecimal.valueOf(2), RoundingMode.UP);
+                Z1Z2TeamRank = Z1Z2TeamRank.stream().peek(item-> {
+                    item.setProductSum(halfProduct.add(item.getProductSum()));
+                }).collect(Collectors.toList());
+            }
+
+            List<TeamRank> finalTeamProducts = new ArrayList<>();
+            finalTeamProducts.addAll(F1F2TeamRank);
+            finalTeamProducts.addAll(Z1Z2TeamRank);
+            finalTeamProducts = finalTeamProducts.stream().peek(item->item.setProductSum(item.getProductSum()
+                    .setScale(0, RoundingMode.UP))).collect(Collectors.toList());
+
+            return TeamRankListResult.success(finalTeamProducts);
+        } catch (Exception e){
+            return TeamRankListResult.failure("获取部门排行程序异常");
+        }
+
+
+
+
+
+
+
+
+
+    }
+}
