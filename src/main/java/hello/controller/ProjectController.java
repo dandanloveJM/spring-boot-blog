@@ -3,6 +3,7 @@ package hello.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import hello.entity.CommentResult;
 import hello.entity.Product;
 import hello.entity.ProjectListResult;
 import hello.entity.ProjectResult;
@@ -47,5 +48,11 @@ public class ProjectController {
     @GetMapping("/getProjectsByOwnerId")
     public ProjectListResult getProjectsByOwnerId(@RequestParam Integer ownerId){
         return projectService.getProjectsByOwnerId(ownerId);
+    }
+
+    @GetMapping("/get/comment")
+    public CommentResult getComment(@RequestParam String processId,
+                                    @RequestParam String taskId){
+        return projectService.getComment(processId, taskId);
     }
 }

@@ -1,6 +1,8 @@
 package hello.service;
 
+import hello.dao.CommentMapper;
 import hello.dao.ProjectDao;
+import hello.entity.CommentResult;
 import hello.entity.Project;
 import hello.entity.ProjectListResult;
 import hello.entity.ProjectResult;
@@ -13,10 +15,13 @@ import java.util.List;
 @Service
 public class ProjectService {
     private final ProjectDao projectDao;
+    private final CommentMapper commentMapper;
 
     @Inject
-    public ProjectService(ProjectDao projectDao){
+    public ProjectService(ProjectDao projectDao,
+                          CommentMapper commentMapper){
         this.projectDao = projectDao;
+        this.commentMapper = commentMapper;
     }
 
     public ProjectListResult getProjects(Integer page, Integer pageSize, Integer userId) {
@@ -133,6 +138,14 @@ public class ProjectService {
             return ProjectResult.success("删除成功");
         } catch (Exception e) {
             return ProjectResult.failure("系统异常");
+        }
+    }
+
+    public CommentResult getComment(String processId, String taskId){
+        try{
+            return CommentResult.success(commentMapper.findCommentByProcessIdAndTaskId(processId, taskId));
+        } catch (Exception e){
+            return CommentResult.failure("获取审核意见失败");
         }
     }
 
