@@ -3,6 +3,7 @@ package hello.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.thoughtworks.qdox.model.expression.Add;
 import hello.anno.ReadUserIdInSession;
 import hello.entity.*;
 import hello.service.*;
@@ -12,6 +13,7 @@ import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.web.bind.annotation.*;
 import org.flowable.task.api.Task;
@@ -54,6 +56,8 @@ public class FlowController {
 
     private final UserService userService;
 
+    private final UserAddedProductService userAddedProductService;
+
 
 
 
@@ -70,7 +74,8 @@ public class FlowController {
                           ProductService productService,
                           RollbackService rollbackService,
                           AuthService authService,
-                          UserService userService
+                          UserService userService,
+                          UserAddedProductService userAddedProductService
     ) {
         this.runtimeService = runtimeService;
         this.taskService = taskService;
@@ -84,6 +89,7 @@ public class FlowController {
         this.rollbackService = rollbackService;
         this.authService = authService;
         this.userService = userService;
+        this.userAddedProductService = userAddedProductService;
     }
 
     public String getLatestTaskId(String processId) {
@@ -360,8 +366,7 @@ public class FlowController {
             Authentication.setAuthenticatedUserId("24");
             taskService.addComment(taskId, processId, "设置产值成功");
             taskService.complete(taskId, map);
-            projectService.updateTotalProductOfProject(newTotal, newRatio, processId);
-            return this.productService.updateProducts(finalTotal, processId);
+            return updateProducts(processId, newTotal, newRatio, finalTotal);
         } catch (Exception e) {
             return ProductResult.failure("财务更新产值失败");
         }
@@ -429,11 +434,28 @@ public class FlowController {
         BigDecimal finalTotal = newTotal.multiply(newRatio).divide(BigDecimal.valueOf(10000), RoundingMode.DOWN);
 
         try {
-            projectService.updateTotalProductOfProject(newTotal, newRatio, processId);
-            return this.productService.updateProducts(finalTotal, processId);
+            return updateProducts(processId, newTotal, newRatio, finalTotal);
         } catch (Exception e) {
             return ProductResult.failure("财务更新产值失败");
         }
+    }
+
+    @NotNull
+    private ProductResult updateProducts(@RequestParam String processId, BigDecimal newTotal, BigDecimal newRatio, BigDecimal finalTotal) throws Exception {
+        projectService.updateTotalProductOfProject(newTotal, newRatio, processId);
+        productService.updateProducts(finalTotal, processId);
+        List<Product> products = productService.getProductsByProcessId(processId).getData();
+        List<AddedProduct> addedProducts = products.stream()
+                .map(item -> {
+                    AddedProduct temp = new AddedProduct();
+                    temp.setProduct(item.getProduct());
+                    temp.setUserId(item.getUserId());
+                    temp.setDisplayName(item.getDisplayName());
+                    return temp;
+                }).collect(Collectors.toList());
+
+        userAddedProductService.insertAndUpdateAddedProducts(addedProducts);
+        return ProductResult.success("更新产值成功");
     }
 
 

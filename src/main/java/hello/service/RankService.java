@@ -109,6 +109,8 @@ public class RankService {
         return TeamRankListResult.success(finalTeamProducts);
     }
 
+
+    //TODO 鉴权，R4R5ADMIN才能看
     public TeamRankListResult getTeamBonus(){
         try{
             List<TeamRank> FourTeamsBonus = userRankDao.get4TeamsBonus();

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.UserAddedProductMapper">
+    <select id="selectAllProducts" resultType="hello.entity.AddedProduct" >
+        select *
+        FROM user_added_product
+    </select>
+
+    <insert id="insertAddedProduct" useGeneratedKeys="true" parameterType="java.util.List"
+            keyProperty="id" keyColumn="id">
+        INSERT INTO user_added_product(user_id, display_name, product)
+        values
+        <foreach collection="list" item="eachUser" index="index" separator=",">
+            (#{eachUser.userId}, #{eachUser.displayName}, #{eachUser.product})
+        </foreach>
+    </insert>
+
+    <update id="updateAddedProduct" parameterType="java.util.List">
+        <foreach collection="list" separator=";" item="item" index="index">
+            update user_added_product
+            set product=product + #{item.product}
+            where user_id=#{item.userId}
+        </foreach>
+    </update>
+
+</mapper>

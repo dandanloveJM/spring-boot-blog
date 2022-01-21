@@ -26,5 +26,6 @@
         <mapper resource="db/mybatis/mappers/ProductMapper.xml"/>
         <mapper resource="db/mybatis/mappers/RollbackMapper.xml"/>
         <mapper resource="db/mybatis/mappers/RankMapper.xml"/>
+        <mapper resource="db/mybatis/mappers/UserAddedProductMapper.xml"/>
     </mappers>
 </configuration>

@@ -79,6 +79,9 @@ public class ProductDao {
 
 
 
+    public void clearBonusToZero(){
+        sqlSession.update("clearBonusToZero");
+    }
 
 
 }
