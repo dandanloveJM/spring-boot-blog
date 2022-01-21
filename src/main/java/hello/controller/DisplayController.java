@@ -18,61 +18,18 @@ import java.util.*;
 
 @RestController
 public class DisplayController {
-    private final RuntimeService runtimeService;
-
-    private final TaskService taskService;
-
-    private final RepositoryService repositoryService;
-
-    private final ProcessEngine processEngine;
-
-    private final ProjectService projectService;
-
-    private HistoryService historyService;
-
-    private final UploadService uploadService;
-
     private final ProductService productService;
-
-    private final ServletWebServerApplicationContext context;
-
-    private final RollbackService rollbackService;
-
-    private final AuthService authService;
-
-    private final UserService userService;
     private final DisplayService displayService;
     private final RankService rankService;
     private final UserAddedProductService userAddedProductService;
 
     @Inject
-    public DisplayController(RuntimeService runtimeService, TaskService taskService,
-                          RepositoryService repositoryService,
-                          ProcessEngine processEngine,
-                          HistoryService historyService,
-                          ProjectService projectService,
-                          UploadService uploadService,
-                          ServletWebServerApplicationContext context,
-                          ProductService productService,
-                          RollbackService rollbackService,
-                          AuthService authService,
-                          UserService userService,
+    public DisplayController(ProductService productService,
                              DisplayService displayService,
                              RankService rankService,
                              UserAddedProductService userAddedProductService
     ) {
-        this.runtimeService = runtimeService;
-        this.taskService = taskService;
-        this.repositoryService = repositoryService;
-        this.processEngine = processEngine;
-        this.historyService = historyService;
-        this.projectService = projectService;
-        this.uploadService = uploadService;
-        this.context = context;
         this.productService = productService;
-        this.rollbackService = rollbackService;
-        this.authService = authService;
-        this.userService = userService;
         this.displayService = displayService;
         this.rankService = rankService;
         this.userAddedProductService = userAddedProductService;
