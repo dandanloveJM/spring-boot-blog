@@ -11,20 +11,20 @@ import javax.inject.Inject;
 
 @Component
 @Aspect
-public class ReadUserIdInSessionAspect {
+public class ReadRoleIdInSessionAspect {
     private final AuthService authService;
 
     @Inject
-    public ReadUserIdInSessionAspect(AuthService authService) {
+    public ReadRoleIdInSessionAspect(AuthService authService) {
         this.authService = authService;
     }
 
-    @Around("@annotation(hello.anno.ReadUserIdInSession)")
-    public Object ReadUserIdInSession(ProceedingJoinPoint joinPoint) throws Throwable{
+    @Around("@annotation(hello.anno.ReadRoleIdInSession)")
+    public Object ReadRoleIdInSession(ProceedingJoinPoint joinPoint) throws Throwable{
         Object[] args = joinPoint.getArgs();
-        args[0]=authService.getCurrentUser().map(User::getId).orElse(-1);
-        System.out.println("---args--");
-        System.out.println(args[0]);
+        args[0]=authService.getCurrentUser().map(User::getRoleId).orElse(-1);
+        System.out.println("----args--role");
+        System.out.println(args);
         return joinPoint.proceed(args);
     }
 }

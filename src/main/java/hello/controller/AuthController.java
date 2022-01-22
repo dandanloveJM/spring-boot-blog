@@ -39,6 +39,7 @@ public class AuthController {
         }
     }
 
+    @CrossOrigin
     @GetMapping("/auth/logout")
     public Object logout() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -52,8 +53,10 @@ public class AuthController {
 
     }
 
+
     @PostMapping("/auth/login")
     public Object login(@RequestBody Map<String, String> usernameAndPassword){
+        System.out.println("没有进来吗");
         String username = usernameAndPassword.get("username");
         String password = usernameAndPassword.get("password");
         System.out.println(usernameAndPassword);

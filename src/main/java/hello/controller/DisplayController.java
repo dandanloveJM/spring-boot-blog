@@ -63,7 +63,7 @@ public class DisplayController {
         return displayService.getAllR4Projects(userId);
     }
 
-    // R5和ADMIN可以看全部
+    // TODO R5和ADMIN可以看全部
     @GetMapping("/allProjects")
     public DisplayResult getAllProjects(){
         return displayService.getAllProjects();
@@ -73,10 +73,6 @@ public class DisplayController {
     public DisplayResult getA1AllProjects(@RequestParam("userId") Integer userId){
         return displayService.getA1AllProjects(userId);
     }
-
-    //TODO 2.个人排行榜 3.部门排行榜R3的均分给两个部门
-    // 4.奖金展示（按部门统计，R3的均分给两个部门） 5.奖金分配
-    // TODO 6.根据角色设置路由, 然后就是写前端
 
     @GetMapping("/userRank")
     public AddedProductListResult getUserRank(){
