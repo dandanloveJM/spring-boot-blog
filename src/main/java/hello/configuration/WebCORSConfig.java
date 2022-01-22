@@ -17,6 +17,6 @@ public class WebCORSConfig implements WebMvcConfigurer {
                 .allowedMethods("*")
                 .allowCredentials(true)
                 .exposedHeaders("Set-Cookie")
-                .maxAge(300000000*1000);
+                .maxAge(3000*1000);
     }
 }
