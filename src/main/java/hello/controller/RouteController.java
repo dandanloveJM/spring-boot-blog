@@ -44,7 +44,7 @@ public class RouteController {
             Route route3 = new Route();
             route3.setId(10);
             route3.setPid(2);
-            route3.setName("图表");
+            route3.setName("进行中的任务");
             route3.setPath("/display/task");
             route3.setRedirect("");
             route3.setComponent("/display/task");

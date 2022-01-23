@@ -13,4 +13,8 @@ public class UserResult extends Result<User>{
         return new UserResult("fail", msg, null);
     }
 
+    public static UserResult failure(String status, String msg){
+        return new UserResult(status, msg, null);
+    }
+
 }

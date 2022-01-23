@@ -1,5 +1,6 @@
 package hello.utils;
 
+import hello.entity.RouteResult;
 import hello.entity.User;
 import hello.service.AuthService;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -23,8 +24,13 @@ public class ReadRoleIdInSessionAspect {
     public Object ReadRoleIdInSession(ProceedingJoinPoint joinPoint) throws Throwable{
         Object[] args = joinPoint.getArgs();
         args[0]=authService.getCurrentUser().map(User::getRoleId).orElse(-1);
-        System.out.println("----args--role");
-        System.out.println(args);
-        return joinPoint.proceed(args);
+        if(args[0].toString().equals("" + -1)) {
+            return RouteResult.failure("expire");
+        } else {
+            System.out.println("----args--role");
+            System.out.println(args[0]);
+            return joinPoint.proceed(args);
+        }
+
     }
 }

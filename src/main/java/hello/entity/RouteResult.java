@@ -12,6 +12,6 @@ public class RouteResult extends Result<List<Route>>{
     }
 
     public static RouteResult failure(String msg){
-        return new RouteResult("fail", "fail", null);
+        return new RouteResult("fail", msg, null);
     }
 }
