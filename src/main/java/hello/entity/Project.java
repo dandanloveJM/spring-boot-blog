@@ -38,6 +38,7 @@ public class Project {
     private BigDecimal totalPercentage;
     private String taskId;
     private List<Product> products;
+    private String ownerName;
 
 
     public Project(){}
@@ -153,5 +154,13 @@ public class Project {
 
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 }

@@ -59,10 +59,6 @@ public class FlowController {
     private final UserAddedProductService userAddedProductService;
 
 
-
-
-
-
     @Inject
     public FlowController(RuntimeService runtimeService, TaskService taskService,
                           RepositoryService repositoryService,
@@ -102,7 +98,7 @@ public class FlowController {
     @PostMapping("start")
     public ProjectResult startLeaveProcess(Integer ownerId) throws UnknownHostException {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("R2", ""+ownerId);
+        map.put("R2", "" + ownerId);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("a10001", map);
         StringBuilder sb = new StringBuilder();
         sb.append("创建产值流程 processId：" + processInstance.getId());
@@ -117,7 +113,7 @@ public class FlowController {
         return ProjectResult.success(sb.toString());
     }
 
-    private Project buildParam(String processId, String name, String number, String type, String attachment, Integer ownerId) {
+    private Project buildParam(String processId, String name, String number, String type, String attachment, Integer ownerId, String ownerName) {
         Project project = new Project();
         project.setProcessId(processId);
         project.setName(name);
@@ -125,6 +121,7 @@ public class FlowController {
         project.setType(Integer.valueOf(type));
         project.setAttachment(attachment);
         project.setOwnerId(ownerId);
+        project.setOwnerName(ownerName);
         return project;
     }
 
@@ -158,9 +155,11 @@ public class FlowController {
                                         @RequestParam String type,
                                         @RequestParam String taskId,
                                         @RequestParam String processId) throws UnknownHostException {
-       if(ownerId == -1){
-           return ProjectResult.failure("请先登录");
-       }
+        if (ownerId == -1) {
+            return ProjectResult.failure("请先登录");
+        }
+
+        String ownerName = userService.getUserById(ownerId).getData().getDisplayName();
 
         // 需要区分是需要新建任务 还是 修改任务，涉及到不同的数据库操作
 
@@ -181,7 +180,7 @@ public class FlowController {
             String url = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + context.getWebServer().getPort() + "/files/";
             attachmentURL = url + uploadResult.getMsg();
         }
-        Project newProject = buildParam(processId, name, number, type, attachmentURL, ownerId);
+        Project newProject = buildParam(processId, name, number, type, attachmentURL, ownerId, ownerName);
 
         // 判断当前任务是否是退回过的
         // 没有退回过--> 新增
@@ -211,23 +210,23 @@ public class FlowController {
 
     }
 
+
     @PostMapping("uploadOutputPercent")
-    public ProductListResult uploadOutputPercent(@RequestParam String taskId,
-                                             @RequestParam String processId,
-                                             @RequestParam String data) {
+    public ProductListResult uploadOutputPercent(@RequestParam("taskId") String taskId,
+                                                 @RequestParam("processId") String processId,
+                                                 @RequestParam("data") String data) {
         // 流程逻辑
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String, Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        try{
+        try {
             Integer ownerId = projectService.getProjectByProcessId(processId).getData().getOwnerId();
             map.put("R3", R2R3R4Relation.R2ToR3UserIdMAP.get(ownerId.toString()));
         } catch (Exception e) {
             return ProductListResult.failure("上传产值比例失败");
         }
-
 
 
         JSONArray data2 = JSON.parseArray(data);
@@ -272,9 +271,9 @@ public class FlowController {
     @ReadUserIdInSession
     @PostMapping("r3/approveTask")
     public ProductListResult checkTaskByR3(Integer userId,
-                                @RequestParam String taskId,
-                                @RequestParam String processId,
-                                @RequestParam(required = false) String comment) {
+                                           @RequestParam String taskId,
+                                           @RequestParam String processId,
+                                           @RequestParam(required = false) String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String, Object> map = new HashMap<>();
         if (task == null) {
@@ -282,14 +281,14 @@ public class FlowController {
         }
 
 
-        try{
-            Project projectInDB= projectService.getProjectByProcessId(processId).getData();
+        try {
+            Project projectInDB = projectService.getProjectByProcessId(processId).getData();
             String ownerId = projectInDB.getOwnerId().toString();
             String type = projectInDB.getType().toString();
             ArrayList<String> R4List = R2R3R4Relation.R2ToR4UserIdMap.get(ownerId);
             // R4绑定类型 找到唯一的那个R4
             R4TypeListResult r4TypeListResult = userService.getR4IdByTypeId(Integer.valueOf(type));
-            if (Objects.equals(r4TypeListResult.getStatus(), "fail")){
+            if (Objects.equals(r4TypeListResult.getStatus(), "fail")) {
                 return ProductListResult.failure("上传产值比例失败");
             } else {
                 List<String> R4ListFindByType = r4TypeListResult.getData()
@@ -316,15 +315,14 @@ public class FlowController {
         }
 
 
-
     }
 
     @ReadUserIdInSession
     @PostMapping("r4/approveTask")
     public ProjectResult checkTaskByR4(Integer userId,
-                                @RequestParam String taskId,
-                                @RequestParam String processId,
-                                @RequestParam(required = false) String comment) {
+                                       @RequestParam String taskId,
+                                       @RequestParam String processId,
+                                       @RequestParam(required = false) String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String, Object> map = new HashMap<>();
 
@@ -376,10 +374,10 @@ public class FlowController {
     @ReadUserIdInSession
     @PostMapping("/reject")
     public RollbackListResult rejectTask(Integer ownerId,
-                                     @RequestParam String taskId,
-                                     @RequestParam String processId,
-                                     @RequestParam String targetKey,
-                                     @RequestParam(required = false) String comment) {
+                                         @RequestParam String taskId,
+                                         @RequestParam String processId,
+                                         @RequestParam String targetKey,
+                                         @RequestParam(required = false) String comment) {
         Task nowTask = taskService.createTaskQuery().taskId(taskId).singleResult();
         Authentication.setAuthenticatedUserId(ownerId.toString());
         if (StringUtils.isNotEmpty(comment)) {
@@ -467,29 +465,33 @@ public class FlowController {
      * @return
      */
     @GetMapping("/history/list")
-    public List<Activity> historyList(@RequestParam(value = "process_id") String processId) {
+    public ActivityListResult historyList(@RequestParam(value = "processId") String processId) {
         List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(processId).activityType("userTask").finished()
                 .orderByHistoricActivityInstanceEndTime().desc().list();
 
         List<Activity> nodes = new ArrayList<>();
+        try {
+            for (HistoricActivityInstance activityInstance : activities) {
+                Activity activity = new Activity();
+                String taskId = activityInstance.getTaskId();
+                Integer userId = Integer.valueOf(activityInstance.getAssignee());
+                String displayName = userService.getUserById(userId).getData().getDisplayName();
+                String comment = projectService.getComment(processId, taskId).getData();
 
-        for(HistoricActivityInstance activityInstance:activities){
-            Activity activity = new Activity();
-            String taskId = activityInstance.getTaskId();
-            Integer userId = Integer.valueOf(activityInstance.getAssignee());
-            String displayName = userService.getUserById(userId).getData().getDisplayName();
-            String comment = projectService.getComment(processId, taskId).getData();
-
-            activity.setProcessId(processId);
-            activity.setTaskId(taskId);
-            activity.setDisplayName(displayName);
-            activity.setActivityName(activityInstance.getActivityName());
-            activity.setComment(comment);
-            activity.setTime(activityInstance.getEndTime());
-            nodes.add(activity);
+                activity.setProcessId(processId);
+                activity.setTaskId(taskId);
+                activity.setDisplayName(displayName);
+                activity.setActivityName(activityInstance.getActivityName());
+                activity.setComment(comment);
+                activity.setTime(activityInstance.getEndTime());
+                nodes.add(activity);
+            }
+            return ActivityListResult.success(nodes);
+        } catch (Exception e) {
+            return ActivityListResult.failure("查询流程审批历史失败");
         }
-        return nodes;
+
 
     }
 

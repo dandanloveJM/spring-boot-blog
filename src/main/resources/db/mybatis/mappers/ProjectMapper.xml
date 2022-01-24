@@ -12,6 +12,7 @@
         project.type,
         project.attachment,
         project.owner_id,
+        project.owner_name,
         project.product_id,
         project.created_at,
         project.updated_at,
@@ -39,6 +40,7 @@
         project.type,
         project.attachment,
         project.owner_id,
+        project.owner_name,
         project.product_id,
         project.created_at,
         project.updated_at,
@@ -57,6 +59,7 @@
             project.type,
             project.attachment,
             project.owner_id,
+            project.owner_name,
             project.product_id,
             project.created_at,
             project.updated_at,
@@ -75,6 +78,7 @@
             project.type,
             project.attachment,
             project.owner_id,
+            project.owner_name,
             project.product_id,
             project.created_at,
             project.updated_at,
@@ -85,12 +89,13 @@
             <foreach collection="list" item="processId" index="index" open="(" separator="," close=")">
                #{processId}
             </foreach>
+            order by project.updated_at desc
     </select>
 
     <insert id="insertProject" parameterType="hello.entity.Project" useGeneratedKeys="true"
             keyProperty="id" keyColumn="id">
         INSERT INTO project (process_id, name, number, type, attachment, owner_id, owner_name, product_id, created_at, updated_at )
-        VALUES (#{processId}, #{name}, #{number}, #{type}, #{attachment}, #{ownerId}, #{owner_name},#{productId}, now(), now())
+        VALUES (#{processId}, #{name}, #{number}, #{type}, #{attachment}, #{ownerId}, #{ownerName},#{productId}, now(), now())
     </insert>
 
     <update id="updateProject" parameterType="hello.entity.Project">
@@ -191,6 +196,7 @@
         <result property="number" column="number"/>
         <result property="type" column="type"/>
         <result property="ownerId" column="owner_id"/>
+        <result property="ownerName" column="owner_name"/>
         <result property="attachment" column="attachment"/>
         <result property="updatedAt" column="updated_at"/>
         <result property="totalProduct" column="total_product"/>
@@ -213,6 +219,7 @@
         <result property="type" column="type"/>
         <result property="attachment" column="attachment"/>
         <result property="ownerId" column="owner_id"/>
+        <result property="ownerName" column="owner_name"/>
         <result property="productId" column="product_id"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>

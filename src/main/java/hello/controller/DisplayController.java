@@ -3,6 +3,7 @@ package hello.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import hello.anno.ReadUserIdInSession;
 import hello.entity.*;
 import hello.service.*;
 import org.flowable.engine.*;
@@ -35,9 +36,9 @@ public class DisplayController {
         this.userAddedProductService = userAddedProductService;
     }
 
-//    @ReadUserIdInSession
+    @ReadUserIdInSession
     @GetMapping("/R1/displayUnfinishedProjects")
-    public ProjectListResult getR1UnifishedProjectsByUserId(@RequestParam("userId") Integer userId){
+    public ProjectListResult getR1UnifishedProjectsByUserId(Integer userId){
         return displayService.getR1UnfinishedProjectsByUserId(userId);
     }
 
