@@ -35,7 +35,7 @@ public class RouteController {
             route2.setId(2);
             route2.setPid(1);
             route2.setName("我的任务");
-            route2.setPath("/element");
+            route2.setPath("/display/task");
             route2.setRedirect("/display/task");
             route2.setIcon("ChromeOutlined");
             route2.setKey("element");
@@ -50,11 +50,52 @@ public class RouteController {
             route3.setComponent("/display/task");
             route3.setIcon("");
             route3.setKey("el_icon");
-            route3.setKeepAlive(true);
+
+
+            Route route4 = new Route();
+            route4.setId(11);
+            route4.setPid(2);
+            route4.setName("已有产值的任务");
+            route4.setPath("/display/doneTask");
+            route4.setRedirect("");
+            route4.setComponent("/display/doneTask");
+            route4.setIcon("");
+            route4.setKey("el_done");
+
+
+            Route route5 = new Route();
+            List<Route> route5children = new ArrayList<>();
+            route5.setId(3);
+            route5.setPid(1);
+            route5.setName("排行榜");
+            route5.setPath("/rank/peopleRank");
+            route5.setRedirect("/rank/peopleRank");
+            route5.setIcon("ChromeOutlined");
+            route5.setKey("rank");
+            route5.setComponent("RouteView");
+
+
+
+            Route route6 = new Route();
+            route6.setId(4);
+            route6.setPid(3);
+            route6.setName("个人排行榜");
+            route6.setPath("/rank/peopleRank");
+            route6.setRedirect("");
+            route6.setIcon("ChromeOutlined");
+            route6.setKey("peopleRank");
+            route6.setComponent("/rank/peopleRank");
+
+            route5children.add(route6);
+            route5.setChildren(route5children);
+
+
 
             route2children.add(route3);
+            route2children.add(route4);
             route2.setChildren(route2children);
             routeChildren.add(route2);
+            routeChildren.add(route5);
 
             route.setChildren(routeChildren);
 

@@ -42,9 +42,9 @@ public class DisplayController {
         return displayService.getR1UnfinishedProjectsByUserId(userId);
     }
 
-//    @ReadUserIdInSession
+    @ReadUserIdInSession
     @GetMapping("/R1/displayFinishedProjects")
-    public ProductListResult getR1FinishedProjects(@RequestParam("userId") Integer userId){
+    public ProductListResult getR1FinishedProjects(Integer userId){
         // 只展示有产值的数据
         return displayService.getFinishedProjectsByUserId(userId);
     }
