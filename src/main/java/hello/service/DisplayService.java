@@ -148,9 +148,11 @@ public class DisplayService {
             // 深拷贝
             Project projectCopy = deepCopy(unfinishedProject);
             if(activeActivityInstance != null) {
-                //需要加上taskId;
+                //需要加上taskId和activityname;
                 String taskId = activeActivityInstance.getTaskId();
+                String activityName = activeActivityInstance.getActivityName();
                 projectCopy.setTaskId(taskId);
+                projectCopy.setActivityName(activityName);
             }
 
             finalUnfinishedProjects.add(projectCopy);

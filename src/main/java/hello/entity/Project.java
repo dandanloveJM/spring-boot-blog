@@ -39,6 +39,7 @@ public class Project {
     private String taskId;
     private List<Product> products;
     private String ownerName;
+    private String activityName;
 
 
     public Project(){}
@@ -162,5 +163,13 @@ public class Project {
 
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
+    }
+
+    public String getActivityName() {
+        return activityName;
+    }
+
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
     }
 }
