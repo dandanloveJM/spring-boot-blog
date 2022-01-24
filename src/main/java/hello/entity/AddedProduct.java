@@ -7,6 +7,7 @@ public class AddedProduct {
     private Integer userId;
     private String displayName;
     private BigDecimal product;
+    private Integer rankId;
 
     public Integer getId() {
         return id;
@@ -38,5 +39,13 @@ public class AddedProduct {
 
     public void setProduct(BigDecimal product) {
         this.product = product;
+    }
+
+    public Integer getRankId() {
+        return rankId;
+    }
+
+    public void setRankId(Integer rankId) {
+        this.rankId = rankId;
     }
 }

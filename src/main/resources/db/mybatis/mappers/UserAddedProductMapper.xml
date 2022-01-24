@@ -6,6 +6,7 @@
     <select id="selectAllProducts" resultType="hello.entity.AddedProduct" >
         select *
         FROM user_added_product
+        order by product desc
     </select>
 
     <insert id="insertAddedProduct" useGeneratedKeys="true" parameterType="java.util.List"
