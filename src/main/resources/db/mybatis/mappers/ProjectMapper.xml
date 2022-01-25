@@ -162,6 +162,7 @@
                 <foreach collection="typeIds" item="typeId" index="index" open="(" separator="," close=")">
                      #{typeId}
                 </foreach>
+                order by project.updated_at desc
     </select>
 
 

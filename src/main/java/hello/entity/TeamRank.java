@@ -3,9 +3,18 @@ package hello.entity;
 import java.math.BigDecimal;
 
 public class TeamRank {
+    private int rankId;
     private String teamRank;
     private String teamName;
     private BigDecimal productSum;
+
+    public int getRankId() {
+        return rankId;
+    }
+
+    public void setRankId(int rankId) {
+        this.rankId = rankId;
+    }
 
     public String getTeamRank() {
         return teamRank;

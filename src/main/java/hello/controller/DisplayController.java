@@ -61,8 +61,9 @@ public class DisplayController {
         return displayService.getAllR3Projects(userId);
     }
 
+    @ReadUserIdInSession
     @GetMapping("/R4/Projects")
-    public DisplayResult getR4AllProjects(@RequestParam("userId") Integer userId){
+    public DisplayResult getR4AllProjects(Integer userId){
         return displayService.getAllR4Projects(userId);
     }
 
@@ -72,8 +73,9 @@ public class DisplayController {
         return displayService.getAllProjects();
     }
 
+    @ReadUserIdInSession
     @GetMapping("/A1/Projects")
-    public DisplayResult getA1AllProjects(@RequestParam("userId") Integer userId){
+    public DisplayResult getA1AllProjects(Integer userId){
         return displayService.getA1AllProjects(userId);
     }
 
