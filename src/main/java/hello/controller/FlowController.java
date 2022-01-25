@@ -95,22 +95,22 @@ public class FlowController {
     }
 
     @ReadUserIdInSession
-    @PostMapping("start")
-    public ProjectResult startLeaveProcess(Integer ownerId) throws UnknownHostException {
+    @GetMapping("start")
+    public StartResult startLeaveProcess(Integer ownerId) throws UnknownHostException {
         HashMap<String, Object> map = new HashMap<>();
         map.put("R2", "" + ownerId);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("a10001", map);
-        StringBuilder sb = new StringBuilder();
-        sb.append("创建产值流程 processId：" + processInstance.getId());
+        try{
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("a10001", map);
+            Start startData = new Start();
+            startData.setProcessId(processInstance.getId());
+            List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(ownerId.toString()).orderByTaskCreateTime().desc().list();
+            startData.setTaskId(tasks.get(0).getId());
+            return StartResult.success(startData);
+        } catch (Exception e){
+            return StartResult.failure("新建流程失败");
+        }
 
 
-        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(ownerId.toString()).orderByTaskCreateTime().desc().list();
-//        for (Task task : tasks) {
-//            System.out.println(task.getId());
-//            sb.append("产值任务taskId:" + task.getId());
-//        }
-        sb.append("本次最新的taskId：" + tasks.get(0).getId());
-        return ProjectResult.success(sb.toString());
     }
 
     private Project buildParam(String processId, String name, String number, String type, String attachment, Integer ownerId, String ownerName) {

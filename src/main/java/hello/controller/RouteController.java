@@ -106,6 +106,9 @@ public class RouteController {
         } else if (roleId == 2) {
             List<Route> routes = getRoutes("/display/r2task", "/display/r2DoneTask");
             return RouteResult.success(routes);
+        } else if (roleId == 3) {
+            List<Route> routes = getRoutes("/display/r3task", "/display/r3DoneTask");
+            return RouteResult.success(routes);
         }
         return RouteResult.failure("路由异常");
     }

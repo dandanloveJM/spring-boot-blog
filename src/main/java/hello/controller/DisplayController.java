@@ -55,8 +55,9 @@ public class DisplayController {
         return displayService.getAllR2Projects(userId);
     }
 
+    @ReadUserIdInSession
     @GetMapping("/R3/Projects")
-    public DisplayResult getR3AllProjects(@RequestParam("userId") Integer userId){
+    public DisplayResult getR3AllProjects(Integer userId){
         return displayService.getAllR3Projects(userId);
     }
 
