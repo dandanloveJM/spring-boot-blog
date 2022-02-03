@@ -143,6 +143,9 @@ public class RouteController {
         } else if (roleId == 4){
             List<Route> routes = getRoutes("/display/r4task", "/display/r4DoneTask","/rank/teamRank");
             return RouteResult.success(routes);
+        } else if (roleId == 6){// 财务
+            List<Route> routes = getRoutes("/display/a1task", "/display/a1DoneTask", null);
+            return RouteResult.success(routes);
         }
         return RouteResult.failure("路由异常");
     }

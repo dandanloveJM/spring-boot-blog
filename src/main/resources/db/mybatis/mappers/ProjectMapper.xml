@@ -124,7 +124,7 @@
 
     <select id="getProjectsByOwnerId" resultMap="R2Projects">
         select project.id, project.process_id, project.name, project.number, project.owner_name,
-               project.type, project.owner_id, project.attachment, project.updated_at,
+               project.type, project.owner_id, project.attachment, project.created_at, project.updated_at,
                project.total_product, project.total_percentage,
                p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
         from project

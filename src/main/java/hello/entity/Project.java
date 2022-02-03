@@ -30,9 +30,7 @@ public class Project {
     private String attachment;
     private Integer ownerId;
     private Integer productId;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Instant createdAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Instant updatedAt;
     private BigDecimal totalProduct;
     private BigDecimal totalPercentage;
