@@ -53,6 +53,7 @@
             product.percentage as percentage,
             product.product as product,
             product.updated_at as product_updated_at,
+               product.display_name as display_name,
             user.id as user_id,
             user.username as user_username
         FROM product
@@ -125,6 +126,7 @@
         <result property="percentage" column="percentage"/>
         <result property="product" column="product"/>
         <result property="userId" column="user_id"/>
+        <result property="displayName" column="display_name"/>
         <result property="updatedAt" column="product_updated_at"/>
         <association property="user" javaType="hello.entity.User">
             <id property="id" column="user_id"/>

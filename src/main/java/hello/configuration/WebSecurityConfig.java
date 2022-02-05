@@ -20,7 +20,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
-                .antMatchers("/start").authenticated();
+                .antMatchers("/start").authenticated()
+                .anyRequest().authenticated();
 
         http.cors();
         http.sessionManagement(session -> session.invalidSessionStrategy(new CustomInvalidSessionStrategy()));

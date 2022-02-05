@@ -101,7 +101,7 @@ public class RouteController {
             Route route8 = new Route();
             route8.setId(6);
             route8.setPid(3);
-            route8.setName("团队奖金池");
+            route8.setName("30%产值待分配");
             route8.setPath("/rank/teamBonus");
             route8.setRedirect("");
             route8.setIcon("ChromeOutlined");

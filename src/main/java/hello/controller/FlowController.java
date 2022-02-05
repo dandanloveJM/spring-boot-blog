@@ -440,20 +440,26 @@ public class FlowController {
 
     @NotNull
     private ProductResult updateProducts(@RequestParam String processId, BigDecimal newTotal, BigDecimal newRatio, BigDecimal finalTotal) throws Exception {
-        projectService.updateTotalProductOfProject(newTotal, newRatio, processId);
-        productService.updateProducts(finalTotal, processId);
-        List<Product> products = productService.getProductsByProcessId(processId).getData();
-        List<AddedProduct> addedProducts = products.stream()
-                .map(item -> {
-                    AddedProduct temp = new AddedProduct();
-                    temp.setProduct(item.getProduct());
-                    temp.setUserId(item.getUserId());
-                    temp.setDisplayName(item.getDisplayName());
-                    return temp;
-                }).collect(Collectors.toList());
+        try {
+            projectService.updateTotalProductOfProject(newTotal, newRatio, processId);
+            productService.updateProducts(finalTotal, processId);
+            List<Product> products = productService.getProductsByProcessId(processId).getData();
+            List<AddedProduct> addedProducts = products.stream()
+                    .map(item -> {
+                        AddedProduct temp = new AddedProduct();
+                        temp.setProduct(item.getProduct());
+                        temp.setUserId(item.getUserId());
+                        temp.setDisplayName(item.getDisplayName());
+                        return temp;
+                    }).collect(Collectors.toList());
 
-        userAddedProductService.insertAndUpdateAddedProducts(addedProducts);
-        return ProductResult.success("更新产值成功");
+            userAddedProductService.insertAndUpdateAddedProducts(addedProducts);
+            return ProductResult.success("更新产值成功");
+        } catch (Exception e){
+            return ProductResult.failure("更新产值失败");
+        }
+
+
     }
 
 
