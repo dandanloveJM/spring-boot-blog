@@ -98,6 +98,9 @@
                  inner join user on product.user_id = user.id
                  inner join project on product.process_id = project.process_id
         where product.user_id=#{userId} and product.product > 0
+        <if test="query != ''">
+            and  project.name  REGEXP #{query}
+        </if>
         order by product.updated_at
     </select>
 

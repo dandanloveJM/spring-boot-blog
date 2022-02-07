@@ -42,9 +42,12 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/R1/displayFinishedProjects")
-    public ProductListResult getR1FinishedProjects(Integer userId){
+    public ProductListResult getR1FinishedProjects(Integer userId, String query){
+        if(query == null){
+            query = "";
+        }
         // 只展示有产值的数据
-        return displayService.getFinishedProjectsByUserId(userId);
+        return displayService.getFinishedProjectsByUserId(userId, query);
     }
 
     @ReadUserIdInSession
@@ -79,18 +82,24 @@ public class DisplayController {
 
     @GetMapping("/userRank")
     public UserRankListResult getUserRank(Integer year){
+        if(year==null){
+            year=2022;
+        }
         return rankService.getUserRanks(year);
 //        return userAddedProductService.getAllAddedProducts();
     }
 
     @GetMapping("/teamRank")
-    public TeamRankListResult getTeamRank(){
-        return rankService.getTeamRank();
+    public TeamRankListResult getTeamRank(Integer year){
+        if(year==null){
+            year=2022;
+        }
+        return rankService.getTeamRank(year);
     }
 
     @GetMapping("/teamBonus")
-    public TeamRankListResult getTeamBonus(){
-        return rankService.getTeamBonus();
+    public TeamRankListResult getTeamBonus(Integer year){
+        return rankService.getTeamBonus(year);
     }
 
     @GetMapping("/addedProducts")
