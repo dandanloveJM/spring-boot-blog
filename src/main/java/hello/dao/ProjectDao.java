@@ -72,8 +72,10 @@ public class ProjectDao {
     }
 
 
-    public List<Project> getProjectsByProcessIds(List<String> processIds){
-        return sqlSession.selectList("getProjectsByProcessIds", processIds);
+    public List<Project> getProjectsByProcessIds(List<String> processIds, String query){
+        Map<String, Object> parameters = asMap("processIds", processIds,
+                "query", query);
+        return sqlSession.selectList("getProjectsByProcessIds", parameters);
     }
 
     public List<Project> getProjectsByOwnerId(Integer ownerId){

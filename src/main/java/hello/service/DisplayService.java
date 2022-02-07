@@ -57,7 +57,7 @@ public class DisplayService {
     }
 
 
-    public ProjectListResult getR1UnfinishedProjectsByUserId(Integer userId){
+    public ProjectListResult getR1UnfinishedProjectsByUserId(Integer userId, String query){
         try {
             // 所有让R1填写的任务
             List<HistoricActivityInstance> R1AllActivities = historyService.createHistoricActivityInstanceQuery()
@@ -69,7 +69,7 @@ public class DisplayService {
 
             // 所有与R1有关的ProcessId 需要区分哪些是流程进行中（1.1 需要R1填写；1.2R1填完了，再走其他流程），哪些流程已结束
             List<String> R1AllProcessIds = R1AllActivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
-            List<Project> R1AllProjects = projectService.getProjectsByProcessIds(R1AllProcessIds).getData();
+            List<Project> R1AllProjects = projectService.getProjectsByProcessIds(R1AllProcessIds, query).getData();
             // 筛选出没有最终产值的Project, 就是R1 相关的 还在流程中的 Project
             List<Project> R1UnfinishedProjects = R1AllProjects.stream()
                     .filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());

@@ -69,7 +69,7 @@
             where project.process_id = #{processId}
         </select>
 
-    <select id="getProjectsByProcessIds" parameterType="java.util.List" resultMap="project">
+    <select id="getProjectsByProcessIds"  resultMap="project">
             SELECT
             project.id,
             project.process_id,
@@ -86,9 +86,12 @@
             project.total_percentage
             FROM project
             where project.process_id in
-            <foreach collection="list" item="processId" index="index" open="(" separator="," close=")">
+            <foreach collection="processIds" item="processId" index="index" open="(" separator="," close=")">
                #{processId}
             </foreach>
+             <if test="query != ''">
+                and  project.name  REGEXP #{query}
+             </if>
             order by project.updated_at desc
     </select>
 

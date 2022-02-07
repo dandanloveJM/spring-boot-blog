@@ -42,7 +42,7 @@ public class ProjectController {
             processIds.add(processId);
         }
 
-        return projectService.getProjectsByProcessIds(processIds);
+        return projectService.getProjectsByProcessIds(processIds, "");
     }
 
     @GetMapping("/getProjectsByOwnerId")

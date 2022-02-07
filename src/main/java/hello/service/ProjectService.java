@@ -94,9 +94,9 @@ public class ProjectService {
         }
     }
 
-    public ProjectListResult getProjectsByProcessIds(List<String> processIds){
+    public ProjectListResult getProjectsByProcessIds(List<String> processIds, String query){
         try{
-            return ProjectListResult.success(projectDao.getProjectsByProcessIds(processIds));
+            return ProjectListResult.success(projectDao.getProjectsByProcessIds(processIds, query));
         } catch (Exception e){
             return ProjectListResult.failure("查询失败");
         }

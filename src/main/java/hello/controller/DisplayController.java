@@ -36,8 +36,11 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/R1/displayUnfinishedProjects")
-    public ProjectListResult getR1UnifishedProjectsByUserId(Integer userId){
-        return displayService.getR1UnfinishedProjectsByUserId(userId);
+    public ProjectListResult getR1UnifishedProjectsByUserId(Integer userId, String query){
+        if(query == null){
+            query = "";
+        }
+        return displayService.getR1UnfinishedProjectsByUserId(userId, query);
     }
 
     @ReadUserIdInSession
