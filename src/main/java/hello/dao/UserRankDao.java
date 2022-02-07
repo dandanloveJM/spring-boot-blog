@@ -18,8 +18,9 @@ public class UserRankDao {
         this.sqlSession = sqlSession;
     }
 
-    public List<UserRank> getUserRanks(){
-        return sqlSession.selectList("selectUserRank");
+    // 用户排名
+    public List<UserRank> getUserRanks(int year){
+        return sqlSession.selectList("selectUserRank",year);
     }
 
     // 获得四个团队的groupby聚合值

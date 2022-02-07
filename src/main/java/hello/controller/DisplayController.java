@@ -6,8 +6,6 @@ import com.alibaba.fastjson.JSONObject;
 import hello.anno.ReadUserIdInSession;
 import hello.entity.*;
 import hello.service.*;
-import org.flowable.engine.*;
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -80,8 +78,9 @@ public class DisplayController {
     }
 
     @GetMapping("/userRank")
-    public AddedProductListResult getUserRank(){
-        return userAddedProductService.getAllAddedProducts();
+    public UserRankListResult getUserRank(Integer year){
+        return rankService.getUserRanks(year);
+//        return userAddedProductService.getAllAddedProducts();
     }
 
     @GetMapping("/teamRank")
