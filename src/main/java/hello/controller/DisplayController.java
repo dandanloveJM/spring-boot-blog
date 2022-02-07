@@ -6,8 +6,6 @@ import com.alibaba.fastjson.JSONObject;
 import hello.anno.ReadUserIdInSession;
 import hello.entity.*;
 import hello.service.*;
-import org.flowable.engine.*;
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,9 +42,12 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/R1/displayFinishedProjects")
-    public ProductListResult getR1FinishedProjects(Integer userId){
+    public ProductListResult getR1FinishedProjects(Integer userId, String query){
+        if(query == null){
+            query = "";
+        }
         // 只展示有产值的数据
-        return displayService.getFinishedProjectsByUserId(userId);
+        return displayService.getFinishedProjectsByUserId(userId, query);
     }
 
     @ReadUserIdInSession
@@ -55,13 +56,15 @@ public class DisplayController {
         return displayService.getAllR2Projects(userId);
     }
 
+    @ReadUserIdInSession
     @GetMapping("/R3/Projects")
-    public DisplayResult getR3AllProjects(@RequestParam("userId") Integer userId){
+    public DisplayResult getR3AllProjects(Integer userId){
         return displayService.getAllR3Projects(userId);
     }
 
+    @ReadUserIdInSession
     @GetMapping("/R4/Projects")
-    public DisplayResult getR4AllProjects(@RequestParam("userId") Integer userId){
+    public DisplayResult getR4AllProjects(Integer userId){
         return displayService.getAllR4Projects(userId);
     }
 
@@ -71,24 +74,32 @@ public class DisplayController {
         return displayService.getAllProjects();
     }
 
+    @ReadUserIdInSession
     @GetMapping("/A1/Projects")
-    public DisplayResult getA1AllProjects(@RequestParam("userId") Integer userId){
+    public DisplayResult getA1AllProjects(Integer userId){
         return displayService.getA1AllProjects(userId);
     }
 
     @GetMapping("/userRank")
-    public AddedProductListResult getUserRank(){
-        return userAddedProductService.getAllAddedProducts();
+    public UserRankListResult getUserRank(Integer year){
+        if(year==null){
+            year=2022;
+        }
+        return rankService.getUserRanks(year);
+//        return userAddedProductService.getAllAddedProducts();
     }
 
     @GetMapping("/teamRank")
-    public TeamRankListResult getTeamRank(){
-        return rankService.getTeamRank();
+    public TeamRankListResult getTeamRank(Integer year){
+        if(year==null){
+            year=2022;
+        }
+        return rankService.getTeamRank(year);
     }
 
     @GetMapping("/teamBonus")
-    public TeamRankListResult getTeamBonus(){
-        return rankService.getTeamBonus();
+    public TeamRankListResult getTeamBonus(Integer year){
+        return rankService.getTeamBonus(year);
     }
 
     @GetMapping("/addedProducts")

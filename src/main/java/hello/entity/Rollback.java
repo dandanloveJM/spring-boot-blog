@@ -1,15 +1,18 @@
 package hello.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
 
 public class Rollback {
     private Integer id;
     private String processId;
     private Integer userId;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    private Instant updatedAt;
+    @JsonProperty("updatedAt")
+    ZonedDateTime updatedAt;
     private String taskId;
     private String comment;
     private String taskKey;
@@ -46,11 +49,11 @@ public class Rollback {
         this.userId = userId;
     }
 
-    public Instant getUpdatedAt() {
+    public ZonedDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(ZonedDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 

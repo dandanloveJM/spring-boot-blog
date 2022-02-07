@@ -74,8 +74,16 @@ public class UserAddedProductService {
                 }
             }
 
-            userAddedProductDao.updateAddedProducts(toUpdateProducts);
-            userAddedProductDao.insertAddedProducts(toInsertProducts);
+            if (!toUpdateProducts.isEmpty()){
+                userAddedProductDao.updateAddedProducts(toUpdateProducts);
+            }
+
+            if(!toInsertProducts.isEmpty()){
+                userAddedProductDao.insertAddedProducts(toInsertProducts);
+            }
+
+
+
             return getAllAddedProducts();
         } catch (Exception e) {
             return AddedProductListResult.failure("新增个人累计产值失败");

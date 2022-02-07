@@ -1,9 +1,11 @@
 package hello.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 
 public class Product {
     private Integer id;
@@ -11,7 +13,6 @@ public class Product {
     private Integer userId;
     private BigDecimal percentage;
     private BigDecimal product;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Instant updatedAt;
     private BigDecimal bonus;
     private User user;

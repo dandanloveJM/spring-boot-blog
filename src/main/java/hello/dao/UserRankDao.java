@@ -18,28 +18,30 @@ public class UserRankDao {
         this.sqlSession = sqlSession;
     }
 
-    public List<UserRank> getUserRanks(){
-        return sqlSession.selectList("selectUserRank");
+    // 用户排名
+    public List<UserRank> getUserRanks(int year){
+        return sqlSession.selectList("selectUserRank",year);
     }
 
     // 获得四个团队的groupby聚合值
-    public List<TeamRank> get4TeamsRank(){
-        return sqlSession.selectList("select4TeamsProducts");
+    public List<TeamRank> get4TeamsRank(int year){
+        return sqlSession.selectList("select4TeamsProducts", year);
     }
 
     // 获得两个R3的groupby sum产值的值
-    public List<TeamRank> get2R3Rank(){
-        return sqlSession.selectList("selectR3Products");
+    public List<TeamRank> get2R3Rank(int year){
+        return sqlSession.selectList("selectR3Products", year);
     }
 
     // 获得四个团队的groupby聚合值
-    public List<TeamRank> get4TeamsBonus(){
-        return sqlSession.selectList("select4TeamsBonus");
+    public List<TeamRank> get4TeamsBonus(int year){
+        return sqlSession.selectList("select4TeamsBonus", year);
     }
 
     // 获得两个R3的groupby sum 奖金池的值
-    public List<TeamRank> get2R3Bonus(){
-        return sqlSession.selectList("selectR3Bonus");
+    public List<TeamRank> get2R3Bonus(int year){
+
+        return sqlSession.selectList("selectR3Bonus", year);
     }
 
 }

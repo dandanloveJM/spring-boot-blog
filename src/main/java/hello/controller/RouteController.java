@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 public class RouteController {
 
-    private List<Route> getRoutes(String undoneTaskURL, String doneTaskURL) {
+    private List<Route> getRoutes(String undoneTaskURL, String doneTaskURL, String teamRankURL) {
         List<Route> routes = new ArrayList<>();
         Route route = new Route();
         route.setId(1);
@@ -81,6 +81,37 @@ public class RouteController {
         route6.setComponent("/rank/peopleRank");
 
         route5children.add(route6);
+
+
+        Route route7 = new Route();
+        route7.setId(5);
+        route7.setPid(3);
+        route7.setName("团队排行榜");
+        route7.setPath("/rank/teamRank");
+        route7.setRedirect("");
+        route7.setIcon("ChromeOutlined");
+        route7.setKey("teamRank");
+        route7.setComponent("/rank/teamRank");
+        route5children.add(route7);
+
+        if (teamRankURL != null){
+
+
+
+            Route route8 = new Route();
+            route8.setId(6);
+            route8.setPid(3);
+            route8.setName("30%产值待分配");
+            route8.setPath("/rank/teamBonus");
+            route8.setRedirect("");
+            route8.setIcon("ChromeOutlined");
+            route8.setKey("teamBonus");
+            route8.setComponent("/rank/teamBonus");
+            route5children.add(route8);
+        }
+
+
+
         route5.setChildren(route5children);
 
 
@@ -101,10 +132,19 @@ public class RouteController {
     public RouteResult getUserMenu(Integer roleId) {
         // 根据用户的权限返回相应的路由
         if (roleId == 1) {
-            List<Route> routes = getRoutes("/display/task", "/display/doneTask");
+            List<Route> routes = getRoutes("/display/task", "/display/doneTask",null);
             return RouteResult.success(routes);
         } else if (roleId == 2) {
-            List<Route> routes = getRoutes("/display/r2task", "/display/r2DoneTask");
+            List<Route> routes = getRoutes("/display/r2task", "/display/r2DoneTask",null);
+            return RouteResult.success(routes);
+        } else if (roleId == 3) {
+            List<Route> routes = getRoutes("/display/r3task", "/display/r3DoneTask",null);
+            return RouteResult.success(routes);
+        } else if (roleId == 4){
+            List<Route> routes = getRoutes("/display/r4task", "/display/r4DoneTask","/rank/teamRank");
+            return RouteResult.success(routes);
+        } else if (roleId == 6){// 财务
+            List<Route> routes = getRoutes("/display/a1task", "/display/a1DoneTask", null);
             return RouteResult.success(routes);
         }
         return RouteResult.failure("路由异常");

@@ -40,9 +40,9 @@ public class DisplayService {
         this.userService = userService;
     }
 
-    public ProductListResult getFinishedProjectsByUserId(Integer userId){
+    public ProductListResult getFinishedProjectsByUserId(Integer userId, String query){
         try{
-            return ProductListResult.success("查询成功", productDao.getProductAndProjectByUserId(userId));
+            return ProductListResult.success("查询成功", productDao.getProductAndProjectByUserId(userId, query));
         } catch (Exception e) {
             return ProductListResult.failure("查询失败");
         }

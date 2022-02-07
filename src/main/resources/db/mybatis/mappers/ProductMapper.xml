@@ -53,6 +53,7 @@
             product.percentage as percentage,
             product.product as product,
             product.updated_at as product_updated_at,
+               product.display_name as display_name,
             user.id as user_id,
             user.username as user_username
         FROM product
@@ -62,10 +63,10 @@
 
     <insert id="insertProducts" useGeneratedKeys="true" parameterType="java.util.List"
             keyProperty="id" keyColumn="id">
-        INSERT INTO product (process_id, user_id, percentage, product, updated_at)
+        INSERT INTO product (process_id, user_id, display_name, percentage, product, updated_at)
         VALUES
         <foreach collection="list" item="product" index="index" separator=",">
-            (#{product.processId}, #{product.userId}, #{product.percentage}, #{product.product}, now())
+            (#{product.processId}, #{product.userId}, #{product.displayName},#{product.percentage}, #{product.product}, now())
         </foreach>
     </insert>
 
@@ -97,6 +98,9 @@
                  inner join user on product.user_id = user.id
                  inner join project on product.process_id = project.process_id
         where product.user_id=#{userId} and product.product > 0
+        <if test="query != ''">
+            and  project.name  REGEXP #{query}
+        </if>
         order by product.updated_at
     </select>
 
@@ -125,6 +129,7 @@
         <result property="percentage" column="percentage"/>
         <result property="product" column="product"/>
         <result property="userId" column="user_id"/>
+        <result property="displayName" column="display_name"/>
         <result property="updatedAt" column="product_updated_at"/>
         <association property="user" javaType="hello.entity.User">
             <id property="id" column="user_id"/>
