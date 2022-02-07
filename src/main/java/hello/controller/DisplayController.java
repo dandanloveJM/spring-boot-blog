@@ -36,82 +36,112 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/R1/displayUnfinishedProjects")
-    public ProjectListResult getR1UnifishedProjectsByUserId(Integer userId, String query){
-        if(query == null){
+    public ProjectListResult getR1UnifishedProjectsByUserId(Integer userId, String query, Integer year) {
+        if (query == null) {
             query = "";
         }
-        return displayService.getR1UnfinishedProjectsByUserId(userId, query);
+        if (year == null) {
+            year = 2022;
+        }
+        return displayService.getR1UnfinishedProjectsByUserId(userId, query, year);
     }
 
     @ReadUserIdInSession
     @GetMapping("/R1/displayFinishedProjects")
-    public ProductListResult getR1FinishedProjects(Integer userId, String query){
-        if(query == null){
+    public ProductListResult getR1FinishedProjects(Integer userId, String query, Integer year) {
+        if (query == null) {
             query = "";
         }
+        if (year == null) {
+            year = 2022;
+        }
         // 只展示有产值的数据
-        return displayService.getFinishedProjectsByUserId(userId, query);
+        return displayService.getFinishedProjectsByUserId(userId, query, year);
     }
 
     @ReadUserIdInSession
     @GetMapping("/R2/Projects")
-    public DisplayResult getR2AllProjects(Integer userId){
-        return displayService.getAllR2Projects(userId);
+    public DisplayResult getR2AllProjects(Integer userId, String query, Integer year) {
+        if (query == null) {
+            query = "";
+        }
+        if (year == null) {
+            year = 2022;
+        }
+        return displayService.getAllR2Projects(userId, query, year);
     }
 
     @ReadUserIdInSession
     @GetMapping("/R3/Projects")
-    public DisplayResult getR3AllProjects(Integer userId){
-        return displayService.getAllR3Projects(userId);
+    public DisplayResult getR3AllProjects(Integer userId, String query, Integer year) {
+        if (query == null) {
+            query = "";
+        }
+        if (year == null) {
+            year = 2022;
+        }
+        return displayService.getAllR3Projects(userId, query, year);
     }
 
     @ReadUserIdInSession
     @GetMapping("/R4/Projects")
-    public DisplayResult getR4AllProjects(Integer userId){
-        return displayService.getAllR4Projects(userId);
+    public DisplayResult getR4AllProjects(Integer userId, String query, Integer year) {
+        if (query == null) {
+            query = "";
+        }
+        if (year == null) {
+            year = 2022;
+        }
+        return displayService.getAllR4Projects(userId, query, year);
     }
 
     // TODO R5和ADMIN可以看全部
     @GetMapping("/allProjects")
-    public DisplayResult getAllProjects(){
+    public DisplayResult getAllProjects() {
         return displayService.getAllProjects();
     }
 
     @ReadUserIdInSession
     @GetMapping("/A1/Projects")
-    public DisplayResult getA1AllProjects(Integer userId){
-        return displayService.getA1AllProjects(userId);
+    public DisplayResult getA1AllProjects(Integer userId, String query, Integer year) {
+        if (query == null) {
+            query = "";
+        }
+        if (year == null) {
+            year = 2022;
+        }
+        return displayService.getA1AllProjects(userId, query, year);
     }
 
     @GetMapping("/userRank")
-    public UserRankListResult getUserRank(Integer year){
-        if(year==null){
-            year=2022;
+    public UserRankListResult getUserRank(Integer year) {
+        if (year == null) {
+            year = 2022;
         }
         return rankService.getUserRanks(year);
 //        return userAddedProductService.getAllAddedProducts();
     }
 
     @GetMapping("/teamRank")
-    public TeamRankListResult getTeamRank(Integer year){
-        if(year==null){
-            year=2022;
+    public TeamRankListResult getTeamRank(Integer year) {
+        if (year == null) {
+            year = 2022;
         }
         return rankService.getTeamRank(year);
     }
 
     @GetMapping("/teamBonus")
-    public TeamRankListResult getTeamBonus(Integer year){
+    public TeamRankListResult getTeamBonus(Integer year) {
         return rankService.getTeamBonus(year);
     }
 
     @GetMapping("/addedProducts")
-    public AddedProductListResult getAddedProducts(){
+    public AddedProductListResult getAddedProducts() {
         return userAddedProductService.getAllAddedProducts();
     }
 
     @GetMapping("/insert/addedProducts")
-    public AddedProductListResult insertAddedProducts(){
+    public AddedProductListResult insertAddedProducts() {
         List<AddedProduct> products = new ArrayList<>();
         AddedProduct addedProduct1 = new AddedProduct();
         addedProduct1.setUserId(16);
@@ -137,7 +167,7 @@ public class DisplayController {
 
 
     @GetMapping("/update/addedProducts")
-    public AddedProductListResult updateAddedProducts(){
+    public AddedProductListResult updateAddedProducts() {
         List<AddedProduct> products = new ArrayList<>();
         AddedProduct addedProduct1 = new AddedProduct();
         addedProduct1.setUserId(16);
@@ -163,7 +193,7 @@ public class DisplayController {
 
     //TODO 权限设置 只有admin可以分配奖金池
     @PostMapping("/allocate/bonus")
-    public AddedProductListResult allocateBonus(@RequestParam String data){
+    public AddedProductListResult allocateBonus(@RequestParam String data) {
         JSONArray data2 = JSON.parseArray(data);
         List<AddedProduct> products = new ArrayList<>();
 

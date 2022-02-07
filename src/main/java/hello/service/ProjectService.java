@@ -45,7 +45,7 @@ public class ProjectService {
 
     public ProjectListResult getProjectsByOwnerId(Integer ownerId){
         try{
-            return ProjectListResult.success(projectDao.getProjectsByOwnerId(ownerId));
+            return ProjectListResult.success(projectDao.getProjectsByOwnerId(ownerId, "", 2022));
         } catch (Exception e) {
             return ProjectListResult.failure("程序异常");
         }
@@ -94,18 +94,18 @@ public class ProjectService {
         }
     }
 
-    public ProjectListResult getProjectsByProcessIds(List<String> processIds, String query){
+    public ProjectListResult getProjectsByProcessIds(List<String> processIds, String query, Integer year){
         try{
-            return ProjectListResult.success(projectDao.getProjectsByProcessIds(processIds, query));
+            return ProjectListResult.success(projectDao.getProjectsByProcessIds(processIds, query, year));
         } catch (Exception e){
             return ProjectListResult.failure("查询失败");
         }
     }
 
 
-    public ProjectListResult getA1ProjectsByProcessIds(List<String> processIds){
+    public ProjectListResult getA1ProjectsByProcessIds(List<String> processIds, String query, Integer year){
         try{
-            return ProjectListResult.success(projectDao.getA1ProjectsByProcessIds(processIds));
+            return ProjectListResult.success(projectDao.getA1ProjectsByProcessIds(processIds, query, year));
         } catch (Exception e){
             return ProjectListResult.failure("查询失败");
         }

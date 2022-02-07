@@ -92,6 +92,7 @@
              <if test="query != ''">
                 and  project.name  REGEXP #{query}
              </if>
+             and year(project.updated_at) = #{year}
             order by project.updated_at desc
     </select>
 
@@ -133,10 +134,14 @@
         from project
         left join product p on project.process_id = p.process_id
         where project.owner_id = #{ownerId}
+        <if test="query != ''">
+           and  project.name  REGEXP #{query}
+        </if>
+        and year(project.updated_at) = #{year}
         order by project.updated_at DESC
     </select>
 
-    <select id="getProjectsByOwnerIds" parameterType="java.util.List" resultMap="R2Projects">
+    <select id="getProjectsByOwnerIds"  resultMap="R2Projects">
             select project.id, project.process_id, project.name, project.number, project.owner_name,
                    project.type, project.owner_id, project.attachment, project.updated_at,
                    project.total_product, project.total_percentage,
@@ -144,9 +149,13 @@
             from project
             inner join product p on project.process_id = p.process_id
             where project.owner_id in
-            <foreach collection="list" item="ownerId" index="index" open="(" separator="," close=")">
+            <foreach collection="ownerIds" item="ownerId" index="index" open="(" separator="," close=")">
                  #{ownerId}
             </foreach>
+             <if test="query != ''">
+                and  project.name  REGEXP #{query}
+             </if>
+            and year(project.updated_at) = #{year}
             order by project.updated_at DESC
     </select>
 
@@ -157,7 +166,12 @@
                        p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
                 from project
                 inner join product p on project.process_id = p.process_id
-                where project.owner_id in
+                where
+                year(project.updated_at) = #{year} and
+                <if test="query != ''">
+                    project.name  REGEXP #{query} and
+                </if>
+                project.owner_id in
                 <foreach collection="R2Ids" item="ownerId" index="index" open="(" separator="," close=")">
                      #{ownerId}
                 </foreach>
@@ -165,6 +179,8 @@
                 <foreach collection="typeIds" item="typeId" index="index" open="(" separator="," close=")">
                      #{typeId}
                 </foreach>
+
+
                 order by project.updated_at desc
     </select>
 
@@ -186,10 +202,16 @@
                    p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
             from project
             inner join product p on project.process_id = p.process_id
-            where project.process_id in
-            <foreach collection="list" item="processId" index="index" open="(" separator="," close=")">
+            where
+             year(project.updated_at) = #{year} and
+             <if test="query != ''">
+                 project.name  REGEXP #{query} and
+             </if>
+             project.process_id in
+            <foreach collection="processIds" item="processId" index="index" open="(" separator="," close=")">
                   #{processId}
             </foreach>
+
             order by project.updated_at DESC
    </select>
 

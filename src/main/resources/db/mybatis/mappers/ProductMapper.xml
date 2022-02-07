@@ -101,6 +101,7 @@
         <if test="query != ''">
             and  project.name  REGEXP #{query}
         </if>
+        and year(product.updated_at) = #{year}
         order by product.updated_at
     </select>
 
