@@ -99,14 +99,14 @@ public class FlowController {
     public StartResult startLeaveProcess(Integer ownerId) throws UnknownHostException {
         HashMap<String, Object> map = new HashMap<>();
         map.put("R2", "" + ownerId);
-        try{
+        try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("a10001", map);
             Start startData = new Start();
             startData.setProcessId(processInstance.getId());
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(ownerId.toString()).orderByTaskCreateTime().desc().list();
             startData.setTaskId(tasks.get(0).getId());
             return StartResult.success(startData);
-        } catch (Exception e){
+        } catch (Exception e) {
             return StartResult.failure("新建流程失败");
         }
 
@@ -279,6 +279,9 @@ public class FlowController {
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
+        if (!StringUtils.isNotEmpty(comment)) {
+            comment = "";
+        }
 
 
         try {
@@ -302,11 +305,13 @@ public class FlowController {
 
                 Integer R4Id = Integer.valueOf(R4ListFindByType.get(0));
                 map.put("R4", R4Id);
-                taskService.complete(taskId, map);
+
                 Authentication.setAuthenticatedUserId(String.valueOf(userId));
-                if (StringUtils.isNotEmpty(comment)) {
-                    taskService.addComment(taskId, processId, comment);
-                }
+
+                taskService.addComment(taskId, processId, "通过, " + comment);
+
+
+                taskService.complete(taskId, map);
                 return ProductListResult.success("室主任审核通过");
             }
 
@@ -455,7 +460,7 @@ public class FlowController {
 
             userAddedProductService.insertAndUpdateAddedProducts(addedProducts);
             return ProductResult.success("更新产值成功");
-        } catch (Exception e){
+        } catch (Exception e) {
             return ProductResult.failure("更新产值失败");
         }
 

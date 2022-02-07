@@ -20,13 +20,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
+                .antMatchers("/files/**").permitAll()
                 .antMatchers("/start").authenticated()
                 .anyRequest().authenticated();
-
         http.cors();
         http.sessionManagement(session -> session.invalidSessionStrategy(new CustomInvalidSessionStrategy()));
-
-
 //                .antMatchers("/r4/approveTask").access("hasAuthority('ROLE_R4审核')");
 
     }
