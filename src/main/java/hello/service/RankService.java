@@ -58,10 +58,10 @@ public class RankService {
     }
 
     // R3的产值要均分给部门
-    public TeamRankListResult getTeamRank() {
+    public TeamRankListResult getTeamRank(Integer year) {
         try {
-            List<TeamRank> FourTeamsRanks = userRankDao.get4TeamsRank();
-            List<TeamRank> TwoR3Ranks = userRankDao.get2R3Rank();
+            List<TeamRank> FourTeamsRanks = userRankDao.get4TeamsRank(year);
+            List<TeamRank> TwoR3Ranks = userRankDao.get2R3Rank(year);
 
             if (FourTeamsRanks.isEmpty() && TwoR3Ranks.isEmpty()) {
                 return TeamRankListResult.success(Collections.emptyList());
@@ -116,10 +116,10 @@ public class RankService {
 
 
     //TODO 鉴权，R4R5ADMIN才能看
-    public TeamRankListResult getTeamBonus() {
+    public TeamRankListResult getTeamBonus(Integer year) {
         try {
-            List<TeamRank> FourTeamsBonus = userRankDao.get4TeamsBonus();
-            List<TeamRank> TwoR3Bonus = userRankDao.get2R3Bonus();
+            List<TeamRank> FourTeamsBonus = userRankDao.get4TeamsBonus(year);
+            List<TeamRank> TwoR3Bonus = userRankDao.get2R3Bonus(year);
 
             if (FourTeamsBonus.isEmpty() && TwoR3Bonus.isEmpty()) {
                 return TeamRankListResult.success(Collections.emptyList());
