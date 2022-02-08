@@ -102,6 +102,12 @@
             and  project.name  REGEXP #{query}
         </if>
         and year(product.updated_at) = #{year}
+        <if test="type != null">
+           and project.type = #{type}
+        </if>
+        <if test="number != ''">
+         and project.number  REGEXP #{number}
+        </if>
         order by product.updated_at
     </select>
 

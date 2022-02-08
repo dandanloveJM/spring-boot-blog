@@ -93,6 +93,12 @@
                 and  project.name  REGEXP #{query}
              </if>
              and year(project.updated_at) = #{year}
+             <if test="type != null">
+              and   project.type = #{type}
+             </if>
+             <if test="number != ''">
+              and  project.number  REGEXP #{number}
+             </if>
             order by project.updated_at desc
     </select>
 
@@ -138,6 +144,12 @@
            and  project.name  REGEXP #{query}
         </if>
         and year(project.updated_at) = #{year}
+        <if test="type != null">
+            project.type = #{type} and
+        </if>
+        <if test="number != ''">
+            project.number  REGEXP #{number} and
+        </if>
         order by project.updated_at DESC
     </select>
 
@@ -156,6 +168,12 @@
                 and  project.name  REGEXP #{query}
              </if>
             and year(project.updated_at) = #{year}
+            <if test="type != null">
+                project.type = #{type} and
+            </if>
+            <if test="number != ''">
+                 project.number  REGEXP #{number} and
+            </if>
             order by project.updated_at DESC
     </select>
 
@@ -170,6 +188,12 @@
                 year(project.updated_at) = #{year} and
                 <if test="query != ''">
                     project.name  REGEXP #{query} and
+                </if>
+                <if test="type != null">
+                    project.type = #{type} and
+                </if>
+                <if test="number != ''">
+                    project.number  REGEXP #{number} and
                 </if>
                 project.owner_id in
                 <foreach collection="R2Ids" item="ownerId" index="index" open="(" separator="," close=")">
@@ -207,6 +231,12 @@
              <if test="query != ''">
                  project.name  REGEXP #{query} and
              </if>
+             <if test="type != null">
+                  project.type = #{type} and
+             </if>
+             <if test="number != ''">
+                 project.number  REGEXP #{number} and
+              </if>
              project.process_id in
             <foreach collection="processIds" item="processId" index="index" open="(" separator="," close=")">
                   #{processId}

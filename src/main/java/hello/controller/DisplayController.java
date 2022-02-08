@@ -36,63 +36,81 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/R1/displayUnfinishedProjects")
-    public ProjectListResult getR1UnifishedProjectsByUserId(Integer userId, String query, Integer year) {
+    public ProjectListResult getR1UnifishedProjectsByUserId(Integer userId, String query, Integer year,
+                                                            Integer type, String number) {
         if (query == null) {
             query = "";
         }
         if (year == null) {
             year = 2022;
         }
-        return displayService.getR1UnfinishedProjectsByUserId(userId, query, year);
+        if(number == null){
+            number = "";
+        }
+        return displayService.getR1UnfinishedProjectsByUserId(userId, query, year, type, number);
     }
 
     @ReadUserIdInSession
     @GetMapping("/R1/displayFinishedProjects")
-    public ProductListResult getR1FinishedProjects(Integer userId, String query, Integer year) {
+    public ProductListResult getR1FinishedProjects(Integer userId, String query, Integer year, Integer type, String number) {
         if (query == null) {
             query = "";
         }
         if (year == null) {
             year = 2022;
         }
+        if(number == null){
+            number = "";
+        }
         // 只展示有产值的数据
-        return displayService.getFinishedProjectsByUserId(userId, query, year);
+        return displayService.getFinishedProjectsByUserId(userId, query, year, type, number);
     }
 
     @ReadUserIdInSession
     @GetMapping("/R2/Projects")
-    public DisplayResult getR2AllProjects(Integer userId, String query, Integer year) {
+    public DisplayResult getR2AllProjects(Integer userId, String query, Integer year, Integer type,
+                                          String number) {
         if (query == null) {
             query = "";
         }
         if (year == null) {
             year = 2022;
         }
-        return displayService.getAllR2Projects(userId, query, year);
+        if(number== null){
+            number = "";
+        }
+        return displayService.getAllR2Projects(userId, query, year, type, number);
     }
 
     @ReadUserIdInSession
     @GetMapping("/R3/Projects")
-    public DisplayResult getR3AllProjects(Integer userId, String query, Integer year) {
+    public DisplayResult getR3AllProjects(Integer userId, String query, Integer year, Integer type, String number) {
         if (query == null) {
             query = "";
         }
         if (year == null) {
             year = 2022;
         }
-        return displayService.getAllR3Projects(userId, query, year);
+        if(number == null) {
+            number = "";
+        }
+        return displayService.getAllR3Projects(userId, query, year, type, number);
     }
 
     @ReadUserIdInSession
     @GetMapping("/R4/Projects")
-    public DisplayResult getR4AllProjects(Integer userId, String query, Integer year) {
+    public DisplayResult getR4AllProjects(Integer userId, String query, Integer year,
+                                          Integer type, String number) {
         if (query == null) {
             query = "";
         }
         if (year == null) {
             year = 2022;
         }
-        return displayService.getAllR4Projects(userId, query, year);
+        if(number == null){
+            number="";
+        }
+        return displayService.getAllR4Projects(userId, query, year, type, number);
     }
 
     // TODO R5和ADMIN可以看全部
@@ -103,14 +121,18 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/A1/Projects")
-    public DisplayResult getA1AllProjects(Integer userId, String query, Integer year) {
+    public DisplayResult getA1AllProjects(Integer userId, String query, Integer year, Integer type, String number) {
         if (query == null) {
             query = "";
         }
         if (year == null) {
             year = 2022;
         }
-        return displayService.getA1AllProjects(userId, query, year);
+
+        if(number == null){
+            number = "";
+        }
+        return displayService.getA1AllProjects(userId, query, year, type, number);
     }
 
     @GetMapping("/userRank")

@@ -69,10 +69,12 @@ public class ProductDao {
         sqlSession.delete("deleteProductsByProcessId", processId);
     }
 
-    public List<Product> getProductAndProjectByUserId(Integer userId, String query, Integer year){
+    public List<Product> getProductAndProjectByUserId(Integer userId, String query, Integer year, Integer type, String number){
         Map<String, Object> parameters = asMap("userId", userId,
                 "query", query,
-                "year", year);
+                "year", year,
+                "type", type,
+                "number", number);
         return sqlSession.selectList("getProductAndProjectByUserId", parameters);
     }
 
