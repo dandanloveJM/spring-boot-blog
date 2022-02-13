@@ -1,6 +1,8 @@
 package hello.dao;
 
 
+import hello.entity.TeamBarChart;
+import hello.entity.TeamPieChart;
 import hello.entity.TeamRank;
 import hello.entity.UserRank;
 import org.apache.ibatis.session.SqlSession;
@@ -40,8 +42,15 @@ public class UserRankDao {
 
     // 获得两个R3的groupby sum 奖金池的值
     public List<TeamRank> get2R3Bonus(int year){
-
         return sqlSession.selectList("selectR3Bonus", year);
+    }
+
+    public List<TeamPieChart> getTeamPieChartParams(String department){
+        return sqlSession.selectList("teamPieChart", department);
+    }
+
+    public List<TeamBarChart> getBarChartParams(){
+        return sqlSession.selectList("teamBarChart");
     }
 
 }

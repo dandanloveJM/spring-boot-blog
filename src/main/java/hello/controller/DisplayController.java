@@ -36,8 +36,11 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/R1/displayUnfinishedProjects")
-    public ProjectListResult getR1UnifishedProjectsByUserId(Integer userId, String query, Integer year,
-                                                            Integer type, String number) {
+    public ProjectListResult getR1UnifishedProjectsByUserId(Integer userId,
+                                                            @RequestParam String query,
+                                                            @RequestParam Integer year,
+                                                            @RequestParam(required=false) Integer type,
+                                                            @RequestParam String number) {
         if (query == null) {
             query = "";
         }
@@ -52,7 +55,11 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/R1/displayFinishedProjects")
-    public ProductListResult getR1FinishedProjects(Integer userId, String query, Integer year, Integer type, String number) {
+    public ProductListResult getR1FinishedProjects(Integer userId,
+                                                   @RequestParam String query,
+                                                   @RequestParam Integer year,
+                                                   @RequestParam(required=false) Integer type,
+                                                   @RequestParam String number) {
         if (query == null) {
             query = "";
         }
@@ -68,8 +75,11 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/R2/Projects")
-    public DisplayResult getR2AllProjects(Integer userId, String query, Integer year, Integer type,
-                                          String number) {
+    public DisplayResult getR2AllProjects(Integer userId,
+                                          @RequestParam String query,
+                                          @RequestParam Integer year,
+                                          @RequestParam(required=false) Integer type,
+                                          @RequestParam String number) {
         if (query == null) {
             query = "";
         }
@@ -84,7 +94,11 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/R3/Projects")
-    public DisplayResult getR3AllProjects(Integer userId, String query, Integer year, Integer type, String number) {
+    public DisplayResult getR3AllProjects(Integer userId,
+                                          @RequestParam String query,
+                                          @RequestParam Integer year,
+                                          @RequestParam(required=false) Integer type,
+                                          @RequestParam String number) {
         if (query == null) {
             query = "";
         }
@@ -99,8 +113,11 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/R4/Projects")
-    public DisplayResult getR4AllProjects(Integer userId, String query, Integer year,
-                                          Integer type, String number) {
+    public DisplayResult getR4AllProjects(Integer userId,
+                                          @RequestParam String query,
+                                          @RequestParam Integer year,
+                                          @RequestParam(required=false) Integer type,
+                                          @RequestParam String number) {
         if (query == null) {
             query = "";
         }
@@ -121,7 +138,11 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/A1/Projects")
-    public DisplayResult getA1AllProjects(Integer userId, String query, Integer year, Integer type, String number) {
+    public DisplayResult getA1AllProjects(Integer userId,
+                                          @RequestParam String query,
+                                          @RequestParam Integer year,
+                                          @RequestParam(required=false) Integer type,
+                                          @RequestParam String number) {
         if (query == null) {
             query = "";
         }
@@ -238,6 +259,16 @@ public class DisplayController {
 
         return result;
 
+    }
+
+    @GetMapping("/teamPieChart")
+    public TeamPieChartsListResult getPieCharts(){
+        return rankService.getTeamPieChartParams();
+    }
+
+    @GetMapping("/barChart")
+    public TeamBarChartResult getBarChart(){
+        return rankService.getBarParams();
     }
 
 }
