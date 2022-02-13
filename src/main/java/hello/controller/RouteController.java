@@ -94,10 +94,10 @@ public class RouteController {
         route7.setComponent("/rank/teamRank");
         route5children.add(route7);
 
+
+
+
         if (teamRankURL != null){
-
-
-
             Route route8 = new Route();
             route8.setId(6);
             route8.setPid(3);
@@ -108,6 +108,20 @@ public class RouteController {
             route8.setKey("teamBonus");
             route8.setComponent("/rank/teamBonus");
             route5children.add(route8);
+
+
+            Route route9 = new Route();
+            route9.setId(6);
+            route9.setPid(3);
+            route9.setName("数据分析");
+            route9.setPath("/rank/chart");
+            route9.setRedirect("");
+            route9.setIcon("ChromeOutlined");
+            route9.setKey("chart");
+            route9.setComponent("/rank/chart");
+            route5children.add(route9);
+
+
         }
 
 

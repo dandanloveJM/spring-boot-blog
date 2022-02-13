@@ -72,22 +72,45 @@ public class ProjectDao {
     }
 
 
-    public List<Project> getProjectsByProcessIds(List<String> processIds){
-        return sqlSession.selectList("getProjectsByProcessIds", processIds);
+    public List<Project> getProjectsByProcessIds(List<String> processIds, String query, Integer year,
+                                                 Integer type, String number){
+        Map<String, Object> parameters = asMap("processIds", processIds,
+                "query", query,
+                "year", year,
+                "type", type,
+                "number", number);
+        return sqlSession.selectList("getProjectsByProcessIds", parameters);
     }
 
-    public List<Project> getProjectsByOwnerId(Integer ownerId){
-        return sqlSession.selectList("getProjectsByOwnerId", ownerId);
+    public List<Project> getProjectsByOwnerId(Integer ownerId, String query, Integer year,
+                                              Integer type, String number){
+        Map<String, Object> parameters = asMap("ownerId", ownerId,
+                "query", query,
+                "year", year,
+                "type", type,
+                "number", number);
+        return sqlSession.selectList("getProjectsByOwnerId", parameters);
     }
 
-    public List<Project> getProjectsByOwnerIds(List<Integer> ownerIds){
-        return sqlSession.selectList("getProjectsByOwnerIds", ownerIds);
+    public List<Project> getProjectsByOwnerIds(List<Integer> ownerIds, String query, Integer year, Integer type, String number){
+        Map<String, Object> parameters = asMap("ownerIds", ownerIds,
+                "query", query,
+                "year", year,
+                "type", type,
+                "number", number);
+        return sqlSession.selectList("getProjectsByOwnerIds", parameters);
     }
 
-    public List<Project> getProjectsByOwnerIdsByR4(List<Integer> R2IdsFindByR4, List<Integer> typeList) {
-        Map<String, List<Integer>> parameters = new HashMap<>();
+    public List<Project> getProjectsByOwnerIdsByR4(List<Integer> R2IdsFindByR4, List<Integer> typeList,
+                                                   String query, Integer year,
+    Integer type, String number) {
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("R2Ids", R2IdsFindByR4);
         parameters.put("typeIds", typeList);
+        parameters.put("query", query);
+        parameters.put("year", year);
+        parameters.put("type", type);
+        parameters.put("number", number);
         return sqlSession.selectList("getProjectsByOwnerIdsByR4", parameters);
     }
 
@@ -95,7 +118,14 @@ public class ProjectDao {
         return sqlSession.selectList("getAllProjects");
     }
 
-    public List<Project> getA1ProjectsByProcessIds(List<String> processIds) {
-        return sqlSession.selectList("getA1ProjectsByProcessIds", processIds);
+    public List<Project> getA1ProjectsByProcessIds(List<String> processIds, String query,
+                                                   Integer year, Integer type,
+                                                   String number) {
+        Map<String, Object> parameters = asMap("processIds", processIds,
+                "query", query,
+                "year", year,
+                "type", type,
+                "number", number);
+        return sqlSession.selectList("getA1ProjectsByProcessIds", parameters);
     }
 }

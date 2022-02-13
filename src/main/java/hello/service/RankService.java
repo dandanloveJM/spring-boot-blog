@@ -104,11 +104,10 @@ public class RankService {
                 .collect(Collectors.toList());
 
 
-
         int i = 1;
         for (TeamRank eachRank : finalTeamProducts) {
             eachRank.setRankId(i);
-            i+=1;
+            i += 1;
         }
 
         return TeamRankListResult.success(finalTeamProducts);
@@ -144,6 +143,34 @@ public class RankService {
 
         } catch (Exception e) {
             return TeamRankListResult.failure("获取奖金排行异常");
+        }
+    }
+
+
+    // 团队饼图参数
+    public TeamPieChartsListResult getTeamPieChartParams() {
+        try {
+            Map<String, List<TeamPieChart>> results = new HashMap<>();
+            ArrayList<String> teams = new ArrayList<>(
+                    Arrays.asList("Z1", "Z2", "F1", "F2")
+            );
+            for (String team : teams) {
+                results.put(team, userRankDao.getTeamPieChartParams(team));
+            }
+
+            return TeamPieChartsListResult.success(results);
+
+        } catch (Exception e) {
+            return TeamPieChartsListResult.failure("程序异常");
+        }
+    }
+
+    // 柱状图参数
+    public TeamBarChartResult getBarParams(){
+        try{
+            return TeamBarChartResult.success(userRankDao.getBarChartParams());
+        } catch (Exception e){
+            return TeamBarChartResult.failure("程序异常");
         }
     }
 }
