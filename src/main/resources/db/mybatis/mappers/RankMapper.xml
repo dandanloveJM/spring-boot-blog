@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.RankMapper">
+    <select id="selectUserRank" resultMap="userRank" >
+        select product.display_name, sum(product.product) as product_sum
+        from product
+        inner join user u on product.user_id = u.id
+        where product.product > 0 and year(product.updated_at)=#{year}
+        group by product.display_name
+        order by product_sum desc
+    </select>
+
+    <select id="select4TeamsProducts" resultMap="teamRank">
+        select u.department,  sum(product.product) as department_product
+        from product
+                 inner join user u on product.user_id = u.id
+        where product > 0 and u.department in ('Z1','Z2','F1','F2') and year(product.updated_at)=#{year}
+        group by u.department
+        order by department_product desc
+    </select>
+
+    <select id="selectR3Products" resultMap="R3Rank">
+        select u.department, sum(product.product) as department_product
+        from product
+                 inner join user u on product.user_id = u.id
+        where product > 0 and u.department in ('Z','F') and year(product.updated_at)=#{year}
+        group by u.department
+    </select>
+
+    <select id="select4TeamsBonus" resultMap="teamRank">
+       select u.department,  sum(product.bonus) as department_product
+       from product
+       inner join user u on product.user_id = u.id
+       where product > 0 and u.department in ('Z1','Z2','F1','F2') and year(product.updated_at)=#{year}
+       group by u.department
+
+    </select>
+
+    <select id="selectR3Bonus" resultMap="R3Rank">
+            select u.department, sum(product.bonus) as department_product
+            from product
+                     inner join user u on product.user_id = u.id
+            where product > 0 and u.department in ('Z','F') and year(product.updated_at)=#{year}
+            group by u.department
+        </select>
+
+     <select id="teamPieChart" resultType="hello.entity.TeamPieChart">
+     select pt.name as name, max(u.department) as department, sum(product.product) as sum
+     from product
+              inner join user u on u.id = product.user_id
+              inner join project p on product.process_id = p.process_id
+              inner join project_type pt on p.type = pt.type_id
+     where p.total_product > 0 and year(p.updated_at)=2022
+       and u.department=#{department}
+     group by pt.name
+     order by sum desc
+     </select>
+
+     <select id="teamBarChart" resultType="hello.entity.TeamBarChart">
+     select project.type, Max(pt.name) as name, count(project.total_product) as count,sum(project.total_product) as sum
+     from project
+              inner join project_type pt on project.type = pt.type_id
+     where project.total_product > 0 and year(project.updated_at)=2022
+     group by project.type
+     order by sum desc
+     </select>
+
+
+    <resultMap id="userRank" type="hello.entity.UserRank">
+        <id property="userId" column="user_id"/>
+        <result property="displayName" column="display_name"/>
+        <result property="productSum" column="product_sum"/>
+    </resultMap>
+
+    <resultMap id="teamRank" type="hello.entity.TeamRank">
+            <id property="teamRank" column="department"/>
+            <result property="teamName" column="team_name"/>
+            <result property="productSum" column="department_product"/>
+    </resultMap>
+
+    <resultMap id="R3Rank" type="hello.entity.TeamRank">
+           <id property="teamRank" column="department"/>
+           <result property="productSum" column="department_product"/>
+    </resultMap>
+</mapper>
