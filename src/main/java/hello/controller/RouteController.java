@@ -144,14 +144,29 @@ public class RouteController {
         route.setId(1);
         route.setPid(0);
         route.setName("排行榜");
-        route.setPath("/rank/peopleRank");
+        route.setPath("/");
         route.setRedirect("/rank/peopleRank");
-        route.setIcon("ChromeOutlined");
-        route.setKey("rank");
-        route.setComponent("RouteView");
+        route.setComponent("BasicLayout");
+        route.setIcon("AppleOutlined");
+        route.setKey("layout");
 
-
+        Route route2 = new Route();
         List<Route> routeChildren = new ArrayList<>();
+        List<Route> route2Children = new ArrayList<>();
+        route2.setId(2);
+        route2.setPid(1);
+        route2.setName("排行榜");
+        route2.setPath("/rank/peopleRank");
+        route2.setRedirect("/rank/peopleRank");
+        route2.setIcon("ChromeOutlined");
+        route2.setKey("element");
+        route2.setComponent("RouteView");
+
+
+
+
+
+
 
 
         Route route6 = new Route();
@@ -164,7 +179,7 @@ public class RouteController {
         route6.setKey("peopleRank");
         route6.setComponent("/rank/peopleRank");
 
-        routeChildren.add(route6);
+        route2Children.add(route6);
 
 
         Route route7 = new Route();
@@ -176,7 +191,7 @@ public class RouteController {
         route7.setIcon("ChromeOutlined");
         route7.setKey("teamRank");
         route7.setComponent("/rank/teamRank");
-        routeChildren.add(route7);
+        route2Children.add(route7);
 
 
         Route route8 = new Route();
@@ -188,7 +203,7 @@ public class RouteController {
         route8.setIcon("ChromeOutlined");
         route8.setKey("teamBonus");
         route8.setComponent("/rank/teamBonus");
-        routeChildren.add(route8);
+        route2Children.add(route8);
 
 
         Route route9 = new Route();
@@ -200,7 +215,11 @@ public class RouteController {
         route9.setIcon("ChromeOutlined");
         route9.setKey("chart");
         route9.setComponent("/rank/chart");
-        routeChildren.add(route9);
+        route2Children.add(route9);
+
+        route2.setChildren(route2Children);
+
+        routeChildren.add(route2);
         route.setChildren(routeChildren);
         routes.add(route);
 
