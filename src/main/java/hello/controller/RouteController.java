@@ -95,9 +95,7 @@ public class RouteController {
         route5children.add(route7);
 
 
-
-
-        if (teamRankURL != null){
+        if (teamRankURL != null) {
             Route route8 = new Route();
             route8.setId(6);
             route8.setPid(3);
@@ -125,7 +123,6 @@ public class RouteController {
         }
 
 
-
         route5.setChildren(route5children);
 
 
@@ -141,23 +138,97 @@ public class RouteController {
     }
 
 
+    private List<Route> getR5Routes() {
+        List<Route> routes = new ArrayList<>();
+        Route route = new Route();
+        route.setId(1);
+        route.setPid(0);
+        route.setName("排行榜");
+        route.setPath("/rank/peopleRank");
+        route.setRedirect("/rank/peopleRank");
+        route.setIcon("ChromeOutlined");
+        route.setKey("rank");
+        route.setComponent("RouteView");
+
+
+        List<Route> routeChildren = new ArrayList<>();
+
+
+        Route route6 = new Route();
+        route6.setId(4);
+        route6.setPid(1);
+        route6.setName("个人排行榜");
+        route6.setPath("/rank/peopleRank");
+        route6.setRedirect("");
+        route6.setIcon("ChromeOutlined");
+        route6.setKey("peopleRank");
+        route6.setComponent("/rank/peopleRank");
+
+        routeChildren.add(route6);
+
+
+        Route route7 = new Route();
+        route7.setId(5);
+        route7.setPid(1);
+        route7.setName("团队排行榜");
+        route7.setPath("/rank/teamRank");
+        route7.setRedirect("");
+        route7.setIcon("ChromeOutlined");
+        route7.setKey("teamRank");
+        route7.setComponent("/rank/teamRank");
+        routeChildren.add(route7);
+
+
+        Route route8 = new Route();
+        route8.setId(6);
+        route8.setPid(3);
+        route8.setName("30%产值待分配");
+        route8.setPath("/rank/teamBonus");
+        route8.setRedirect("");
+        route8.setIcon("ChromeOutlined");
+        route8.setKey("teamBonus");
+        route8.setComponent("/rank/teamBonus");
+        routeChildren.add(route8);
+
+
+        Route route9 = new Route();
+        route9.setId(6);
+        route9.setPid(3);
+        route9.setName("数据分析");
+        route9.setPath("/rank/chart");
+        route9.setRedirect("");
+        route9.setIcon("ChromeOutlined");
+        route9.setKey("chart");
+        route9.setComponent("/rank/chart");
+        routeChildren.add(route9);
+        route.setChildren(routeChildren);
+        routes.add(route);
+
+        return routes;
+
+
+    }
+
     @ReadRoleIdInSession
     @GetMapping("/user/menu")
     public RouteResult getUserMenu(Integer roleId) {
         // 根据用户的权限返回相应的路由
         if (roleId == 1) {
-            List<Route> routes = getRoutes("/display/task", "/display/doneTask",null);
+            List<Route> routes = getRoutes("/display/task", "/display/doneTask", null);
             return RouteResult.success(routes);
         } else if (roleId == 2) {
-            List<Route> routes = getRoutes("/display/r2task", "/display/r2DoneTask",null);
+            List<Route> routes = getRoutes("/display/r2task", "/display/r2DoneTask", null);
             return RouteResult.success(routes);
         } else if (roleId == 3) {
-            List<Route> routes = getRoutes("/display/r3task", "/display/r3DoneTask",null);
+            List<Route> routes = getRoutes("/display/r3task", "/display/r3DoneTask", null);
             return RouteResult.success(routes);
-        } else if (roleId == 4){
-            List<Route> routes = getRoutes("/display/r4task", "/display/r4DoneTask","/rank/teamRank");
+        } else if (roleId == 4) {
+            List<Route> routes = getRoutes("/display/r4task", "/display/r4DoneTask", "/rank/teamRank");
             return RouteResult.success(routes);
-        } else if (roleId == 6){// 财务
+        } else if (roleId == 5) {
+            List<Route> routes = getR5Routes();
+            return RouteResult.success(routes);
+        } else if (roleId == 6) {// 财务
             List<Route> routes = getRoutes("/display/a1task", "/display/a1DoneTask", null);
             return RouteResult.success(routes);
         }

@@ -4,11 +4,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.mybatis.example.RankMapper">
     <select id="selectUserRank" resultMap="userRank" >
-        select product.display_name, sum(product.product) as product_sum
+        select product.user_id, max(product.display_name) as display_name, sum(product.product) as product_sum
         from product
         inner join user u on product.user_id = u.id
         where product.product > 0 and year(product.updated_at)=#{year}
-        group by product.display_name
+        group by product.user_id
         order by product_sum desc
     </select>
 
