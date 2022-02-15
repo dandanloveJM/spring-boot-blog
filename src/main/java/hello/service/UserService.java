@@ -62,7 +62,7 @@ public class UserService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority("ROLE_" + userMapper.getPermissionById(id)));
         }
 
-        return new User(username, user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(username, user.getPassword(), authorities);
     }
 
     public UserListResult getAllR1R2R3Users(){

@@ -84,9 +84,8 @@ public class AuthController {
     }
 
     @PostMapping("/auth/register")
-    public Object register(@RequestBody Map<String, String> usernameAndPassword){
-        String username = usernameAndPassword.get("username");
-        String password = usernameAndPassword.get("password");
+    public Object register(@RequestParam String username, @RequestParam String password){
+
         if (username == null || password == null) {
             return LoginResult.failure("username/password == null", false);
         }
