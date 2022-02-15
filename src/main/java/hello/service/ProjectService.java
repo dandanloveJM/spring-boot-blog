@@ -127,19 +127,17 @@ public class ProjectService {
         }
     }
 
-    public ProjectResult deleteProject(int projectId){
-        Project projectInDb = projectDao.getProjectById(projectId);
-        if (projectInDb == null) {
-            return ProjectResult.failure("项目不存在");
-        }
+    public ProjectResult deleteProject(String processId){
+        try{
 
-        try {
-            projectDao.deleteProject(projectId);
-            return ProjectResult.success("删除成功");
+            projectDao.deleteProjectByProcessId(processId);
+            projectDao.deleteProjectByProcessId(processId);
+            return ProjectResult.success("删除项目成功");
         } catch (Exception e) {
-            return ProjectResult.failure("系统异常");
+            return ProjectResult.failure("删除失败");
         }
     }
+
 
     public CommentResult getComment(String processId, String taskId){
         try{

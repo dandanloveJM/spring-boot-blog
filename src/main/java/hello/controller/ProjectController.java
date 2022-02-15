@@ -55,4 +55,9 @@ public class ProjectController {
                                     @RequestParam String taskId){
         return projectService.getComment(processId, taskId);
     }
+
+    @PostMapping("/deleteProject")
+    public ProjectResult deleteProjectByProcessId(@RequestParam String processId){
+        return projectService.deleteProject(processId);
+    }
 }

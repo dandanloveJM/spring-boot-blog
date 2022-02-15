@@ -20,9 +20,9 @@ public class RankService {
         this.userRankDao = userRankDao;
     }
 
-    public UserRankListResult getUserRanks(int year) {
+    public UserRankListResult getUserRanks(int year, String team) {
         try {
-            List<UserRank> userRankList = userRankDao.getUserRanks(year);
+            List<UserRank> userRankList = userRankDao.getUserRanks(year, team);
             if (userRankList.isEmpty()) {
                 return UserRankListResult.success(userRankList);
             }
