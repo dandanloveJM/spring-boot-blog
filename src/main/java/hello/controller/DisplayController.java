@@ -157,11 +157,11 @@ public class DisplayController {
     }
 
     @GetMapping("/userRank")
-    public UserRankListResult getUserRank(Integer year) {
+    public UserRankListResult getUserRank(Integer year, String team) {
         if (year == null) {
             year = 2022;
         }
-        return rankService.getUserRanks(year);
+        return rankService.getUserRanks(year, team);
 //        return userAddedProductService.getAllAddedProducts();
     }
 

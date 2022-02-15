@@ -9,7 +9,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserRankDao {
@@ -19,10 +21,18 @@ public class UserRankDao {
     public UserRankDao(SqlSession sqlSession) {
         this.sqlSession = sqlSession;
     }
-
+    private Map<String, Object> asMap(Object... args){
+        Map<String, Object> result = new HashMap<>();
+        for (int i = 0; i < args.length; i+=2) {
+            result.put(args[i].toString(), args[i+1]);
+        }
+        return result;
+    }
     // 用户排名
-    public List<UserRank> getUserRanks(int year){
-        return sqlSession.selectList("selectUserRank",year);
+    public List<UserRank> getUserRanks(int year, String team){
+        Map<String, Object> parameters =asMap("year", year,
+                "team", team);
+        return sqlSession.selectList("selectUserRank", parameters);
     }
 
     // 获得四个团队的groupby聚合值

@@ -8,6 +8,10 @@
         from product
         inner join user u on product.user_id = u.id
         where product.product > 0 and year(product.updated_at)=#{year}
+
+        <if test="team != ''">
+        and u.department = #{team}
+        </if>
         group by product.user_id
         order by product_sum desc
     </select>
