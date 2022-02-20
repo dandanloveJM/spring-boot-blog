@@ -24,6 +24,15 @@ public class UploadService {
         this.rootLocation = Paths.get("uploadssss");
     }
 
+    public void init() throws Exception {
+        try {
+            Files.createDirectories(rootLocation);
+        }
+        catch (IOException e) {
+            throw new Exception("Could not initialize storage", e);
+        }
+    }
+
     public UploadResult store(MultipartFile file) {
         try {
             if (file.isEmpty()) {
