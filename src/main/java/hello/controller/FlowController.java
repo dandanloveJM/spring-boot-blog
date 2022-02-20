@@ -154,7 +154,7 @@ public class FlowController {
                                         @RequestParam String number,
                                         @RequestParam String type,
                                         @RequestParam String taskId,
-                                        @RequestParam String processId) throws UnknownHostException {
+                                        @RequestParam String processId) throws Exception {
         if (ownerId == -1) {
             return ProjectResult.failure("请先登录");
         }
@@ -174,6 +174,7 @@ public class FlowController {
 
 
         // 以下是在处理上传数据、文件 -> 创建新project的逻辑
+        this.uploadService.init();
         String attachmentURL = null;
         UploadResult uploadResult = this.uploadService.store(file);
         if (uploadResult.getStatus().equals("ok")) {

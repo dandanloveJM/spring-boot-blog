@@ -82,24 +82,59 @@ public class ProjectDao {
         return sqlSession.selectList("getProjectsByProcessIds", parameters);
     }
 
-    public List<Project> getProjectsByOwnerId(Integer ownerId, String query, Integer year,
+    public List<Project> getUnfinishedProjectsByR2(Integer ownerId, String query, Integer year,
+                                                      Integer type, String number){
+        Map<String, Object> parameters = asMap("ownerId", ownerId,
+                "query", query,
+                "year", year,
+                "type", type,
+                "number", number);
+        return sqlSession.selectList("getUnfinishedProjectsByOwnerId", parameters);
+    }
+
+
+    public List<Project> getFinishedProjectsByOwnerId(Integer ownerId, String query, Integer year,
                                               Integer type, String number){
         Map<String, Object> parameters = asMap("ownerId", ownerId,
                 "query", query,
                 "year", year,
                 "type", type,
                 "number", number);
-        return sqlSession.selectList("getProjectsByOwnerId", parameters);
+        return sqlSession.selectList("getFinishedProjectsByOwnerId", parameters);
     }
 
+    // R2R3自己参与的任务
+    public List<Project> getFinishedProjectsByUserIdR2(Integer ownerId, String query, Integer year,
+                                                      Integer type, String number){
+        Map<String, Object> parameters = asMap("ownerId", ownerId,
+                "query", query,
+                "year", year,
+                "type", type,
+                "number", number);
+        return sqlSession.selectList("getFinishedProjectsByUserIdR2", parameters);
+    }
+
+    // R3 管理的R2的任务
     public List<Project> getProjectsByOwnerIds(List<Integer> ownerIds, String query, Integer year, Integer type, String number){
         Map<String, Object> parameters = asMap("ownerIds", ownerIds,
                 "query", query,
                 "year", year,
                 "type", type,
                 "number", number);
-        return sqlSession.selectList("getProjectsByOwnerIds", parameters);
+        return sqlSession.selectList("getProjectsByOwnerIdsR3", parameters);
     }
+
+    // R3 进行中的任务
+    public List<Project> getUnfinishedProjectsByOwnerIds(List<Integer> ownerIds, String query, Integer year, Integer type, String number){
+        Map<String, Object> parameters = asMap("ownerIds", ownerIds,
+                "query", query,
+                "year", year,
+                "type", type,
+                "number", number);
+        return sqlSession.selectList("getUnfinishedProjectsByOwnerIdsR3", parameters);
+    }
+
+
 
     public List<Project> getProjectsByOwnerIdsByR4(List<Integer> R2IdsFindByR4, List<Integer> typeList,
                                                    String query, Integer year,

@@ -73,9 +73,11 @@ public class DisplayController {
         return displayService.getFinishedProjectsByUserId(userId, query, year, type, number);
     }
 
+
+
     @ReadUserIdInSession
-    @GetMapping("/R2/Projects")
-    public DisplayResult getR2AllProjects(Integer userId,
+    @GetMapping("/R2/unfinishedProjects")
+    public ProjectListResult getR2UnfinishedProjects(Integer userId,
                                           @RequestParam String query,
                                           @RequestParam Integer year,
                                           @RequestParam(required=false) Integer type,
@@ -89,12 +91,52 @@ public class DisplayController {
         if(number== null){
             number = "";
         }
-        return displayService.getAllR2Projects(userId, query, year, type, number);
+        return displayService.getUnfinishedR2Projects(userId, query, year, type, number);
     }
 
     @ReadUserIdInSession
-    @GetMapping("/R3/Projects")
-    public DisplayResult getR3AllProjects(Integer userId,
+    @GetMapping("/R2/finishedProjects")
+    public ProjectListResult getR2FinishedProjects(Integer userId,
+                                                     @RequestParam String query,
+                                                     @RequestParam Integer year,
+                                                     @RequestParam(required=false) Integer type,
+                                                     @RequestParam String number) {
+        if (query == null) {
+            query = "";
+        }
+        if (year == null) {
+            year = 2022;
+        }
+        if(number== null){
+            number = "";
+        }
+        return displayService.getFinishedR2Projects(userId, query, year, type, number);
+    }
+
+
+    @ReadUserIdInSession
+    @GetMapping("/R3/unfinishedProjects")
+    public ProjectListResult getR3UnfinishedProjects(Integer userId,
+                                              @RequestParam String query,
+                                              @RequestParam Integer year,
+                                              @RequestParam(required=false) Integer type,
+                                              @RequestParam String number) {
+        if (query == null) {
+            query = "";
+        }
+        if (year == null) {
+            year = 2022;
+        }
+        if(number == null) {
+            number = "";
+        }
+        return displayService.getUnfinishedR3Projects(userId, query, year, type, number);
+    }
+
+
+    @ReadUserIdInSession
+    @GetMapping("/R3/finishedProjects")
+    public ProjectListResult getR3FinishedProjects(Integer userId,
                                           @RequestParam String query,
                                           @RequestParam Integer year,
                                           @RequestParam(required=false) Integer type,
@@ -108,7 +150,7 @@ public class DisplayController {
         if(number == null) {
             number = "";
         }
-        return displayService.getAllR3Projects(userId, query, year, type, number);
+        return displayService.getR3FinishedProjects(userId, query, year, type, number);
     }
 
     @ReadUserIdInSession

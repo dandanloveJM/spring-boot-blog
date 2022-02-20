@@ -45,7 +45,7 @@ public class ProjectService {
 
     public ProjectListResult getProjectsByOwnerId(Integer ownerId){
         try{
-            return ProjectListResult.success(projectDao.getProjectsByOwnerId(ownerId, "", 2022, null, ""));
+            return ProjectListResult.success(projectDao.getUnfinishedProjectsByR2(ownerId, "", 2022, null, ""));
         } catch (Exception e) {
             return ProjectListResult.failure("程序异常");
         }

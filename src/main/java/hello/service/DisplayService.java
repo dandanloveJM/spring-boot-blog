@@ -56,28 +56,29 @@ public class DisplayService {
         }
     }
 
+    public List<Project> getUnfinishedProjects(Integer userId, String query, Integer year, Integer type, String number){
+        // 所有让R1填写的任务
+        List<HistoricActivityInstance> AllActivities = historyService.createHistoricActivityInstanceQuery()
+                .taskAssignee(String.valueOf(userId)).orderByHistoricActivityInstanceEndTime().desc().list();
+
+        if (AllActivities.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 所有与R1有关的ProcessId 需要区分哪些是流程进行中（1.1 需要R1填写；1.2R1填完了，再走其他流程），哪些流程已结束
+        List<String> R1AllProcessIds = AllActivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
+        List<Project> R1AllProjects = projectService.getProjectsByProcessIds(R1AllProcessIds, query, year, type, number).getData();
+        // 筛选出没有最终产值的Project, 就是R1 相关的 还在流程中的 Project
+        List<Project> R1UnfinishedProjects = R1AllProjects.stream()
+                .filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
+
+        return generateUnfinishedProjects(R1UnfinishedProjects, userId);
+
+    }
 
     public ProjectListResult getR1UnfinishedProjectsByUserId(Integer userId, String query, Integer year, Integer type, String number) {
         try {
-            // 所有让R1填写的任务
-            List<HistoricActivityInstance> R1AllActivities = historyService.createHistoricActivityInstanceQuery()
-                    .taskAssignee(String.valueOf(userId)).orderByHistoricActivityInstanceEndTime().desc().list();
-
-            if (R1AllActivities.isEmpty()) {
-                return ProjectListResult.success(Collections.emptyList());
-            }
-
-            // 所有与R1有关的ProcessId 需要区分哪些是流程进行中（1.1 需要R1填写；1.2R1填完了，再走其他流程），哪些流程已结束
-            List<String> R1AllProcessIds = R1AllActivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
-            List<Project> R1AllProjects = projectService.getProjectsByProcessIds(R1AllProcessIds, query, year, type, number).getData();
-            // 筛选出没有最终产值的Project, 就是R1 相关的 还在流程中的 Project
-            List<Project> R1UnfinishedProjects = R1AllProjects.stream()
-                    .filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
-
-            List<Project> finalAllUnfinishedProjects = generateUnfinishedProjects(R1UnfinishedProjects, userId);
-
-
-            return ProjectListResult.success(finalAllUnfinishedProjects);
+            return ProjectListResult.success(getUnfinishedProjects(userId, query, year, type, number));
         } catch (Exception e) {
             return ProjectListResult.failure("程序异常");
         }
@@ -85,28 +86,93 @@ public class DisplayService {
 
     }
 
-
-    public DisplayResult getAllR2Projects(Integer userId, String query, Integer year, Integer type, String number) {
+    public ProjectListResult getUnfinishedR2Projects(Integer userId, String query, Integer year, Integer type, String number){
         try {
-            List<Project> result = projectDao.getProjectsByOwnerId(userId, query, year, type, number);
-            return getDisplayResult(userId, result);
+            return ProjectListResult.success(getUnfinishedProjects(userId, query, year, type, number));
+//            List<Project> result = projectDao.getUnfinishedProjectsByR2(userId, query, year, type, number);
+//            List<Project> finalUnfinished = generateUnfinishedProjects(result, userId);
+//            return ProjectListResult.success(finalUnfinished);
         } catch (Exception e) {
-            return DisplayResult.failure("程序异常");
+            return ProjectListResult.failure("程序异常");
         }
     }
 
-    public DisplayResult getAllR3Projects(Integer userId, String query, Integer year, Integer type, String number) {
+    public ProjectListResult getFinishedR2Projects(Integer userId, String query, Integer year, Integer type, String number){
+        try {
+            // R2上的任务
+            List<Project> result = projectDao.getFinishedProjectsByOwnerId(userId, query, year, type, number);
+            // R2参与的任务 但不是自己上的
+            List<Project> participantProjects = projectDao.getFinishedProjectsByUserIdR2(userId, query, year, type, number);
+
+            List<String> processIds = result.stream().map(item -> item.getProcessId())
+                    .collect(Collectors.toList());
+
+            List<Project> finalResult = new ArrayList<>();
+            finalResult.addAll(result);
+            // 自己参与的任务中需要剔除自己上的任务
+            finalResult.addAll(participantProjects.stream().filter(item -> !processIds.contains(item.getProcessId()))
+                    .collect(Collectors.toList()));
+
+
+
+            return ProjectListResult.success(finalResult);
+        } catch (Exception e) {
+            return ProjectListResult.failure("程序异常");
+        }
+    }
+
+
+    public ProjectListResult getUnfinishedR3Projects(Integer userId, String query, Integer year, Integer type, String number){
         // 传入R3ID,找到对应的R2ID
         List<Integer> R2IdsFindByR3 = R2R3R4Relation.R3ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
         try {
             // 查出来所有的projects
-            List<Project> allProjects = projectDao.getProjectsByOwnerIds(R2IdsFindByR3, query, year, type, number);
-            return getDisplayResult(userId, allProjects);
+            List<Project> allProjects = projectDao.getUnfinishedProjectsByOwnerIds(R2IdsFindByR3, query, year, type, number);
+            List<Project> finalUnfinished = generateUnfinishedProjects(allProjects, userId);
+            return ProjectListResult.success(finalUnfinished);
 
         } catch (Exception e) {
-            return DisplayResult.failure("程序异常");
+            return ProjectListResult.failure("程序异常");
         }
     }
+
+    public ProjectListResult getR3FinishedProjects(Integer userId, String query, Integer year, Integer type, String number){
+        // 传入R3ID,找到对应的R2ID
+        List<Integer> R2IdsFindByR3 = R2R3R4Relation.R3ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
+        try {
+            // R3管理的R2
+            List<Project> allProjects = projectDao.getProjectsByOwnerIds(R2IdsFindByR3, query, year, type, number);
+            // R3参与的任务. 但不是自己管理的R2上的
+            List<Project> participantProjects = projectDao.getFinishedProjectsByUserIdR2(userId, query, year, type, number);
+
+            List<String> processIds = allProjects.stream().map(Project::getProcessId)
+                    .collect(Collectors.toList());
+
+            List<Project> finalResult = new ArrayList<>();
+            finalResult.addAll(allProjects);
+            // 自己参与的任务中需要剔除自己上的任务
+            finalResult.addAll(participantProjects.stream().filter(item -> !processIds.contains(item.getProcessId()))
+                    .collect(Collectors.toList()));
+
+            return ProjectListResult.success(finalResult);
+
+        } catch (Exception e) {
+            return ProjectListResult.failure("程序异常");
+        }
+    }
+
+//    public DisplayResult getAllR3Projects(Integer userId, String query, Integer year, Integer type, String number) {
+//        // 传入R3ID,找到对应的R2ID
+//        List<Integer> R2IdsFindByR3 = R2R3R4Relation.R3ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
+//        try {
+//            // 查出来所有的projects
+//            List<Project> allProjects = projectDao.getProjectsByOwnerIds(R2IdsFindByR3, query, year, type, number);
+//            return getDisplayResult(userId, allProjects);
+//
+//        } catch (Exception e) {
+//            return DisplayResult.failure("程序异常");
+//        }
+//    }
 
     @NotNull
     private DisplayResult getDisplayResult(Integer userId, List<Project> allProjects) {
@@ -235,4 +301,6 @@ public class DisplayService {
             return DisplayResult.failure("程序异常");
         }
     }
+
+
 }
