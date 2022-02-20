@@ -40,11 +40,11 @@ public class DisplayService {
         this.userService = userService;
     }
 
-    public ProductListResult getFinishedProjectsByUserId(Integer userId, String query, Integer year, Integer type, String number) {
+    public ProjectListResult getFinishedProjectsByUserId(Integer userId, String query, Integer year, Integer type, String number) {
         try {
-            return ProductListResult.success("查询成功", productDao.getProductAndProjectByUserId(userId, query, year, type, number));
+            return ProjectListResult.success(projectDao.getFinishedProjectsByOwnerId(userId, query, year, type, number));
         } catch (Exception e) {
-            return ProductListResult.failure("查询失败");
+            return ProjectListResult.failure("查询失败");
         }
     }
 
@@ -101,21 +101,9 @@ public class DisplayService {
         try {
             // R2上的任务
             List<Project> result = projectDao.getFinishedProjectsByOwnerId(userId, query, year, type, number);
-            // R2参与的任务 但不是自己上的
-            List<Project> participantProjects = projectDao.getFinishedProjectsByUserIdR2(userId, query, year, type, number);
-
-            List<String> processIds = result.stream().map(item -> item.getProcessId())
-                    .collect(Collectors.toList());
-
-            List<Project> finalResult = new ArrayList<>();
-            finalResult.addAll(result);
-            // 自己参与的任务中需要剔除自己上的任务
-            finalResult.addAll(participantProjects.stream().filter(item -> !processIds.contains(item.getProcessId()))
-                    .collect(Collectors.toList()));
 
 
-
-            return ProjectListResult.success(finalResult);
+            return ProjectListResult.success(result);
         } catch (Exception e) {
             return ProjectListResult.failure("程序异常");
         }
@@ -141,20 +129,20 @@ public class DisplayService {
         List<Integer> R2IdsFindByR3 = R2R3R4Relation.R3ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
         try {
             // R3管理的R2
-            List<Project> allProjects = projectDao.getProjectsByOwnerIds(R2IdsFindByR3, query, year, type, number);
-            // R3参与的任务. 但不是自己管理的R2上的
-            List<Project> participantProjects = projectDao.getFinishedProjectsByUserIdR2(userId, query, year, type, number);
+            List<Project> allProjects = projectDao.getProjectsByOwnerIds(userId, R2IdsFindByR3, query, year, type, number);
+//            // R3参与的任务. 但不是自己管理的R2上的
+//            List<Project> participantProjects = projectDao.getFinishedProjectsByUserIdR2(userId, query, year, type, number);
+//
+//            List<String> processIds = allProjects.stream().map(Project::getProcessId)
+//                    .collect(Collectors.toList());
+//
+//            List<Project> finalResult = new ArrayList<>();
+//            finalResult.addAll(allProjects);
+//            // 自己参与的任务中需要剔除自己上的任务
+//            finalResult.addAll(participantProjects.stream().filter(item -> !processIds.contains(item.getProcessId()))
+//                    .collect(Collectors.toList()));
 
-            List<String> processIds = allProjects.stream().map(Project::getProcessId)
-                    .collect(Collectors.toList());
-
-            List<Project> finalResult = new ArrayList<>();
-            finalResult.addAll(allProjects);
-            // 自己参与的任务中需要剔除自己上的任务
-            finalResult.addAll(participantProjects.stream().filter(item -> !processIds.contains(item.getProcessId()))
-                    .collect(Collectors.toList()));
-
-            return ProjectListResult.success(finalResult);
+            return ProjectListResult.success(allProjects);
 
         } catch (Exception e) {
             return ProjectListResult.failure("程序异常");

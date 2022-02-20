@@ -104,8 +104,8 @@
 
     <insert id="insertProject" parameterType="hello.entity.Project" useGeneratedKeys="true"
             keyProperty="id" keyColumn="id">
-        INSERT INTO project (process_id, name, number, type, attachment, owner_id, owner_name, product_id, created_at, updated_at )
-        VALUES (#{processId}, #{name}, #{number}, #{type}, #{attachment}, #{ownerId}, #{ownerName},#{productId}, now(), now())
+        INSERT INTO project (process_id, name, number, type, attachment, owner_id, owner_name, product_id, pm_id, created_at, updated_at )
+        VALUES (#{processId}, #{name}, #{number}, #{type}, #{attachment}, #{ownerId}, #{ownerName},#{productId}, #{pmId}, now(), now())
     </insert>
 
     <update id="updateProject" parameterType="hello.entity.Project">
@@ -119,6 +119,12 @@
             SET total_product=#{totalProduct}, total_percentage=#{totalPercentage}, updated_at=now()
             where project.process_id = #{processId}
      </update>
+
+     <update id="updatePmId" parameterType="hello.entity.Project">
+                 UPDATE project
+                 SET pm_id=#{pmId}, owner_name=#{ownerName},updated_at=now()
+                 where project.process_id = #{processId}
+          </update>
 
     <delete id="deleteProject" parameterType="int">
         DELETE
@@ -160,7 +166,7 @@
                p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
         from project
         left join product p on project.process_id = p.process_id
-        where ISNULL(project.total_product)=0 and project.owner_id = #{ownerId}
+        where ISNULL(project.total_product)=0 and (project.owner_id = #{ownerId} or project.pm_id=#{ownerId} or p.user_id=#{ownerId})
         <if test="query != ''">
            and  project.name  REGEXP #{query}
         </if>
@@ -228,10 +234,10 @@
                    p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
             from project
             left join product p on project.process_id = p.process_id
-            where ISNULL(project.total_product)=0 and project.owner_id in
+            where ISNULL(project.total_product)=0 and (p.user_id=#{userId} or project.owner_id in
             <foreach collection="ownerIds" item="ownerId" index="index" open="(" separator="," close=")">
                  #{ownerId}
-            </foreach>
+            </foreach>)
              <if test="query != ''">
                 and  project.name  REGEXP #{query}
              </if>

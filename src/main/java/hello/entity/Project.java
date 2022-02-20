@@ -38,6 +38,7 @@ public class Project {
     private List<Product> products;
     private String ownerName;
     private String activityName;
+    private Integer pmId;
 
 
     public Project(){}
@@ -169,5 +170,13 @@ public class Project {
 
     public void setActivityName(String activityName) {
         this.activityName = activityName;
+    }
+
+    public Integer getPmId() {
+        return pmId;
+    }
+
+    public void setPmId(Integer pmId) {
+        this.pmId = pmId;
     }
 }

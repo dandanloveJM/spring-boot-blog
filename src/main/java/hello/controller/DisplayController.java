@@ -55,7 +55,7 @@ public class DisplayController {
 
     @ReadUserIdInSession
     @GetMapping("/R1/displayFinishedProjects")
-    public ProductListResult getR1FinishedProjects(Integer userId,
+    public ProjectListResult getR1FinishedProjects(Integer userId,
                                                    @RequestParam String query,
                                                    @RequestParam Integer year,
                                                    @RequestParam(required=false) Integer type,

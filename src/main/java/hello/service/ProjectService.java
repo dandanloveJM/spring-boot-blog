@@ -94,6 +94,24 @@ public class ProjectService {
         }
     }
 
+
+    public ProjectResult updatePmId(Integer pmId, String ownerName, String processId) throws Exception {
+        Project projectInDb = projectDao.getProjectByProcessId(processId);
+        if (projectInDb == null) {
+            return ProjectResult.failure("项目不存在");
+        }
+
+        Project newProject = new Project();
+        newProject.setPmId(pmId);
+        newProject.setOwnerName(ownerName);
+        try{
+            return ProjectResult.success("更新项目长", projectDao.updatePmId(newProject) );
+        } catch (Exception e) {
+            throw new Exception("程序异常");
+        }
+    }
+
+
     public ProjectListResult getProjectsByProcessIds(List<String> processIds, String query, Integer year, Integer type, String number){
         try{
             return ProjectListResult.success(projectDao.getProjectsByProcessIds(processIds, query, year, type, number));

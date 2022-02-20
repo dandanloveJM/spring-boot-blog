@@ -75,7 +75,7 @@ public class ProductDao {
                 "year", year,
                 "type", type,
                 "number", number);
-        return sqlSession.selectList("getProductAndProjectByUserId", parameters);
+        return sqlSession.selectList("getFinishedProjectsByOwnerId", parameters);
     }
 
     public List<Product> getUnfinishedProjectsByUserId(Integer userId){

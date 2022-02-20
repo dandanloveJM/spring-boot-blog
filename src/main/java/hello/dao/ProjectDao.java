@@ -62,6 +62,11 @@ public class ProjectDao {
         return getProjectByProcessId(newProject.getProcessId());
     }
 
+    public Project updatePmId(Project newProject){
+        sqlSession.update("updatePmId", newProject);
+        return getProjectByProcessId(newProject.getProcessId());
+    }
+
 
     public void deleteProject(int projectId){
         sqlSession.delete("deleteProject", projectId);
@@ -115,8 +120,10 @@ public class ProjectDao {
     }
 
     // R3 管理的R2的任务
-    public List<Project> getProjectsByOwnerIds(List<Integer> ownerIds, String query, Integer year, Integer type, String number){
-        Map<String, Object> parameters = asMap("ownerIds", ownerIds,
+    public List<Project> getProjectsByOwnerIds(Integer userId, List<Integer> ownerIds, String query, Integer year, Integer type, String number){
+        Map<String, Object> parameters = asMap(
+                "userId", userId,
+                "ownerIds", ownerIds,
                 "query", query,
                 "year", year,
                 "type", type,

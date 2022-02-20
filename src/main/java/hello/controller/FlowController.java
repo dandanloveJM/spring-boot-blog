@@ -113,7 +113,9 @@ public class FlowController {
 
     }
 
-    private Project buildParam(String processId, String name, String number, String type, String attachment, Integer ownerId, String ownerName) {
+    private Project buildParam(String processId, String name, String number, String type,
+                               String attachment, Integer ownerId, String ownerName,
+                               Integer pmId) {
         Project project = new Project();
         project.setProcessId(processId);
         project.setName(name);
@@ -122,6 +124,7 @@ public class FlowController {
         project.setAttachment(attachment);
         project.setOwnerId(ownerId);
         project.setOwnerName(ownerName);
+        project.setPmId(pmId);
         return project;
     }
 
@@ -149,7 +152,7 @@ public class FlowController {
     @PostMapping("uploadTaskInfo")
     public ProjectResult uploadTaskInfo(Integer ownerId,
                                         @RequestParam("file") MultipartFile file,
-                                        @RequestParam String nextAssignee,
+                                        @RequestParam Integer nextAssignee,
                                         @RequestParam String name,
                                         @RequestParam String number,
                                         @RequestParam String type,
@@ -159,7 +162,7 @@ public class FlowController {
             return ProjectResult.failure("请先登录");
         }
 
-        String ownerName = userService.getUserById(ownerId).getData().getDisplayName();
+        String ownerName = userService.getUserById(nextAssignee).getData().getDisplayName();
 
         // 需要区分是需要新建任务 还是 修改任务，涉及到不同的数据库操作
 
@@ -183,7 +186,7 @@ public class FlowController {
 
             attachmentURL = url + uploadResult.getMsg();
         }
-        Project newProject = buildParam(processId, name, number, type, attachmentURL, ownerId, ownerName);
+        Project newProject = buildParam(processId, name, number, type, attachmentURL, ownerId, ownerName, nextAssignee);
 
         // 判断当前任务是否是退回过的
         // 没有退回过--> 新增
