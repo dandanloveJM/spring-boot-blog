@@ -94,7 +94,8 @@ public class RouteController {
         route7.setComponent("/rank/teamRank");
         route5children.add(route7);
 
-
+        routeChildren.add(route2);
+        routeChildren.add(route5);
         if (teamRankURL != null) {
             Route route8 = new Route();
             route8.setId(6);
@@ -105,8 +106,8 @@ public class RouteController {
             route8.setIcon("ChromeOutlined");
             route8.setKey("teamBonus");
             route8.setComponent("/rank/teamBonus");
-            route5children.add(route8);
 
+            routeChildren.add(route8);
 
             Route route9 = new Route();
             route9.setId(6);
@@ -117,7 +118,8 @@ public class RouteController {
             route9.setIcon("ChromeOutlined");
             route9.setKey("chart");
             route9.setComponent("/rank/chart");
-            route5children.add(route9);
+
+            routeChildren.add(route9);
 
 
         }
@@ -129,8 +131,7 @@ public class RouteController {
         route2children.add(route3);
         route2children.add(route4);
         route2.setChildren(route2children);
-        routeChildren.add(route2);
-        routeChildren.add(route5);
+
 
         route.setChildren(routeChildren);
         routes.add(route);
