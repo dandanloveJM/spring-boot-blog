@@ -7,6 +7,7 @@ public class UserRank {
     private Integer userId;
     private String displayName;
     private BigDecimal productSum;
+    private String team;
 
     public Integer getId() {
         return id;
@@ -40,4 +41,11 @@ public class UserRank {
         this.productSum = productSum;
     }
 
+    public String getTeam() {
+        return team;
+    }
+
+    public void setTeam(String team) {
+        this.team = team;
+    }
 }

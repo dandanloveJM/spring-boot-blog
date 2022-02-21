@@ -161,6 +161,11 @@ public class FlowController {
         if (ownerId == -1) {
             return ProjectResult.failure("请先登录");
         }
+        Boolean isValidFile = file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/png");
+
+        if(!isValidFile){
+            return ProjectResult.failure("只能上传jpeg, jpg, png格式的图片");
+        }
 
         String ownerName = userService.getUserById(nextAssignee).getData().getDisplayName();
 
@@ -237,6 +242,14 @@ public class FlowController {
 
         JSONArray data2 = JSON.parseArray(data);
         List<Product> products = new ArrayList<>();
+
+        int productSum = 0;
+        for (int i = 0; i < data2.size(); i++) {
+            productSum += (Integer) data2.getJSONObject(i).get("percentage");
+        }
+        if (productSum > 100){
+            return ProductListResult.failure("比例不能超过100");
+        }
 
         for (int i = 0; i < data2.size(); i++) {
             JSONObject obj = data2.getJSONObject(i);

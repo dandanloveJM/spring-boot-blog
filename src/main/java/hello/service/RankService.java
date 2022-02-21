@@ -32,12 +32,25 @@ public class RankService {
                     .stream().filter(item -> item.getProductSum() != null)
                     .collect(Collectors.toList());
 
+
+
             int i = 1;
+            BigDecimal count = new BigDecimal(0);
             for (UserRank userRank : filteredUserRankList) {
                 userRank.setId(i);
                 userRank.setProductSum(userRank.getProductSum().setScale(0, RoundingMode.UP));
                 i++;
+                count = count.add(userRank.getProductSum());
             }
+
+            UserRank total = new UserRank();
+            total.setTeam("");
+            total.setDisplayName("合计");
+            total.setProductSum(count);
+            filteredUserRankList.add(total);
+
+
+
 
             return UserRankListResult.success(filteredUserRankList);
 
