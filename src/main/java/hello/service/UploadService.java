@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class UploadService {
@@ -38,7 +40,8 @@ public class UploadService {
             if (file.isEmpty()) {
                 return UploadResult.failure("似乎没有上传文件呢");
             }
-            String newFileName = "czglcjzx" + file.getOriginalFilename();
+
+            String newFileName = UUID.randomUUID() +".png";
             Path destinationFile = this.rootLocation.resolve(
                             Paths.get(newFileName))
                     .normalize().toAbsolutePath();

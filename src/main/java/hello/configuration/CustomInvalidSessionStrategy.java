@@ -21,7 +21,7 @@ public class CustomInvalidSessionStrategy implements InvalidSessionStrategy {
         Cookie cookie = new Cookie("JSESSIONID", null);
         cookie.setPath("/");
         cookie.setMaxAge(0);  // 设置为0，浏览器端就会删除同域名，同path的cookie
-        cookie.setDomain("47.96.175.63");
+        cookie.setDomain("121.41.9.16");
         httpServletResponse.addCookie(cookie);
 
         httpServletResponse.setContentType("application/json;charset=utf-8");
