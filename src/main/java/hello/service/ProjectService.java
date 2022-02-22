@@ -1,6 +1,7 @@
 package hello.service;
 
 import hello.dao.CommentMapper;
+import hello.dao.ProductDao;
 import hello.dao.ProjectDao;
 import hello.entity.CommentResult;
 import hello.entity.Project;
@@ -15,13 +16,16 @@ import java.util.List;
 @Service
 public class ProjectService {
     private final ProjectDao projectDao;
+    private final ProductDao productDao;
     private final CommentMapper commentMapper;
 
     @Inject
     public ProjectService(ProjectDao projectDao,
-                          CommentMapper commentMapper){
+                          CommentMapper commentMapper,
+                          ProductDao productDao){
         this.projectDao = projectDao;
         this.commentMapper = commentMapper;
+        this.productDao = productDao;
     }
 
     public ProjectListResult getProjects(Integer page, Integer pageSize, Integer userId) {
@@ -149,7 +153,9 @@ public class ProjectService {
         try{
 
             projectDao.deleteProjectByProcessId(processId);
-            projectDao.deleteProjectByProcessId(processId);
+            projectDao.deleteProcessRecord(processId);
+            productDao.deleteProductsByProcessId(processId);
+
             return ProjectResult.success("删除项目成功");
         } catch (Exception e) {
             return ProjectResult.failure("删除失败");

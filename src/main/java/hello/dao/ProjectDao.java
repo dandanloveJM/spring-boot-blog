@@ -76,6 +76,9 @@ public class ProjectDao {
         sqlSession.delete("deleteProjectByProcessId", processId);
     }
 
+    public void deleteProcessRecord(String processId){
+        sqlSession.delete("deleteACTINST", processId);
+    }
 
     public List<Project> getProjectsByProcessIds(List<String> processIds, String query, Integer year,
                                                  Integer type, String number){
@@ -132,7 +135,8 @@ public class ProjectDao {
     }
 
     // R3 进行中的任务
-    public List<Project> getUnfinishedProjectsByOwnerIds(List<Integer> ownerIds, String query, Integer year, Integer type, String number){
+    public List<Project> getUnfinishedProjectsByOwnerIds(List<Integer> ownerIds, String query,
+                                                         Integer year, Integer type, String number){
         Map<String, Object> parameters = asMap("ownerIds", ownerIds,
                 "query", query,
                 "year", year,
@@ -156,8 +160,14 @@ public class ProjectDao {
         return sqlSession.selectList("getProjectsByOwnerIdsByR4", parameters);
     }
 
-    public List<Project> getAllProjects(){
-        return sqlSession.selectList("getAllProjects");
+    public List<Project> getAllProjects(String query,
+                                        Integer year, Integer type, String number){
+        Map<String, Object> parameters = asMap(
+                "query", query,
+                "year", year,
+                "type", type,
+                "number", number);
+        return sqlSession.selectList("getAllProjects", parameters);
     }
 
     public List<Project> getA1ProjectsByProcessIds(List<String> processIds, String query,

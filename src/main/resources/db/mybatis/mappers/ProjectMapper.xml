@@ -138,6 +138,12 @@
         WHERE project.process_id = #{processId}
     </delete>
 
+    <delete id="deleteACTINST" parameterType="String">
+            DELETE
+            FROM `ACT_HI_ACTINST`
+            WHERE PROC_INST_ID_ = #{processId}
+    </delete>
+
 <select id="getUnfinishedProjectsByOwnerId" resultMap="R2Projects">
         select project.id, project.process_id, project.name, project.number, project.owner_name,
                project.type, project.owner_id, project.attachment, project.created_at, project.updated_at,
@@ -286,19 +292,11 @@
     </select>
 
 
-    <select id="getAllProjects" resultMap="R2Projects">
-                select project.id, project.process_id, project.name, project.number, project.owner_name,
-                       project.type, project.owner_id, project.attachment, project.updated_at,
-                       project.total_product, project.total_percentage,
-                       p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
-                from project
-                inner join product p on project.process_id = p.process_id
-                order by project.updated_at DESC
-    </select>
+
 
     <select id="getA1ProjectsByProcessIds" parameterType="java.util.List" resultMap="R2Projects">
             select project.id, project.process_id, project.name, project.number, project.owner_name,
-                   project.type, project.owner_id, project.attachment, project.updated_at,
+                   project.type, project.owner_id, project.attachment, project.updated_at, project.pm_id,
                    project.total_product, project.total_percentage,
                    p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
             from project
@@ -322,6 +320,27 @@
             order by project.updated_at DESC
    </select>
 
+
+<select id="getAllProjects" resultMap="R2Projects">
+        select project.id, project.process_id, project.name, project.number, project.owner_name,
+               project.type, project.owner_id, project.attachment, project.created_at, project.updated_at,
+               project.total_product, project.total_percentage,
+               p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
+        from project
+        left join product p on project.process_id = p.process_id
+        where  year(project.updated_at) = #{year}
+        <if test="query != ''">
+           and  project.name  REGEXP #{query}
+        </if>
+
+        <if test="type != null">
+        and   project.type = #{type}
+        </if>
+        <if test="number != ''">
+        and    project.number  REGEXP #{number}
+        </if>
+        order by project.updated_at DESC
+    </select>
 
 
 

@@ -187,7 +187,7 @@ public class FlowController {
         UploadResult uploadResult = this.uploadService.store(file);
         if (uploadResult.getStatus().equals("ok")) {
             //String url = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + context.getWebServer().getPort() + "/files/";
-            String url = "http://47.96.175.63:"+context.getWebServer().getPort() + "/files/";
+            String url = "http://121.41.9.16:"+context.getWebServer().getPort() + "/files/";
 
             attachmentURL = url + uploadResult.getMsg();
         }

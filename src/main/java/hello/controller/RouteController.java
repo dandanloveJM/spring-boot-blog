@@ -179,11 +179,6 @@ public class RouteController {
 
 
 
-
-
-
-
-
         Route route6 = new Route();
         route6.setId(4);
         route6.setPid(1);
@@ -243,6 +238,64 @@ public class RouteController {
 
     }
 
+
+    private List<Route> getAdminRoutes(){
+        List<Route> routes = new ArrayList<>();
+        Route route = new Route();
+        route.setId(1);
+        route.setPid(0);
+        route.setName("任务管理");
+        route.setPath("/");
+        route.setRedirect("/admin/undoneTask");
+        route.setComponent("BasicLayout");
+        route.setIcon("AppleOutlined");
+        route.setKey("layout");
+
+        Route route2 = new Route();
+        List<Route> routeChildren = new ArrayList<>();
+        List<Route> route2children = new ArrayList<>();
+        route2.setId(2);
+        route2.setPid(1);
+        route2.setName("任务管理");
+        route2.setPath("/admin/undoneTask");
+        route2.setRedirect("/admin/undoneTask");
+        route2.setIcon("ChromeOutlined");
+        route2.setKey("element");
+        route2.setComponent("RouteView");
+
+        Route route3 = new Route();
+        route3.setId(10);
+        route3.setPid(2);
+        route3.setName("进行中的任务");
+        route3.setPath("/admin/undoneTask");
+        route3.setRedirect("");
+        route3.setComponent("/admin/undoneTask");
+        route3.setIcon("");
+        route3.setKey("el_icon");
+
+
+        Route route4 = new Route();
+        route4.setId(11);
+        route4.setPid(2);
+        route4.setName("已有产值的任务");
+        route4.setPath("/admin/doneTask");
+        route4.setRedirect("");
+        route4.setComponent("/admin/doneTask");
+        route4.setIcon("");
+        route4.setKey("el_done");
+
+        route2children.add(route3);
+        route2children.add(route4);
+        route2.setChildren(route2children);
+        routeChildren.add(route2);
+        route.setChildren(routeChildren);
+        routes.add(route);
+        return routes;
+
+
+    }
+
+
     @ReadRoleIdInSession
     @GetMapping("/user/menu")
     public RouteResult getUserMenu(Integer roleId) {
@@ -264,6 +317,9 @@ public class RouteController {
             return RouteResult.success(routes);
         } else if (roleId == 6) {// 财务
             List<Route> routes = getRoutes("/display/a1task", "/display/a1DoneTask", null);
+            return RouteResult.success(routes);
+        } else if (roleId == 7) {
+            List<Route> routes = getAdminRoutes();
             return RouteResult.success(routes);
         }
         return RouteResult.failure("路由异常");

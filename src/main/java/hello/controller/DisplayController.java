@@ -21,17 +21,20 @@ public class DisplayController {
     private final DisplayService displayService;
     private final RankService rankService;
     private final UserAddedProductService userAddedProductService;
+    private final R4TypeService r4TypeService;
 
     @Inject
     public DisplayController(ProductService productService,
                              DisplayService displayService,
                              RankService rankService,
-                             UserAddedProductService userAddedProductService
+                             UserAddedProductService userAddedProductService,
+                             R4TypeService r4TypeService
     ) {
         this.productService = productService;
         this.displayService = displayService;
         this.rankService = rankService;
         this.userAddedProductService = userAddedProductService;
+        this.r4TypeService = r4TypeService;
     }
 
     @ReadUserIdInSession
@@ -174,8 +177,11 @@ public class DisplayController {
 
     // TODO R5和ADMIN可以看全部
     @GetMapping("/allProjects")
-    public DisplayResult getAllProjects() {
-        return displayService.getAllProjects();
+    public DisplayResult getAllProjects(@RequestParam String query,
+                                        @RequestParam Integer year,
+                                        @RequestParam(required=false) Integer type,
+                                        @RequestParam String number) {
+        return displayService.getAllProjects(query, year, type, number);
     }
 
     @ReadUserIdInSession
@@ -311,6 +317,12 @@ public class DisplayController {
     @GetMapping("/barChart")
     public TeamBarChartResult getBarChart(){
         return rankService.getBarParams();
+    }
+
+
+    @GetMapping("/r4types")
+    public R4TypeListResult getAllR4Types(){
+        return r4TypeService.showAllR4Types();
     }
 
 }

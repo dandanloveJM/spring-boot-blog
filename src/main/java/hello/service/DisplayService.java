@@ -229,9 +229,10 @@ public class DisplayService {
         }
     }
 
-    public Map<String, List<Project>> getAllProjectsMap() {
+    public Map<String, List<Project>> getAllProjectsMap(String query,
+                                                        Integer year, Integer type, String number) {
         Map<String, List<Project>> projects = new HashMap<>();
-        List<Project> allProjects = projectDao.getAllProjects();
+        List<Project> allProjects = projectDao.getAllProjects(query, year, type, number);
         if (allProjects.isEmpty()) {
             projects.put("empty", Collections.emptyList());
             return projects;
@@ -246,9 +247,10 @@ public class DisplayService {
         return projects;
     }
 
-    public DisplayResult getAllProjects() {
+    public DisplayResult getAllProjects(String query,
+                                        Integer year, Integer type, String number) {
         try {
-            Map<String, List<Project>> projects = getAllProjectsMap();
+            Map<String, List<Project>> projects = getAllProjectsMap(query, year, type, number);
             return DisplayResult.success(projects);
         } catch (Exception e) {
             return DisplayResult.failure("程序异常");
