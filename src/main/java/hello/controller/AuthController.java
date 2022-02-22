@@ -1,6 +1,7 @@
 package hello.controller;
 
 
+import hello.anno.ReadUserIdInSession;
 import hello.entity.LoginResult;
 import hello.entity.User;
 import hello.service.UserService;
@@ -20,6 +21,9 @@ import java.util.Map;
 public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    // 8位以上 包含字母数字和特殊符号
+    public static final String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![a-z0-9\\W]+$)(?![A-Za-z\\W]+$)(?![A-Z0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
+
 
     @Inject
     public AuthController(UserService userService,
@@ -51,6 +55,22 @@ public class AuthController {
             return LoginResult.success("已退出",false);
         }
 
+    }
+
+    @ReadUserIdInSession
+    @PostMapping("/resetPassword")
+    public LoginResult resetPassword(Integer userId, @RequestParam String password){
+
+        if(password.matches(PW_PATTERN)){
+            return LoginResult.failure("密码必须是同时包含数字、字母、特殊字符的8位以上", true);
+        }
+
+        try{
+            userService.changePassword(userId, password);
+            return LoginResult.success("修改密码成功", true);
+        } catch (Exception e) {
+            return LoginResult.failure("修改密码失败", false);
+        }
     }
 
 

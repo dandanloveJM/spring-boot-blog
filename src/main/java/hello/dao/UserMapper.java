@@ -4,6 +4,7 @@ import hello.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -21,6 +22,11 @@ public interface UserMapper {
     void save(@Param("username")String username,
               @Param("password")String password,
               @Param("avatar") String avatar);
+
+    @Update("UPDATE `user` SET password=#{password}, updated_at=now() where id=#{userId}")
+    void updatePassword(@Param("userId") Integer userId,
+                        @Param("password") String password);
+
 
     @Select("SELECT permission_ids FROM user left join role on user.role_id = role.id where username=#{username}")
     String getRoleByUsername(@Param("username") String username);

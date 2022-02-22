@@ -94,8 +94,22 @@ public class RouteController {
         route7.setComponent("/rank/teamRank");
         route5children.add(route7);
 
+
+        Route route10 = new Route();
+        route10.setId(10);
+        route10.setPid(1);
+        route10.setName("修改密码");
+        route10.setPath("/userInfo/resetPassword");
+        route10.setRedirect("");
+        route10.setIcon("ChromeOutlined");
+        route10.setKey("resetPassword");
+        route10.setComponent("/userInfo/resetPassword");
+
+
+
         routeChildren.add(route2);
         routeChildren.add(route5);
+
         if (teamRankURL != null) {
             Route route8 = new Route();
             route8.setId(6);
@@ -131,7 +145,7 @@ public class RouteController {
         route2children.add(route3);
         route2children.add(route4);
         route2.setChildren(route2children);
-
+        routeChildren.add(route10);
 
         route.setChildren(routeChildren);
         routes.add(route);

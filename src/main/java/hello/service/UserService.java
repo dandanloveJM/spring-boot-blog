@@ -41,6 +41,10 @@ public class UserService implements UserDetailsService {
 //        userMapper.save(username, password, null);
     }
 
+    public void changePassword(Integer userId, String password) {
+        userMapper.updatePassword(userId, bCryptPasswordEncoder.encode(password));
+    }
+
     public hello.entity.User getUserByUsername(String username) {
         return userMapper.findUserByUsername(username);
     }
