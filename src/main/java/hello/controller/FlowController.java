@@ -245,7 +245,8 @@ public class FlowController {
 
         int productSum = 0;
         for (int i = 0; i < data2.size(); i++) {
-            productSum += (Integer) data2.getJSONObject(i).get("percentage");
+            String percentage = (String) data2.getJSONObject(i).get("percentage");
+            productSum += Integer.parseInt(percentage);
         }
         if (productSum > 100){
             return ProductListResult.failure("比例不能超过100");

@@ -7,6 +7,8 @@ public class TeamRank {
     private String teamRank;
     private String teamName;
     private BigDecimal productSum;
+    private BigDecimal sumForR4;
+    private BigDecimal sumForR5;
 
     public int getRankId() {
         return rankId;
@@ -38,5 +40,21 @@ public class TeamRank {
 
     public void setProductSum(BigDecimal productSum) {
         this.productSum = productSum;
+    }
+
+    public BigDecimal getSumForR4() {
+        return sumForR4;
+    }
+
+    public void setSumForR4(BigDecimal sumForR4) {
+        this.sumForR4 = sumForR4;
+    }
+
+    public BigDecimal getSumForR5() {
+        return sumForR5;
+    }
+
+    public void setSumForR5(BigDecimal sumForR5) {
+        this.sumForR5 = sumForR5;
     }
 }

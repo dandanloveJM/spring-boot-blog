@@ -44,14 +44,11 @@ public class RankService {
             }
 
             UserRank total = new UserRank();
+
             total.setTeam("");
             total.setDisplayName("合计");
             total.setProductSum(count);
             filteredUserRankList.add(total);
-
-
-
-
             return UserRankListResult.success(filteredUserRankList);
 
 
@@ -107,13 +104,34 @@ public class RankService {
 
     @NotNull
     private TeamRankListResult getTeamRankListResult(List<TeamRank> z1Z2TeamRank, List<TeamRank> f1F2TeamRank) {
-        List<TeamRank> finalTeamProducts = new ArrayList<>();
-        finalTeamProducts.addAll(f1F2TeamRank);
-        finalTeamProducts.addAll(z1Z2TeamRank);
+        List<TeamRank> teamRanks = getFinalTeamProducts(z1Z2TeamRank, f1F2TeamRank);
+
+
+        int i = 1;
+        for (TeamRank eachRank : teamRanks) {
+            eachRank.setRankId(i);
+            i += 1;
+        }
+
+        return TeamRankListResult.success(teamRanks);
+    }
+
+
+    @NotNull
+    private TeamRankListResult getTeamBonusListResult(List<TeamRank> z1Z2TeamRank, List<TeamRank> f1F2TeamRank) {
+        List<TeamRank> finalTeamProducts = getFinalTeamProducts(z1Z2TeamRank, f1F2TeamRank);
+
         finalTeamProducts = finalTeamProducts.stream()
-                .peek(item -> item.setProductSum(item.getProductSum()
-                        .setScale(0, RoundingMode.UP)))
-                .sorted(Comparator.comparing(TeamRank::getProductSum).reversed())
+                .map(item -> {
+                    TeamRank tmpRank = new TeamRank();
+                    tmpRank.setTeamRank(item.getTeamRank());
+                    tmpRank.setSumForR4(item.getProductSum().divide(BigDecimal.valueOf(3), RoundingMode.UP)
+                            .multiply(BigDecimal.valueOf(2)).setScale(0, RoundingMode.UP));
+                    tmpRank.setSumForR5(item.getProductSum().divide(BigDecimal.valueOf(3), RoundingMode.UP)
+                            .setScale(0, RoundingMode.UP));
+
+                    return tmpRank;
+                }).sorted(Comparator.comparing(TeamRank::getSumForR4).reversed())
                 .collect(Collectors.toList());
 
 
@@ -124,6 +142,17 @@ public class RankService {
         }
 
         return TeamRankListResult.success(finalTeamProducts);
+    }
+
+    private List<TeamRank> getFinalTeamProducts(List<TeamRank> z1Z2TeamRank, List<TeamRank> f1F2TeamRank) {
+        List<TeamRank> finalTeamProducts = new ArrayList<>();
+        finalTeamProducts.addAll(f1F2TeamRank);
+        finalTeamProducts.addAll(z1Z2TeamRank);
+        return finalTeamProducts.stream()
+                .peek(item -> item.setProductSum(item.getProductSum()
+                        .setScale(0, RoundingMode.UP)))
+                .sorted(Comparator.comparing(TeamRank::getProductSum).reversed())
+                .collect(Collectors.toList());
     }
 
 
@@ -152,7 +181,7 @@ public class RankService {
             Z1Z2TeamBonus = addHalfR3Product(R3BonusMap.get("Z"), Z1Z2TeamBonus);
             F1F2TeamBonus = addHalfR3Product(R3BonusMap.get("F"), F1F2TeamBonus);
 
-            return getTeamRankListResult(F1F2TeamBonus, Z1Z2TeamBonus);
+            return getTeamBonusListResult(F1F2TeamBonus, Z1Z2TeamBonus);
 
         } catch (Exception e) {
             return TeamRankListResult.failure("获取奖金排行异常");
