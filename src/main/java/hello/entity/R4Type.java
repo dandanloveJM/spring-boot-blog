@@ -3,6 +3,7 @@ package hello.entity;
 public class R4Type {
     private Integer id;
     private Integer userId;
+    private String username;
     private Integer typeId;
     private String description;
 
@@ -32,6 +33,14 @@ public class R4Type {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setDescription(String description) {

@@ -7,7 +7,7 @@ import java.util.List;
 
 @Mapper
 public interface R4TypeMapper {
-    @Select("SELECT * from R4_type")
+    @Select("SELECT * from R4_type left join `user` u on u.id=R4_type.user_id")
     List<R4Type> getAllR4TypeData();
 
     @Select("SELECT * FROM R4_type where type_id=#{typeId}")
