@@ -39,4 +39,7 @@ public interface UserMapper {
 
     @Select("SELECT * FROM user where id=#{userId}")
     User getUserById(Integer userId);
+
+    @Select("SELECT * FROM user where display_name=#{displayName}")
+    User getUserByDisplayName(String displayName);
 }

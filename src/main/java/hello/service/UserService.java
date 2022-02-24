@@ -1,10 +1,9 @@
 package hello.service;
 
 
-import hello.dao.R4TypeMapper;
+import hello.dao.R4TypeDao;
 import hello.dao.UserMapper;
 import hello.entity.R4TypeListResult;
-import hello.entity.R4TypeResult;
 import hello.entity.UserListResult;
 import hello.entity.UserResult;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,16 +23,16 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private UserMapper userMapper;
-    private R4TypeMapper r4TypeMapper;
+    private R4TypeDao r4TypeDao;
 
 
     @Inject
     public UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
                        UserMapper userMapper,
-                       R4TypeMapper r4TypeMapper){
+                       R4TypeDao r4TypeDao){
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userMapper = userMapper;
-        this.r4TypeMapper = r4TypeMapper;
+        this.r4TypeDao = r4TypeDao;
     }
 
     public void save(String username, String password) {
@@ -80,7 +79,7 @@ public class UserService implements UserDetailsService {
 
     public R4TypeListResult getAllR4Type(){
         try {
-            return R4TypeListResult.success("查询成功", r4TypeMapper.getAllR4TypeData());
+            return R4TypeListResult.success("查询成功", r4TypeDao.getAllR4TypeData(null));
         } catch (Exception e) {
             System.out.println(e);
             return R4TypeListResult.failure("程序异常");
@@ -89,7 +88,7 @@ public class UserService implements UserDetailsService {
 
     public R4TypeListResult getR4IdByTypeId(Integer typeId){
         try{
-            return R4TypeListResult.success("查询成功", r4TypeMapper.getUserIdByTypeId(typeId));
+            return R4TypeListResult.success("查询成功", r4TypeDao.getUserIdByTypeId(typeId));
         } catch (Exception e){
             System.out.println(e);
             return R4TypeListResult.failure("程序异常");
@@ -98,7 +97,7 @@ public class UserService implements UserDetailsService {
 
     public R4TypeListResult getTypeIdsByR4(Integer userId){
         try{
-            return R4TypeListResult.success("查询成功", r4TypeMapper.getTypeIdsByUserId(userId));
+            return R4TypeListResult.success("查询成功", r4TypeDao.getTypeIdsByUserId(userId));
         } catch (Exception e){
             System.out.println(e);
             return R4TypeListResult.failure("程序异常");

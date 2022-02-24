@@ -19,7 +19,7 @@
 <!--    </mappers>-->
     <settings>
         <setting name="mapUnderscoreToCamelCase" value="true"/>
-<!--        <setting name="logImpl" value="STDOUT_LOGGING" />-->
+        <setting name="logImpl" value="STDOUT_LOGGING" />
     </settings>
     <mappers>
         <mapper resource="db/mybatis/mappers/BlogMapper.xml"/>
@@ -28,5 +28,6 @@
         <mapper resource="db/mybatis/mappers/RollbackMapper.xml"/>
         <mapper resource="db/mybatis/mappers/RankMapper.xml"/>
         <mapper resource="db/mybatis/mappers/UserAddedProductMapper.xml"/>
+        <mapper resource="db/mybatis/mappers/R4TypeMapper.xml"/>
     </mappers>
 </configuration>

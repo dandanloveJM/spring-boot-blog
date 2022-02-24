@@ -282,12 +282,77 @@ public class RouteController {
         route4.setRedirect("");
         route4.setComponent("/admin/doneTask");
         route4.setIcon("");
-        route4.setKey("el_done");
+        route4.setKey("doneTask");
+
+
+        Route route8 = new Route();
+        route8.setId(6);
+        route8.setPid(1);
+        route8.setName("30%产值待分配");
+        route8.setPath("/rank/teamBonus");
+        route8.setRedirect("");
+        route8.setIcon("ChromeOutlined");
+        route8.setKey("teamBonus");
+        route8.setComponent("/rank/teamBonus");
+
+
+        Route route5 = new Route();
+        List<Route> route5children = new ArrayList<>();
+        route5.setId(3);
+        route5.setPid(1);
+        route5.setName("排行榜");
+        route5.setPath("/rank/peopleRank");
+        route5.setRedirect("/rank/peopleRank");
+        route5.setIcon("ChromeOutlined");
+        route5.setKey("rank");
+        route5.setComponent("RouteView");
+
+
+        Route route6 = new Route();
+        route6.setId(4);
+        route6.setPid(3);
+        route6.setName("个人排行榜");
+        route6.setPath("/rank/peopleRank");
+        route6.setRedirect("");
+        route6.setIcon("ChromeOutlined");
+        route6.setKey("peopleRank");
+        route6.setComponent("/rank/peopleRank");
+
+        route5children.add(route6);
+
+
+        Route route7 = new Route();
+        route7.setId(5);
+        route7.setPid(3);
+        route7.setName("团队排行榜");
+        route7.setPath("/rank/teamRank");
+        route7.setRedirect("");
+        route7.setIcon("ChromeOutlined");
+        route7.setKey("teamRank");
+        route7.setComponent("/rank/teamRank");
+        route5children.add(route7);
+
+        route5.setChildren(route5children);
+
+
+        Route route9 = new Route();
+        route9.setId(13);
+        route9.setPid(2);
+        route9.setName("分管领导的任务类型管理");
+        route9.setPath("/admin/types");
+        route9.setRedirect("");
+        route9.setComponent("/admin/r4types");
+        route9.setIcon("");
+        route9.setKey("el_done");
+
 
         route2children.add(route3);
         route2children.add(route4);
         route2.setChildren(route2children);
         routeChildren.add(route2);
+        routeChildren.add(route5);
+        routeChildren.add(route8);
+        routeChildren.add(route9);
         route.setChildren(routeChildren);
         routes.add(route);
         return routes;

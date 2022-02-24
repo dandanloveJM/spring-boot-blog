@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.R4TypeMapper">
+    <select id="selectAllR4Types" resultType="hello.entity.R4Type">
+        SELECT `R4_type`.id, `R4_type`.user_id, `R4_type`.type_id, `R4_type`.description, u.display_name from `R4_type`
+            left join `user` u on u.id=R4_type.user_id
+        <if test="typeId != null">
+        where `R4_type`.type_id=#{typeId}
+        </if>
+        order by `R4_type`.type_id
+    </select>
+
+    <select id="getUserIdByTypeId" resultType="hello.entity.R4Type">
+        SELECT * FROM R4_type where type_id=#{typeId}
+    </select>
+
+    <select id="getTypeIdsByUserId" resultType="hello.entity.R4Type">
+        SELECT * FROM R4_type where user_id=#{userId}
+    </select>
+
+    <update id="updateUserId" parameterType="hello.entity.R4Type">
+        update `R4_type` SET `R4_type`.user_id=#{userId}
+        where `R4_type`.id=#{id}
+    </update>
+
+    <delete id="deleteByR4TypeId">
+        DELETE FROM `R4_type` where `R4_type`.id=#{id}
+    </delete>
+
+    <insert id="insertR4Type" parameterType="hello.entity.R4Type" useGeneratedKeys="true">
+        insert into `R4_type` (user_id, type_id, description)
+        values (#{userId}, #{typeId}, #{description})
+    </insert>
+</mapper>
