@@ -321,8 +321,8 @@ public class DisplayController {
 
 
     @GetMapping("/r4types")
-    public R4TypeListResult getAllR4Types(Integer typeId){
-        return r4TypeService.showAllR4Types(typeId);
+    public R4TypeListResult getAllR4Types(Integer typeId, Integer userId){
+        return r4TypeService.showAllR4Types(typeId, userId);
     }
 
     @PostMapping("/change/userId/r4type")
@@ -336,9 +336,11 @@ public class DisplayController {
     }
 
     @PostMapping("/add/r4type")
-    public R4TypeResult addR4Type(@RequestParam String displayName, @RequestParam Integer typeId,
+    public R4TypeResult addR4Type(@RequestParam Integer userId, @RequestParam Integer typeId,
                                   @RequestParam String description){
-        return r4TypeService.addNewR4Type(displayName, typeId, description);
+        return r4TypeService.addNewR4Type(userId, typeId, description);
     }
+
+
 
 }

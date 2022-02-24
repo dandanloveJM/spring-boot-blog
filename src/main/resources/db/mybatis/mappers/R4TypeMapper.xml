@@ -6,8 +6,14 @@
     <select id="selectAllR4Types" resultType="hello.entity.R4Type">
         SELECT `R4_type`.id, `R4_type`.user_id, `R4_type`.type_id, `R4_type`.description, u.display_name from `R4_type`
             left join `user` u on u.id=R4_type.user_id
-        <if test="typeId != null">
-        where `R4_type`.type_id=#{typeId}
+        <if test="typeId != null and userId != null">
+        where `R4_type`.type_id=#{typeId} and `R4_type`.user_id=#{userId}
+        </if>
+        <if test="typeId != null and userId == null">
+            where `R4_type`.type_id=#{typeId}
+        </if>
+        <if test="typeId == null and userId != null">
+            where `R4_type`.user_id=#{userId}
         </if>
         order by `R4_type`.type_id
     </select>

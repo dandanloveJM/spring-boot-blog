@@ -37,6 +37,9 @@ public interface UserMapper {
     @Select("SELECT id, display_name FROM user where role_id in (1,2,3)")
     List<User> getAllR1R2R3Users();
 
+    @Select("SELECT id, display_name FROM user where role_id=4")
+    List<User> getAllR4Users();
+
     @Select("SELECT * FROM user where id=#{userId}")
     User getUserById(Integer userId);
 

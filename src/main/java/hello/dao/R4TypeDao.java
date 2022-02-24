@@ -25,8 +25,8 @@ public class R4TypeDao {
         return result;
     }
 
-    public List<R4Type> getAllR4TypeData(Integer typeId){
-        Map<String, Object> parameters = asMap("typeId", typeId);
+    public List<R4Type> getAllR4TypeData(Integer typeId, Integer userId){
+        Map<String, Object> parameters = asMap("typeId", typeId, "userId", userId);
 
         return sqlSession.selectList("selectAllR4Types", parameters);
     }

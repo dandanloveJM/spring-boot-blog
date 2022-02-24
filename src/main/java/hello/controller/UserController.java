@@ -29,6 +29,11 @@ public class UserController {
         return userService.getAllR4Type();
     }
 
+    @GetMapping("/all/r4")
+    public UserListResult getAllR4(){
+        return userService.getAllR4Users();
+    }
+
     @GetMapping("/r4Types")
     public R4TypeListResult getR4ByTypeId(@RequestParam("typeId") Integer typeId){
         return userService.getR4IdByTypeId(typeId);

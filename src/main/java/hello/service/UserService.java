@@ -79,7 +79,7 @@ public class UserService implements UserDetailsService {
 
     public R4TypeListResult getAllR4Type(){
         try {
-            return R4TypeListResult.success("查询成功", r4TypeDao.getAllR4TypeData(null));
+            return R4TypeListResult.success("查询成功", r4TypeDao.getAllR4TypeData(null, null));
         } catch (Exception e) {
             System.out.println(e);
             return R4TypeListResult.failure("程序异常");
@@ -109,6 +109,15 @@ public class UserService implements UserDetailsService {
             return UserResult.success("获取用户信息成功", userMapper.getUserById(userId));
         } catch (Exception e){
             return UserResult.failure("获取用户信息失败");
+        }
+    }
+
+    public UserListResult getAllR4Users() {
+        try {
+            return UserListResult.success("查询成功", userMapper.getAllR4Users());
+        } catch (Exception e){
+            System.out.println(e);
+            return UserListResult.failure("程序异常");
         }
     }
 }

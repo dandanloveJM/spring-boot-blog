@@ -18,9 +18,9 @@ public class R4TypeService {
         this.userMapper = userMapper;
     }
 
-    public R4TypeListResult showAllR4Types(Integer typeId) {
+    public R4TypeListResult showAllR4Types(Integer typeId, Integer userId) {
         try {
-            return R4TypeListResult.success("查询成功", r4TypeDao.getAllR4TypeData(typeId));
+            return R4TypeListResult.success("查询成功", r4TypeDao.getAllR4TypeData(typeId, userId));
         } catch (Exception e) {
             return R4TypeListResult.failure("查询失败");
         }
@@ -49,10 +49,10 @@ public class R4TypeService {
         }
     }
 
-    public R4TypeResult addNewR4Type(String displayName, Integer typeId, String description) {
+    public R4TypeResult addNewR4Type(Integer userId, Integer typeId, String description) {
         R4Type r4Type = new R4Type();
-        User userInDB = userMapper.getUserByDisplayName(displayName);
-        r4Type.setUserId(userInDB.getId());
+
+        r4Type.setUserId(userId);
         r4Type.setDescription(description);
         r4Type.setTypeId(typeId);
         try {
