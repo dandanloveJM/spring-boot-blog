@@ -65,13 +65,5 @@ public class ProductService {
         }
     }
 
-    // 二次分配奖金，更新产值，把奖金归零
-    public ProductResult clearBonusToZero(){
-        try{
-            productDao.clearBonusToZero();
-            return ProductResult.success("清零奖金成功");
-        } catch (Exception e){
-            return ProductResult.failure("清零奖金成功");
-        }
-    }
+
 }

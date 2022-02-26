@@ -3,10 +3,7 @@ package hello.service;
 import hello.dao.CommentMapper;
 import hello.dao.ProductDao;
 import hello.dao.ProjectDao;
-import hello.entity.CommentResult;
-import hello.entity.Project;
-import hello.entity.ProjectListResult;
-import hello.entity.ProjectResult;
+import hello.entity.*;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -18,14 +15,17 @@ public class ProjectService {
     private final ProjectDao projectDao;
     private final ProductDao productDao;
     private final CommentMapper commentMapper;
+    private final RankService rankService;
 
     @Inject
     public ProjectService(ProjectDao projectDao,
                           CommentMapper commentMapper,
-                          ProductDao productDao){
+                          ProductDao productDao,
+                          RankService rankService){
         this.projectDao = projectDao;
         this.commentMapper = commentMapper;
         this.productDao = productDao;
+        this.rankService = rankService;
     }
 
     public ProjectListResult getProjects(Integer page, Integer pageSize, Integer userId) {
@@ -155,6 +155,8 @@ public class ProjectService {
             projectDao.deleteProjectByProcessId(processId);
             projectDao.deleteProcessRecord(processId);
             productDao.deleteProductsByProcessId(processId);
+            List<TeamRank> teamBonus = rankService.getTeamBonus(2022).getData();
+            rankService.updateTeamBonusByCalculating(teamBonus);
 
             return ProjectResult.success("删除项目成功");
         } catch (Exception e) {

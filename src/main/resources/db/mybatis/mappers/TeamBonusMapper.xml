@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.TeamBonusMapper">
+    <select id="selectAllTeamBonus" resultType="hello.entity.TeamRank">
+        select * from team_bonus where year(updated_at)=#{year}
+    </select>
+
+    <update id="calculateBonus">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update team_bonus
+            set all_bonus=#{item.allBonus},r4_bonus=#{item.R4Bonus}, r5_bonus=#{item.R5Bonus}
+            where team=#{item.team}
+        </foreach>
+    </update>
+
+    <update id="minusBonusR4">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update team_bonus
+            set r4_bonus=r4_bonus-#{item.R4Bonus},
+                all_bonus=r4_bonus+r5_bonus
+            where team=#{item.team}
+        </foreach>
+    </update>
+
+    <update id="minusBonusR5">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update team_bonus
+            set r5_bonus=r5_bonus-#{item.R5Bonus},
+            all_bonus=r4_bonus+r5_bonus
+            where team=#{item.team}
+        </foreach>
+    </update>
+
+</mapper>

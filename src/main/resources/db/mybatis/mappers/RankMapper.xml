@@ -79,13 +79,13 @@
     </resultMap>
 
     <resultMap id="teamRank" type="hello.entity.TeamRank">
-            <id property="teamRank" column="department"/>
+            <id property="team" column="department"/>
             <result property="teamName" column="team_name"/>
-            <result property="productSum" column="department_product"/>
+            <result property="allBonus" column="department_product"/>
     </resultMap>
 
     <resultMap id="R3Rank" type="hello.entity.TeamRank">
-           <id property="teamRank" column="department"/>
-           <result property="productSum" column="department_product"/>
+           <id property="team" column="department"/>
+           <result property="allBonus" column="department_product"/>
     </resultMap>
 </mapper>

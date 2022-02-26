@@ -3,11 +3,9 @@ package hello.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import hello.entity.CommentResult;
-import hello.entity.Product;
-import hello.entity.ProjectListResult;
-import hello.entity.ProjectResult;
+import hello.entity.*;
 import hello.service.ProjectService;
+import hello.service.RankService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,10 +19,13 @@ import java.util.List;
 @RestController
 public class ProjectController {
     private final ProjectService projectService;
+    private final RankService rankService;
 
     @Inject
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(ProjectService projectService,
+                             RankService rankService) {
         this.projectService = projectService;
+        this.rankService = rankService;
     }
 
     @PostMapping("/getProjectByProcessId")
@@ -59,5 +60,6 @@ public class ProjectController {
     @PostMapping("/deleteProject")
     public ProjectResult deleteProjectByProcessId(@RequestParam String processId){
         return projectService.deleteProject(processId);
+
     }
 }

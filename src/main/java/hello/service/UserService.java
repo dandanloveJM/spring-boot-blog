@@ -6,6 +6,7 @@ import hello.dao.UserMapper;
 import hello.entity.R4TypeListResult;
 import hello.entity.UserListResult;
 import hello.entity.UserResult;
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

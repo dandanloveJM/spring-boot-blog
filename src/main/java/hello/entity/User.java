@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 public class User {
@@ -20,6 +21,8 @@ public class User {
     String password;
     int roleId;
     String displayName;
+    BigDecimal userReallocateProduct;
+    String department;
 
     public User(Integer id, String username, String avatar, ZonedDateTime createdAt, ZonedDateTime updatedAt, String password) {
         this.id = id;
@@ -96,5 +99,21 @@ public class User {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public BigDecimal getUserReallocateProduct() {
+        return userReallocateProduct;
+    }
+
+    public void setUserReallocateProduct(BigDecimal userReallocateProduct) {
+        this.userReallocateProduct = userReallocateProduct;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 }

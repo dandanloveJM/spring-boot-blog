@@ -2,6 +2,7 @@ package hello.service;
 
 import hello.entity.ResourceResult;
 import hello.entity.UploadResult;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -40,8 +41,8 @@ public class UploadService {
             if (file.isEmpty()) {
                 return UploadResult.failure("似乎没有上传文件呢");
             }
-
-            String newFileName = UUID.randomUUID() +".png";
+            String extensionName = FilenameUtils.getExtension(file.getOriginalFilename());
+            String newFileName = UUID.randomUUID() +"." + extensionName;
             Path destinationFile = this.rootLocation.resolve(
                             Paths.get(newFileName))
                     .normalize().toAbsolutePath();

@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import hello.anno.ReadUserIdInSession;
 import hello.entity.*;
 import hello.service.*;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,19 +23,22 @@ public class DisplayController {
     private final RankService rankService;
     private final UserAddedProductService userAddedProductService;
     private final R4TypeService r4TypeService;
+    private final ReallocateBonusService reallocateBonusService;
 
     @Inject
     public DisplayController(ProductService productService,
                              DisplayService displayService,
                              RankService rankService,
                              UserAddedProductService userAddedProductService,
-                             R4TypeService r4TypeService
+                             R4TypeService r4TypeService,
+                             ReallocateBonusService reallocateBonusService
     ) {
         this.productService = productService;
         this.displayService = displayService;
         this.rankService = rankService;
         this.userAddedProductService = userAddedProductService;
         this.r4TypeService = r4TypeService;
+        this.reallocateBonusService = reallocateBonusService;
     }
 
     @ReadUserIdInSession
@@ -223,7 +227,37 @@ public class DisplayController {
 
     @GetMapping("/teamBonus")
     public TeamRankListResult getTeamBonus(Integer year) {
-        return rankService.getTeamBonus(year);
+//        return rankService.getTeamBonus(year);
+        return rankService.getAllBonus(year);
+    }
+
+    //TODO 只有admin可以用这个接口
+    @PostMapping("/reallocate/bonus")
+    public ProductResult reallocateBonus(
+            @RequestParam("bonusType") String bonusType,
+            @RequestParam("data") String data) {
+        JSONArray data2 = JSON.parseArray(data);
+        List<Product> products = new ArrayList<>();
+
+
+
+        for (int i = 0; i < data2.size(); i++) {
+            JSONObject obj = data2.getJSONObject(i);
+            Product newProduct = new Product();
+            String processId="reallocate--"+ RandomStringUtils.randomAlphanumeric(5);
+            String userid = (String) obj.get("userId");
+            String product = (String) obj.get("product");
+            String displayName = (String) obj.get("displayName");
+            newProduct.setProcessId(processId);
+            newProduct.setUserId(Integer.valueOf(userid));
+            newProduct.setProduct(new BigDecimal(product));
+            newProduct.setDisplayName(displayName);
+            products.add(newProduct);
+        }
+
+        return reallocateBonusService.updateProductTable(bonusType, products);
+
+
     }
 
     @GetMapping("/addedProducts")
@@ -282,32 +316,7 @@ public class DisplayController {
         return userAddedProductService.updateAddedProducts(products);
     }
 
-    //TODO 权限设置 只有admin可以分配奖金池
-    @PostMapping("/allocate/bonus")
-    public AddedProductListResult allocateBonus(@RequestParam String data) {
-        JSONArray data2 = JSON.parseArray(data);
-        List<AddedProduct> products = new ArrayList<>();
 
-        for (int i = 0; i < data2.size(); i++) {
-            JSONObject obj = data2.getJSONObject(i);
-            AddedProduct newProduct = new AddedProduct();
-
-            String userid = (String) obj.get("userId");
-            String product = (String) obj.get("product");
-            String displayName = (String) obj.get("displayName");
-
-            newProduct.setDisplayName(displayName);
-            newProduct.setUserId(Integer.valueOf(userid));
-            newProduct.setProduct(new BigDecimal(product));
-            products.add(newProduct);
-        }
-
-        AddedProductListResult result = userAddedProductService.insertAndUpdateAddedProducts(products);
-        productService.clearBonusToZero();
-
-        return result;
-
-    }
 
     @GetMapping("/teamPieChart")
     public TeamPieChartsListResult getPieCharts(){

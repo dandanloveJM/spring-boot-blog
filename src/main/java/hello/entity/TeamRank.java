@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 
 public class TeamRank {
     private int rankId;
+    private String team;
     private String teamRank;
     private String teamName;
-    private BigDecimal productSum;
-    private BigDecimal sumForR4;
-    private BigDecimal sumForR5;
+    private BigDecimal allBonus;
+    private BigDecimal R4Bonus;
+    private BigDecimal R5Bonus;
+
 
     public int getRankId() {
         return rankId;
@@ -18,12 +20,12 @@ public class TeamRank {
         this.rankId = rankId;
     }
 
-    public String getTeamRank() {
-        return teamRank;
+    public String getTeam() {
+        return team;
     }
 
-    public void setTeamRank(String teamRank) {
-        this.teamRank = teamRank;
+    public void setTeam(String team) {
+        this.team = team;
     }
 
     public String getTeamName() {
@@ -34,27 +36,35 @@ public class TeamRank {
         this.teamName = teamName;
     }
 
-    public BigDecimal getProductSum() {
-        return productSum;
+    public BigDecimal getAllBonus() {
+        return allBonus;
     }
 
-    public void setProductSum(BigDecimal productSum) {
-        this.productSum = productSum;
+    public void setAllBonus(BigDecimal allBonus) {
+        this.allBonus = allBonus;
     }
 
-    public BigDecimal getSumForR4() {
-        return sumForR4;
+    public BigDecimal getR4Bonus() {
+        return R4Bonus;
     }
 
-    public void setSumForR4(BigDecimal sumForR4) {
-        this.sumForR4 = sumForR4;
+    public void setR4Bonus(BigDecimal r4Bonus) {
+        R4Bonus = r4Bonus;
     }
 
-    public BigDecimal getSumForR5() {
-        return sumForR5;
+    public BigDecimal getR5Bonus() {
+        return R5Bonus;
     }
 
-    public void setSumForR5(BigDecimal sumForR5) {
-        this.sumForR5 = sumForR5;
+    public void setR5Bonus(BigDecimal r5Bonus) {
+        R5Bonus = r5Bonus;
+    }
+
+    public String getTeamRank() {
+        return teamRank;
+    }
+
+    public void setTeamRank(String teamRank) {
+        this.teamRank = teamRank;
     }
 }

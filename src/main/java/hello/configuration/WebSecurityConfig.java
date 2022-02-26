@@ -33,6 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/files/**").permitAll()
                 .antMatchers("/start").authenticated()
+                .antMatchers("/reallocate/bonus").access("hasAuthority('ROLE_超级管理员')")
                 .anyRequest().authenticated();
         http.cors();
         http.sessionManagement(session -> session.invalidSessionStrategy(new CustomInvalidSessionStrategy()));

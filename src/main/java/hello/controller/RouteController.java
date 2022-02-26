@@ -289,11 +289,11 @@ public class RouteController {
         route8.setId(6);
         route8.setPid(1);
         route8.setName("30%产值待分配");
-        route8.setPath("/rank/teamBonus");
+        route8.setPath("/admin/allocate");
         route8.setRedirect("");
         route8.setIcon("ChromeOutlined");
-        route8.setKey("teamBonus");
-        route8.setComponent("/rank/teamBonus");
+        route8.setKey("allocate");
+        route8.setComponent("/admin/allocate");
 
 
         Route route5 = new Route();

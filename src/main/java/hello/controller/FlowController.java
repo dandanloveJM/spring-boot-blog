@@ -56,6 +56,8 @@ public class FlowController {
 
     private final UserService userService;
 
+    private final RankService rankService;
+
     private final UserAddedProductService userAddedProductService;
 
 
@@ -71,7 +73,8 @@ public class FlowController {
                           RollbackService rollbackService,
                           AuthService authService,
                           UserService userService,
-                          UserAddedProductService userAddedProductService
+                          UserAddedProductService userAddedProductService,
+                          RankService rankService
     ) {
         this.runtimeService = runtimeService;
         this.taskService = taskService;
@@ -86,6 +89,7 @@ public class FlowController {
         this.authService = authService;
         this.userService = userService;
         this.userAddedProductService = userAddedProductService;
+        this.rankService = rankService;
     }
 
     public String getLatestTaskId(String processId) {
@@ -387,9 +391,10 @@ public class FlowController {
 
         try {
             Authentication.setAuthenticatedUserId("24");
+            ProductResult results = updateProducts(processId, newTotal, newRatio, finalTotal);
             taskService.addComment(taskId, processId, "设置产值成功");
             taskService.complete(taskId, map);
-            return updateProducts(processId, newTotal, newRatio, finalTotal);
+            return results;
         } catch (Exception e) {
             return ProductResult.failure("财务更新产值失败");
         }
@@ -468,17 +473,13 @@ public class FlowController {
         try {
             projectService.updateTotalProductOfProject(newTotal, newRatio, processId);
             productService.updateProducts(finalTotal, processId);
-            List<Product> products = productService.getProductsByProcessId(processId).getData();
-            List<AddedProduct> addedProducts = products.stream()
-                    .map(item -> {
-                        AddedProduct temp = new AddedProduct();
-                        temp.setProduct(item.getProduct());
-                        temp.setUserId(item.getUserId());
-                        temp.setDisplayName(item.getDisplayName());
-                        return temp;
-                    }).collect(Collectors.toList());
 
-            userAddedProductService.insertAndUpdateAddedProducts(addedProducts);
+
+
+            List<TeamRank> teamBonus = rankService.getTeamBonus(2022).getData();
+            rankService.updateTeamBonusByCalculating(teamBonus);
+
+
             return ProductResult.success("更新产值成功");
         } catch (Exception e) {
             return ProductResult.failure("更新产值失败");

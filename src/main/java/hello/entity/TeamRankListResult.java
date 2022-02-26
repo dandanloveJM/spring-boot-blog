@@ -7,6 +7,9 @@ public class TeamRankListResult extends Result<List<TeamRank>>{
         super(status, msg, data);
     }
 
+    public static TeamRankListResult success(String msg){
+        return new TeamRankListResult("ok", msg, null);
+    }
     public static TeamRankListResult success(List<TeamRank> data){
         return new TeamRankListResult("ok", "查询成功", data);
     }
