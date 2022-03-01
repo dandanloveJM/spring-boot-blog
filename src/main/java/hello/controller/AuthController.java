@@ -16,13 +16,16 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     // 8位以上 包含字母数字和特殊符号
-    public static final String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![a-z0-9\\W]+$)(?![A-Za-z\\W]+$)(?![A-Z0-9\\W]+$)[a-zA-Z0-9\\W]{8,20}$";
+//    public static final String PW_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8,20}$";
+//    Pattern p = Pattern.compile(PW_PATTERN);
 
 
     @Inject
@@ -61,9 +64,10 @@ public class AuthController {
     @PostMapping("/resetPassword")
     public LoginResult resetPassword(Integer userId, @RequestParam String password){
 
-        if(password.matches(PW_PATTERN)){
-            return LoginResult.failure("密码必须是同时包含数字、字母、特殊字符的8位以上", true);
-        }
+//        Matcher m = p.matcher(password);
+//        if(!m.matches()){
+//            return LoginResult.failure("密码必须是同时包含数字、字母、特殊字符的8位以上", true);
+//        }
 
         try{
             userService.changePassword(userId, password);
