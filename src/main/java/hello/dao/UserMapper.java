@@ -34,7 +34,7 @@ public interface UserMapper {
     @Select("SELECT name FROM permission where id=#{id}")
     String getPermissionById(@Param("id") int id);
 
-    @Select("SELECT id, display_name FROM user where role_id in (1,2,3)")
+    @Select("SELECT id, display_name FROM user where role_id in (1,2,3) order by username")
     List<User> getAllR1R2R3Users();
 
     @Select("SELECT id, display_name FROM user where role_id=4")
@@ -45,5 +45,6 @@ public interface UserMapper {
 
     @Select("SELECT * FROM user where display_name=#{displayName}")
     User getUserByDisplayName(String displayName);
+
 
 }

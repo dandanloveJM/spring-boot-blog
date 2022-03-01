@@ -24,6 +24,11 @@ public class UserController {
         return userService.getAllR1R2R3Users();
     }
 
+    @GetMapping("/all/users")
+    public UserListResult getAllUsersByAdmin(@RequestParam("department") String department){
+        return userService.getAllUsersByAdmin(department);
+    }
+
     @GetMapping("/allR4Types")
     public R4TypeListResult getAllR4Types(){
         return userService.getAllR4Type();

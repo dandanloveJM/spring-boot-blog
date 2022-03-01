@@ -147,7 +147,7 @@ public class ProjectDao {
 
 
 
-    public List<Project> getProjectsByOwnerIdsByR4(List<Integer> R2IdsFindByR4, List<Integer> typeList,
+    public List<Project> getUnfinishedProjectsByOwnerIdsByR4(List<Integer> R2IdsFindByR4, List<Integer> typeList,
                                                    String query, Integer year,
     Integer type, String number) {
         Map<String, Object> parameters = new HashMap<>();
@@ -157,8 +157,35 @@ public class ProjectDao {
         parameters.put("year", year);
         parameters.put("type", type);
         parameters.put("number", number);
-        return sqlSession.selectList("getProjectsByOwnerIdsByR4", parameters);
+        return sqlSession.selectList("getUnfinishedProjectsByOwnerIdsByR4", parameters);
     }
+
+    public List<Project> getFinishedProjectsByOwnerIdsByR4(List<Integer> R2IdsFindByR4,
+                                                           String query, Integer year,
+                                                           Integer type, String number){
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("R2Ids", R2IdsFindByR4);
+        parameters.put("query", query);
+        parameters.put("year", year);
+        parameters.put("type", type);
+        parameters.put("number", number);
+        return sqlSession.selectList("getFinishedProjectsByOwnerIdsByR4", parameters);
+
+    }
+
+    public List<Project> getFinishedProjectsByOwnerIdsZengtao(
+                                                           String query, Integer year,
+                                                           Integer type, String number){
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("query", query);
+        parameters.put("year", year);
+        parameters.put("type", type);
+        parameters.put("number", number);
+        return sqlSession.selectList("getFinishedProjectsByOwnerIdsZengtao", parameters);
+
+    }
+
+
 
     public List<Project> getAllProjects(String query,
                                         Integer year, Integer type, String number){

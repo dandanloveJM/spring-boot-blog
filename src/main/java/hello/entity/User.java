@@ -17,12 +17,14 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @JsonProperty("updatedAt")
     ZonedDateTime updatedAt;
-    @JsonIgnore
+//    @JsonIgnore
     String password;
     int roleId;
     String displayName;
     BigDecimal userReallocateProduct;
     String department;
+    String teamName;
+
 
     public User(Integer id, String username, String avatar, ZonedDateTime createdAt, ZonedDateTime updatedAt, String password) {
         this.id = id;
@@ -115,5 +117,13 @@ public class User {
 
     public void setDepartment(String department) {
         this.department = department;
+    }
+
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
     }
 }

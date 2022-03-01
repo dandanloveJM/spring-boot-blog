@@ -345,6 +345,16 @@ public class RouteController {
         route9.setIcon("");
         route9.setKey("el_done");
 
+        Route route10 = new Route();
+        route10.setId(14);
+        route10.setPid(2);
+        route10.setName("用户管理");
+        route10.setPath("/admin/userInfo");
+        route10.setRedirect("");
+        route10.setComponent("/admin/userInfos");
+        route10.setIcon("");
+        route10.setKey("el_userinfo2");
+
 
         route2children.add(route3);
         route2children.add(route4);
@@ -353,6 +363,7 @@ public class RouteController {
         routeChildren.add(route5);
         routeChildren.add(route8);
         routeChildren.add(route9);
+        routeChildren.add(route10);
         route.setChildren(routeChildren);
         routes.add(route);
         return routes;

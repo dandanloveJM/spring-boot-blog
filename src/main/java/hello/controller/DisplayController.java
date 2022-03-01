@@ -157,12 +157,17 @@ public class DisplayController {
         if(number == null) {
             number = "";
         }
-        return displayService.getR3FinishedProjects(userId, query, year, type, number);
+        if(userId == 45){
+            return displayService.getZengtaoFinishedProjects(userId, query, year, type, number);
+        } else {
+            return displayService.getR3FinishedProjects(userId, query, year, type, number);
+        }
+
     }
 
     @ReadUserIdInSession
-    @GetMapping("/R4/Projects")
-    public DisplayResult getR4AllProjects(Integer userId,
+    @GetMapping("/R4/unfinished/projects")
+    public ProjectListResult getR4UnfinishedProjects(Integer userId,
                                           @RequestParam String query,
                                           @RequestParam Integer year,
                                           @RequestParam(required=false) Integer type,
@@ -176,7 +181,26 @@ public class DisplayController {
         if(number == null){
             number="";
         }
-        return displayService.getAllR4Projects(userId, query, year, type, number);
+        return displayService.getR4UnfinishedProjects(userId, query, year, type, number);
+    }
+
+    @ReadUserIdInSession
+    @GetMapping("/R4/finished/projects")
+    public ProjectListResult getR4FinishedProjects(Integer userId,
+                                                     @RequestParam String query,
+                                                     @RequestParam Integer year,
+                                                     @RequestParam(required=false) Integer type,
+                                                     @RequestParam String number) {
+        if (query == null) {
+            query = "";
+        }
+        if (year == null) {
+            year = 2022;
+        }
+        if(number == null){
+            number="";
+        }
+        return displayService.getR4FinishedProjects(userId, query, year, type, number);
     }
 
     // TODO R5和ADMIN可以看全部
@@ -350,6 +374,12 @@ public class DisplayController {
         return r4TypeService.addNewR4Type(userId, typeId, description);
     }
 
+
+    @GetMapping("/pivot/chart")
+    public PivotParamsListResult getPivotParams(String team){
+        return rankService.getPivotParams(team);
+
+    }
 
 
 }
