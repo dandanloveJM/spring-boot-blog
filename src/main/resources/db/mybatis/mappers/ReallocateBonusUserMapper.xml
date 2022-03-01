@@ -10,4 +10,21 @@
             #{userId}
         </foreach>
     </select>
+
+    <select id="getAllUsersByAdmin" resultMap="adminUser" >
+        SELECT id, username, display_name, password, team_name, department FROM user
+        where role_id in (1,2,3,4,5,6,7)
+        <if test="department != ''">
+            and user.department=#{department}
+        </if>
+        order by username
+    </select>
+
+    <resultMap id="adminUser" type="hello.entity.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="teamName" column="team_name"/>
+        <result property="displayName" column="display_name"/>
+        <result property="password" column="password"/>
+    </resultMap>
 </mapper>

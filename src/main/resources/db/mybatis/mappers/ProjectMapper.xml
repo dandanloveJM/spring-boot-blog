@@ -257,10 +257,32 @@
             order by project.updated_at DESC
     </select>
 
+    <select id="getFinishedProjectsByOwnerIdsZengtao"  resultMap="R2Projects">
+                select project.id, project.process_id, project.name, project.number, project.owner_name,
+                       project.type, project.owner_id, project.attachment, project.updated_at,
+                       project.total_product, project.total_percentage,
+                       p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
+                from project
+                left join product p on project.process_id = p.process_id
+                where ISNULL(project.total_product)=0
+                and (p.user_id=#{userId} or project.owner_id in (16,17))
+                 <if test="query != ''">
+                    and  project.name  REGEXP #{query}
+                 </if>
+                and year(project.updated_at) = #{year}
+                <if test="type != null">
+                and    project.type = #{type}
+                </if>
+                <if test="number != ''">
+                and    project.number  REGEXP #{number}
+                </if>
+                order by project.updated_at DESC
+        </select>
 
 
 
-    <select id="getProjectsByOwnerIdsByR4" parameterType="java.util.List" resultMap="R2Projects">
+
+    <select id="getUnfinishedProjectsByOwnerIdsByR4" parameterType="java.util.List" resultMap="R2Projects">
                 select project.id, project.process_id, project.name, project.number, project.owner_name,
                        project.type, project.owner_id, project.attachment, project.updated_at,
                        project.total_product, project.total_percentage,
@@ -268,7 +290,7 @@
                 from project
                 inner join product p on project.process_id = p.process_id
                 where
-                year(project.updated_at) = #{year} and
+                year(project.updated_at) = #{year} and ISNULL(project.total_product)=1 and
                 <if test="query != ''">
                     project.name  REGEXP #{query} and
                 </if>
@@ -291,6 +313,31 @@
                 order by project.updated_at desc
     </select>
 
+
+ <select id="getFinishedProjectsByOwnerIdsByR4" parameterType="java.util.List" resultMap="R2Projects">
+                select project.id, project.process_id, project.name, project.number, project.owner_name,
+                       project.type, project.owner_id, project.attachment, project.updated_at,
+                       project.total_product, project.total_percentage,
+                       p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
+                from project
+                inner join product p on project.process_id = p.process_id
+                where
+                year(project.updated_at) = #{year} and ISNULL(project.total_product)=0 and
+                <if test="query != ''">
+                    project.name  REGEXP #{query} and
+                </if>
+                <if test="type != null">
+                    project.type = #{type} and
+                </if>
+                <if test="number != ''">
+                    project.number  REGEXP #{number} and
+                </if>
+                project.owner_id in
+                <foreach collection="R2Ids" item="ownerId" index="index" open="(" separator="," close=")">
+                     #{ownerId}
+                </foreach>
+                order by project.updated_at desc
+    </select>
 
 
 

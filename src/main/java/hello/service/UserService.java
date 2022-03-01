@@ -3,6 +3,7 @@ package hello.service;
 
 import hello.dao.R4TypeDao;
 import hello.dao.UserMapper;
+import hello.dao.UserRankDao;
 import hello.entity.R4TypeListResult;
 import hello.entity.UserListResult;
 import hello.entity.UserResult;
@@ -25,24 +26,29 @@ public class UserService implements UserDetailsService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private UserMapper userMapper;
     private R4TypeDao r4TypeDao;
+    private UserRankDao userRankDao;
 
 
     @Inject
     public UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
                        UserMapper userMapper,
-                       R4TypeDao r4TypeDao){
+                       R4TypeDao r4TypeDao,
+                       UserRankDao userRankDao){
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userMapper = userMapper;
         this.r4TypeDao = r4TypeDao;
+        this.userRankDao = userRankDao;
+
     }
 
     public void save(String username, String password) {
-        userMapper.save(username, bCryptPasswordEncoder.encode(password), null);
-//        userMapper.save(username, password, null);
+//        userMapper.save(username, bCryptPasswordEncoder.encode(password), null);
+        userMapper.save(username, password, null);
     }
 
     public void changePassword(Integer userId, String password) {
-        userMapper.updatePassword(userId, bCryptPasswordEncoder.encode(password));
+//        userMapper.updatePassword(userId, bCryptPasswordEncoder.encode(password));
+        userMapper.updatePassword(userId, password);
     }
 
     public hello.entity.User getUserByUsername(String username) {
@@ -58,13 +64,16 @@ public class UserService implements UserDetailsService {
 
         Set<GrantedAuthority> authorities = new HashSet<>();
         String permissionIds = userMapper.getRoleByUsername(username);
-        List<Integer> ids = Arrays.stream(permissionIds.split(","))
-                .map(Integer::valueOf)
-                .collect(Collectors.toList());
+        if (permissionIds != null){
+            List<Integer> ids = Arrays.stream(permissionIds.split(","))
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList());
 
-        for (Integer id : ids) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + userMapper.getPermissionById(id)));
+            for (Integer id : ids) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + userMapper.getPermissionById(id)));
+            }
         }
+
 
         return new User(username, user.getPassword(), authorities);
     }
@@ -77,6 +86,17 @@ public class UserService implements UserDetailsService {
             return UserListResult.failure("程序异常");
         }
     }
+
+
+    public UserListResult getAllUsersByAdmin(String department){
+        try {
+            return UserListResult.success("查询成功", userRankDao.getAllUsersByAdmin(department));
+        } catch (Exception e){
+            System.out.println(e);
+            return UserListResult.failure("程序异常");
+        }
+    }
+
 
     public R4TypeListResult getAllR4Type(){
         try {

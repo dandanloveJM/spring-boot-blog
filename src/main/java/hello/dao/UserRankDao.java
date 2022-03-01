@@ -1,10 +1,7 @@
 package hello.dao;
 
 
-import hello.entity.TeamBarChart;
-import hello.entity.TeamPieChart;
-import hello.entity.TeamRank;
-import hello.entity.UserRank;
+import hello.entity.*;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
 
@@ -63,4 +60,13 @@ public class UserRankDao {
         return sqlSession.selectList("teamBarChart");
     }
 
+    public List<User> getAllUsersByAdmin(String department){
+        Map<String, Object> parameters =asMap("department", department);
+        return sqlSession.selectList("getAllUsersByAdmin", parameters);
+
+    }
+
+    public List<PivotParams> getPivotParams(String team) {
+        return sqlSession.selectList("teamPivotParams", team);
+    }
 }

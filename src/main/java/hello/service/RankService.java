@@ -111,10 +111,18 @@ public class RankService {
 
 
         int i = 1;
+        BigDecimal count = new BigDecimal(0);
         for (TeamRank eachRank : teamRanks) {
             eachRank.setRankId(i);
             i += 1;
+            count = count.add(eachRank.getAllBonus());
         }
+        TeamRank total = new TeamRank();
+        total.setRankId(i);
+        total.setTeam("合计");
+        total.setAllBonus(count);
+        teamRanks.add(total);
+
 
         return TeamRankListResult.success(teamRanks);
     }
@@ -141,10 +149,20 @@ public class RankService {
 
 
         int i = 1;
+        BigDecimal countR4Bonus = new BigDecimal(0);
+        BigDecimal countR5Bonus = new BigDecimal(0);
         for (TeamRank eachRank : finalTeamProducts) {
             eachRank.setRankId(i);
             i += 1;
+            countR4Bonus = countR4Bonus.add(eachRank.getR4Bonus());
+            countR5Bonus = countR5Bonus.add(eachRank.getR5Bonus());
         }
+        TeamRank total = new TeamRank();
+        total.setRankId(i);
+        total.setTeam("合计");
+        total.setR4Bonus(countR4Bonus);
+        total.setR5Bonus(countR5Bonus);
+        finalTeamProducts.add(total);
 
         return TeamRankListResult.success(finalTeamProducts);
     }
@@ -230,8 +248,8 @@ public class RankService {
         }
     }
 
-    public TeamRankListResult getAllBonus(Integer year){
-        try{
+    public TeamRankListResult getAllBonus(Integer year) {
+        try {
             List<TeamRank> teamRanks = teamBonusDao.getAllTeamBonus(year);
             int i = 1;
             for (TeamRank eachRank : teamRanks) {
@@ -239,7 +257,7 @@ public class RankService {
                 i += 1;
             }
             return TeamRankListResult.success(teamRanks);
-        }catch (Exception e){
+        } catch (Exception e) {
             return TeamRankListResult.failure("查询失败");
         }
     }
@@ -262,4 +280,53 @@ public class RankService {
         }
     }
 
+    public PivotParamsListResult getPivotParams(String team) {
+
+        try {
+            List<PivotParams> pivotParams = userRankDao.getPivotParams(team);
+            Map<String, ArrayList<Object>> pivotMap = new HashMap<>();
+            pivotMap.put("caijisheji", new ArrayList<>());
+            pivotMap.put("keyanxiangmu", new ArrayList<>());
+            pivotMap.put("xianchangchuli", new ArrayList<>());
+            pivotMap.put("zhiliangpingjia", new ArrayList<>());
+            pivotMap.put("ziliaofenxi", new ArrayList<>());
+            pivotMap.put("biaocengdiaocha", new ArrayList<>());
+            pivotMap.put("celiangzhikong", new ArrayList<>());
+            pivotMap.put("jishuzhichi", new ArrayList<>());
+            pivotMap.put("xianchangzhichi", new ArrayList<>());
+            pivotMap.put("dangjian", new ArrayList<>());
+
+            ArrayList<Object> users = new ArrayList<>();
+            for (PivotParams eachPivotParam : pivotParams
+            ) {
+                users.add(eachPivotParam.getDisplayName());
+                pivotMap.get("caijisheji")
+                        .add(eachPivotParam.getCaijisheji() == null ? BigDecimal.ZERO : eachPivotParam.getCaijisheji());
+                pivotMap.get("keyanxiangmu")
+                        .add(eachPivotParam.getKeyanxiangmu() == null ? BigDecimal.ZERO : eachPivotParam.getKeyanxiangmu());
+                pivotMap.get("xianchangchuli")
+                        .add(eachPivotParam.getXianchangchuli() == null ? BigDecimal.ZERO : eachPivotParam.getXianchangchuli());
+                pivotMap.get("zhiliangpingjia")
+                        .add(eachPivotParam.getZhiliangpingjia() == null ? BigDecimal.ZERO : eachPivotParam.getZhiliangpingjia());
+                pivotMap.get("ziliaofenxi")
+                        .add(eachPivotParam.getZiliaofenxi() == null ? BigDecimal.ZERO : eachPivotParam.getZiliaofenxi());
+                pivotMap.get("biaocengdiaocha")
+                        .add(eachPivotParam.getBiaocengdiaocha() == null ? BigDecimal.ZERO : eachPivotParam.getBiaocengdiaocha());
+                pivotMap.get("celiangzhikong")
+                        .add(eachPivotParam.getCeliangzhikong() == null ? BigDecimal.ZERO : eachPivotParam.getCeliangzhikong());
+                pivotMap.get("jishuzhichi")
+                        .add(eachPivotParam.getJishuzhichi() == null ? BigDecimal.ZERO : eachPivotParam.getJishuzhichi());
+                pivotMap.get("xianchangzhichi")
+                        .add(eachPivotParam.getXianchangzhichi() == null ? BigDecimal.ZERO : eachPivotParam.getXianchangzhichi());
+                pivotMap.get("dangjian")
+                        .add(eachPivotParam.getDangjian() == null ? BigDecimal.ZERO : eachPivotParam.getDangjian());
+
+
+            }
+            pivotMap.put("users", users);
+            return PivotParamsListResult.success("查询成功", pivotMap);
+        } catch (Exception e) {
+            return PivotParamsListResult.failure("程序异常");
+        }
+    }
 }
