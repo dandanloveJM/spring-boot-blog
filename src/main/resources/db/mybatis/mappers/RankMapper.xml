@@ -71,6 +71,27 @@
      order by sum desc
      </select>
 
+     <select id="teamPivotParams" resultType="hello.entity.PivotParams">
+     select
+            p.display_name,
+            sum(case when type=1 then p.product End) as 'caijisheji',
+            sum(case when type=2 then p.product End) as 'keyanxiangmu',
+            sum(case when type=3 then p.product End) as "xianchangchuli",
+            sum(case when type=4 then p.product End) as "zhiliangpingjia",
+            sum(case when type=5 then p.product End) as "ziliaofenxi",
+            sum(case when type=6 then p.product End) as "biaocengdiaocha",
+            sum(case when type=7 then p.product End) as "celiangzhikong",
+            sum(case when type=8 then p.product End) as "jishuzhichi",
+            sum(case when type=9 then p.product End) as "xianchangzhichi",
+            sum(case when type=10 then p.product End) as "dangjian"
+     from project
+              left join product p on project.process_id = p.process_id
+     left join user u on p.user_id = u.id
+     where ISNULL(project.total_product)=0 and u.department=#{team}
+     group by display_name
+
+     </select>
+
 
     <resultMap id="userRank" type="hello.entity.UserRank">
         <id property="userId" column="user_id"/>
