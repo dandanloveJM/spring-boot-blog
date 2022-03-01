@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 
 import javax.inject.Inject;
 
@@ -34,6 +35,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/files/**").permitAll()
                 .antMatchers("/start").authenticated()
                 .antMatchers("/reallocate/bonus").access("hasAuthority('ROLE_超级管理员')")
+                .antMatchers("/all/users").access("hasAuthority('ROLE_超级管理员')")
                 .anyRequest().authenticated();
         http.cors();
         http.sessionManagement(session -> session.invalidSessionStrategy(new CustomInvalidSessionStrategy()));
@@ -59,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setHideUserNotFoundExceptions(false);
         provider.setUserDetailsService(userService);
-        provider.setPasswordEncoder(bCryptPasswordEncoder());
+        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
         return provider;
     }
 
