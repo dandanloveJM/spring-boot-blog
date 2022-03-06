@@ -241,7 +241,10 @@ public class RankService {
 
     public TeamRankListResult updateTeamBonusByCalculating(List<TeamRank> teamBonusList) {
         try {
-            teamBonusDao.updateTeamBonusByCalculating(teamBonusList);
+
+            List<TeamRank> teamBonusWithoutTotalSum = teamBonusList.stream().filter(item->!item.getTeam().equals("合计")).collect(Collectors.toList());
+
+            teamBonusDao.updateTeamBonusByCalculating(teamBonusWithoutTotalSum);
             return TeamRankListResult.success("更新成功");
         } catch (Exception e) {
             return TeamRankListResult.failure("查询失败");
@@ -284,7 +287,7 @@ public class RankService {
 
         try {
             List<PivotParams> pivotParams = userRankDao.getPivotParams(team);
-            Map<String, ArrayList<Object>> pivotMap = new HashMap<>();
+            Map<String, ArrayList<BigDecimal>> pivotMap = new HashMap<>();
             pivotMap.put("caijisheji", new ArrayList<>());
             pivotMap.put("keyanxiangmu", new ArrayList<>());
             pivotMap.put("xianchangchuli", new ArrayList<>());
@@ -296,7 +299,7 @@ public class RankService {
             pivotMap.put("xianchangzhichi", new ArrayList<>());
             pivotMap.put("dangjian", new ArrayList<>());
 
-            ArrayList<Object> users = new ArrayList<>();
+            ArrayList<String> users = new ArrayList<>();
             for (PivotParams eachPivotParam : pivotParams
             ) {
                 users.add(eachPivotParam.getDisplayName());
@@ -323,8 +326,24 @@ public class RankService {
 
 
             }
-            pivotMap.put("users", users);
-            return PivotParamsListResult.success("查询成功", pivotMap);
+
+
+            Map<String, ArrayList<String>> finalPivotMap = new HashMap<>();
+            pivotMap.forEach((key, value) -> {
+                BigDecimal totalSum = BigDecimal.ZERO;
+                for (BigDecimal number : value) {
+                    totalSum = totalSum.add(number);
+                }
+                if(totalSum.compareTo(BigDecimal.ZERO) > 0){
+                    ArrayList<String> newValue = (ArrayList<String>) value.stream().map(BigDecimal::toString).collect(Collectors.toList());
+                    finalPivotMap.put(key, newValue);
+                }
+            });
+
+
+            finalPivotMap.put("users", users);
+
+            return PivotParamsListResult.success("查询成功", finalPivotMap);
         } catch (Exception e) {
             return PivotParamsListResult.failure("程序异常");
         }

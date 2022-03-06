@@ -46,5 +46,4 @@ public interface UserMapper {
     @Select("SELECT * FROM user where display_name=#{displayName}")
     User getUserByDisplayName(String displayName);
 
-
 }
