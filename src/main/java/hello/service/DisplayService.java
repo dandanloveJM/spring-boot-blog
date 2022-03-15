@@ -75,7 +75,7 @@ public class DisplayService {
         List<Project> R1UnfinishedProjects = R1AllProjects.stream()
                 .filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
 
-        return generateUnfinishedProjects(R1UnfinishedProjects, userId);
+        return generateUnfinishedProjects(R1UnfinishedProjects, userId, "R1");
 
     }
 
@@ -92,9 +92,7 @@ public class DisplayService {
     public ProjectListResult getUnfinishedR2Projects(Integer userId, String query, Integer year, Integer type, String number){
         try {
             return ProjectListResult.success(getUnfinishedProjects(userId, query, year, type, number));
-//            List<Project> result = projectDao.getUnfinishedProjectsByR2(userId, query, year, type, number);
-//            List<Project> finalUnfinished = generateUnfinishedProjects(result, userId);
-//            return ProjectListResult.success(finalUnfinished);
+
         } catch (Exception e) {
             return ProjectListResult.failure("程序异常");
         }
@@ -128,7 +126,7 @@ public class DisplayService {
         try {
             // 查出来所有的projects
             List<Project> allProjects = projectDao.getUnfinishedProjectsByOwnerIds(R2IdsFindByR3, query, year, type, number);
-            List<Project> finalUnfinished = generateUnfinishedProjects(allProjects, userId);
+            List<Project> finalUnfinished = generateUnfinishedProjects(allProjects, userId, "R3");
             return ProjectListResult.success(finalUnfinished);
 
         } catch (Exception e) {
@@ -174,23 +172,7 @@ public class DisplayService {
 //        }
 //    }
 
-    @NotNull
-    private DisplayResult getDisplayResult(Integer userId, List<Project> allProjects) {
-        Map<String, List<Project>> projects = new HashMap<>();
-        if (allProjects.isEmpty()) {
-            projects.put("empty", Collections.emptyList());
-            return DisplayResult.success(projects);
-        }
 
-        List<Project> finished = allProjects.stream().filter(item -> item.getTotalProduct() != null).collect(Collectors.toList());
-        List<Project> unfinished = allProjects.stream().filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
-        List<Project> finalUnfinished = generateUnfinishedProjects(unfinished, userId);
-
-        List<Project> finishedProjectsWithTotalSum = addTotalSum(finished);
-        projects.put("finished", finishedProjectsWithTotalSum);
-        projects.put("unfinished", finalUnfinished);
-        return DisplayResult.success(projects);
-    }
 
 
     public static Project deepCopy(Project unfinishedProject) {
@@ -199,7 +181,7 @@ public class DisplayService {
     }
 
     // 给还在流程中需要R2下一步操作的添加taskId
-    public List<Project> generateUnfinishedProjects(List<Project> originUnfinished, Integer userId) {
+    public List<Project> generateUnfinishedProjects(List<Project> originUnfinished, Integer userId, String role) {
         List<Project> finalUnfinishedProjects = new ArrayList<>();
 
         for (Project unfinishedProject : originUnfinished) {
@@ -223,7 +205,24 @@ public class DisplayService {
 
             finalUnfinishedProjects.add(projectCopy);
         }
-        return finalUnfinishedProjects;
+
+        if(role.equals("R4")){
+            ArrayList<String> R4UnfinishedActivityName = new ArrayList<>();
+            R4UnfinishedActivityName.add("R4审核");
+            R4UnfinishedActivityName.add("A1填写产值");
+
+            return finalUnfinishedProjects.stream().filter(item->R4UnfinishedActivityName.contains(item.getActivityName())).collect(Collectors.toList());
+        } else if (role.equals("R3")){
+            ArrayList<String> R3UnfinishedActivityName = new ArrayList<>();
+            R3UnfinishedActivityName.add("R3审核");
+            R3UnfinishedActivityName.add("R4审核");
+            R3UnfinishedActivityName.add("A1填写产值");
+
+            return finalUnfinishedProjects.stream().filter(item->R3UnfinishedActivityName.contains(item.getActivityName())).collect(Collectors.toList());
+        } else {
+            return finalUnfinishedProjects;
+        }
+
     }
 
     public ProjectListResult getZengtaoFinishedProjects(Integer userId, String query, Integer year,
@@ -252,7 +251,7 @@ public class DisplayService {
             List<Project> allProjects = projectDao.getUnfinishedProjectsByOwnerIdsByR4(R2IdsFindByR4, typeIdsFindByR4Id,
                     query, year, type, number);
 
-            List<Project> finalUnfinished = generateUnfinishedProjects(allProjects, userId);
+            List<Project> finalUnfinished = generateUnfinishedProjects(allProjects, userId, "R4");
             return ProjectListResult.success(finalUnfinished);
         } catch (Exception e) {
             return ProjectListResult.failure("程序异常");
@@ -333,7 +332,7 @@ public class DisplayService {
             List<Project> unfinishedProjects = A1AllProjects.stream()
                     .filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
 
-            List<Project> finalAllUnfinishedProjects = generateUnfinishedProjects(unfinishedProjects, userId);
+            List<Project> finalAllUnfinishedProjects = generateUnfinishedProjects(unfinishedProjects, userId,"A1");
 
             // 合计
             List<Project> finishedProjectsWithTotalSum = addTotalSum(finishedProjects);
