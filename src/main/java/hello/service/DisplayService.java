@@ -6,12 +6,10 @@ import hello.dao.ProductDao;
 import hello.dao.ProjectDao;
 import hello.entity.*;
 import hello.utils.R2R3R4Relation;
-import liquibase.pro.packaged.B;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.ActivityInstance;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -60,7 +58,7 @@ public class DisplayService {
     }
 
     public List<Project> getUnfinishedProjects(Integer userId, String query, Integer year, Integer type, String number){
-        // 所有让R1填写的任务
+        // 所有让userid填写的任务
         List<HistoricActivityInstance> AllActivities = historyService.createHistoricActivityInstanceQuery()
                 .taskAssignee(String.valueOf(userId)).orderByHistoricActivityInstanceEndTime().desc().list();
 
@@ -68,7 +66,7 @@ public class DisplayService {
             return Collections.emptyList();
         }
 
-        // 所有与R1有关的ProcessId 需要区分哪些是流程进行中（1.1 需要R1填写；1.2R1填完了，再走其他流程），哪些流程已结束
+        // 所有与userid有关的ProcessId 需要区分哪些是流程进行中（1.1 需要R1填写；1.2R1填完了，再走其他流程），哪些流程已结束
         List<String> R1AllProcessIds = AllActivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
         List<Project> R1AllProjects = projectService.getProjectsByProcessIds(R1AllProcessIds, query, year, type, number).getData();
         // 筛选出没有最终产值的Project, 就是R1 相关的 还在流程中的 Project
@@ -188,7 +186,7 @@ public class DisplayService {
             String processId = unfinishedProject.getProcessId();
 
             ActivityInstance activeActivityInstance = runtimeService.createActivityInstanceQuery()
-                    .taskAssignee(String.valueOf(userId))
+//                    .taskAssignee(String.valueOf(userId))
                     .processInstanceId(processId)
                     .unfinished()
                     .singleResult();
@@ -250,6 +248,7 @@ public class DisplayService {
             // 查出来所有的projects
             List<Project> allProjects = projectDao.getUnfinishedProjectsByOwnerIdsByR4(R2IdsFindByR4, typeIdsFindByR4Id,
                     query, year, type, number);
+
 
             List<Project> finalUnfinished = generateUnfinishedProjects(allProjects, userId, "R4");
             return ProjectListResult.success(finalUnfinished);
