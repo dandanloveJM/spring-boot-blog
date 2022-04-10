@@ -212,11 +212,15 @@ public class DisplayService {
             return finalUnfinishedProjects.stream().filter(item->R4UnfinishedActivityName.contains(item.getActivityName())).collect(Collectors.toList());
         } else if (role.equals("R3")){
             ArrayList<String> R3UnfinishedActivityName = new ArrayList<>();
+
             R3UnfinishedActivityName.add("R3审核");
             R3UnfinishedActivityName.add("R4审核");
             R3UnfinishedActivityName.add("A1填写产值");
 
-            return finalUnfinishedProjects.stream().filter(item->R3UnfinishedActivityName.contains(item.getActivityName())).collect(Collectors.toList());
+            return finalUnfinishedProjects.stream().filter(item->
+                            (R3UnfinishedActivityName.contains(item.getActivityName()))
+                                    || (Objects.equals(item.getPmId(), userId))
+                    ).collect(Collectors.toList());
         } else {
             return finalUnfinishedProjects;
         }
@@ -280,9 +284,9 @@ public class DisplayService {
 
 
     public Map<String, List<Project>> getAllProjectsMap(String query,
-                                                        Integer year, Integer type, String number) {
+                                                        Integer year, Integer type, String number, Integer month) {
         Map<String, List<Project>> projects = new HashMap<>();
-        List<Project> allProjects = projectDao.getAllProjects(query, year, type, number);
+        List<Project> allProjects = projectDao.getAllProjects(query, year, type, number, month);
         if (allProjects.isEmpty()) {
             projects.put("empty", Collections.emptyList());
             return projects;
@@ -298,9 +302,9 @@ public class DisplayService {
     }
 
     public DisplayResult getAllProjects(String query,
-                                        Integer year, Integer type, String number) {
+                                        Integer year, Integer type, String number, Integer month) {
         try {
-            Map<String, List<Project>> projects = getAllProjectsMap(query, year, type, number);
+            Map<String, List<Project>> projects = getAllProjectsMap(query, year, type, number, month);
             return DisplayResult.success(projects);
         } catch (Exception e) {
             return DisplayResult.failure("程序异常");
@@ -308,7 +312,7 @@ public class DisplayService {
     }
 
 
-    public DisplayResult getA1AllProjects(Integer userId, String query, Integer year, Integer type, String number) {
+    public DisplayResult getA1AllProjects(Integer userId, String query, Integer year, Integer type, String number, Integer month) {
         try {
             List<HistoricActivityInstance> A1AllActivities = historyService.createHistoricActivityInstanceQuery()
                     .taskAssignee(String.valueOf(userId)).orderByHistoricActivityInstanceEndTime().desc().list();
@@ -321,7 +325,7 @@ public class DisplayService {
 
             // 所有与A1有关的ProcessId 需要区分哪些是流程进行中（需要A1填写），哪些流程已结束(resetValue)
             List<String> A1AllProcessIds = A1AllActivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
-            List<Project> A1AllProjects = projectService.getA1ProjectsByProcessIds(A1AllProcessIds, query, year, type, number).getData();
+            List<Project> A1AllProjects = projectService.getA1ProjectsByProcessIds(A1AllProcessIds, query, year, type, number, month).getData();
 
             List<Project> finishedProjects = A1AllProjects.stream()
                     .filter(item -> item.getTotalProduct() != null)

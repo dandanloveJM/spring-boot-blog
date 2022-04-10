@@ -17,7 +17,8 @@
         project.created_at,
         project.updated_at,
         project.total_product,
-        project.total_percentage
+        project.total_percentage,
+        project.pm_id
         FROM project
         <if test="userId != null">
             WHERE project.owner_id = #{userId}
@@ -45,7 +46,8 @@
         project.created_at,
         project.updated_at,
         project.total_product,
-        project.total_percentage
+        project.total_percentage,
+        project.pm_id
         FROM project
         where project.id = ${projectId}
     </select>
@@ -64,7 +66,8 @@
             project.created_at,
             project.updated_at,
             project.total_product,
-            project.total_percentage
+            project.total_percentage,
+            project.pm_id
             FROM project
             where project.process_id = #{processId}
         </select>
@@ -83,7 +86,8 @@
             project.created_at,
             project.updated_at,
             project.total_product,
-            project.total_percentage
+            project.total_percentage,
+            project.pm_id
             FROM project
             where project.process_id in
             <foreach collection="processIds" item="processId" index="index" open="(" separator="," close=")">
@@ -212,7 +216,7 @@
 <select id="getUnfinishedProjectsByOwnerIdsR3"  resultMap="R2Projects">
             select project.id, project.process_id, project.name, project.number, project.owner_name,
                    project.type, project.owner_id, project.attachment, project.updated_at,
-                   project.total_product, project.total_percentage,
+                   project.total_product, project.total_percentage, project.pm_id,
                    p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
             from project
             left join product p on project.process_id = p.process_id
@@ -359,6 +363,9 @@
              <if test="number != ''">
                  project.number  REGEXP #{number} and
               </if>
+              <if test="month != null">
+                  month(project.updated_at) = #{month} and
+              </if>
              project.process_id in
             <foreach collection="processIds" item="processId" index="index" open="(" separator="," close=")">
                   #{processId}
@@ -378,6 +385,9 @@
         where  year(project.updated_at) = #{year}
         <if test="query != ''">
            and  project.name  REGEXP #{query}
+        </if>
+        <if test="month != null">
+            year(project.updated_at) = #{month}
         </if>
 
         <if test="type != null">
@@ -404,6 +414,7 @@
         <result property="updatedAt" column="updated_at"/>
         <result property="totalProduct" column="total_product"/>
         <result property="totalPercentage" column="total_percentage"/>
+        <result property="pmId" column="pm_id"/>
         <collection property="products" ofType="hello.entity.Product">
              <id property="id" column="product_id"/>
              <result property="userId" column="user_id"/>
@@ -427,6 +438,7 @@
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
         <result property="updatedAt" column="updated_at"/>
+        <result property="pmId" column="pm_id"/>
         <result property="totalProduct" column="total_product"/>
         <result property="totalPercentage" column="total_percentage"/>
     </resultMap>
