@@ -208,8 +208,10 @@ public class DisplayController {
     public DisplayResult getAllProjects(@RequestParam String query,
                                         @RequestParam Integer year,
                                         @RequestParam(required=false) Integer type,
-                                        @RequestParam String number) {
-        return displayService.getAllProjects(query, year, type, number);
+                                        @RequestParam String number,
+                                        @RequestParam(required=false) Integer month
+    ) {
+        return displayService.getAllProjects(query, year, type, number, month);
     }
 
     @ReadUserIdInSession
@@ -218,7 +220,10 @@ public class DisplayController {
                                           @RequestParam String query,
                                           @RequestParam Integer year,
                                           @RequestParam(required=false) Integer type,
-                                          @RequestParam String number) {
+                                          @RequestParam String number,
+                                          @RequestParam(required = false) Integer month
+
+    ) {
         if (query == null) {
             query = "";
         }
@@ -229,7 +234,8 @@ public class DisplayController {
         if(number == null){
             number = "";
         }
-        return displayService.getA1AllProjects(userId, query, year, type, number);
+
+        return displayService.getA1AllProjects(userId, query, year, type, number, month);
     }
 
     @GetMapping("/userRank")

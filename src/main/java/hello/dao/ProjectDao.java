@@ -188,23 +188,26 @@ public class ProjectDao {
 
 
     public List<Project> getAllProjects(String query,
-                                        Integer year, Integer type, String number){
+                                        Integer year, Integer type, String number, Integer month){
         Map<String, Object> parameters = asMap(
                 "query", query,
                 "year", year,
                 "type", type,
-                "number", number);
+                "number", number,
+                "month", month);
         return sqlSession.selectList("getAllProjects", parameters);
     }
 
     public List<Project> getA1ProjectsByProcessIds(List<String> processIds, String query,
                                                    Integer year, Integer type,
-                                                   String number) {
+                                                   String number,
+                                                   Integer month) {
         Map<String, Object> parameters = asMap("processIds", processIds,
                 "query", query,
                 "year", year,
                 "type", type,
-                "number", number);
+                "number", number,
+                "month", month);
         return sqlSession.selectList("getA1ProjectsByProcessIds", parameters);
     }
 
