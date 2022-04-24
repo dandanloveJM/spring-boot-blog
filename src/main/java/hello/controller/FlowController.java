@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
@@ -178,6 +179,7 @@ public class FlowController {
         Map<String, Object> map = new HashMap<>();
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 
+
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
@@ -214,6 +216,7 @@ public class FlowController {
                     // 退回过 --> 删除已有数据，重新保存新的数据
                     DBresult = projectService.modifyProject(newProject);
                 }
+                taskService.addComment(taskId, processId, "【通过】");
                 taskService.complete(taskId, map);
                 return DBresult;
             }
@@ -282,6 +285,8 @@ public class FlowController {
                     // 删除旧的，改新的
                     DBResult = productService.modifyProducts(products);
                 }
+
+                taskService.addComment(taskId, processId, "【通过】");
                 taskService.complete(taskId, map);
                 return DBResult;
             }
@@ -303,9 +308,7 @@ public class FlowController {
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        if (!StringUtils.isNotEmpty(comment)) {
-            comment = "";
-        }
+
 
 
         try {
@@ -332,7 +335,9 @@ public class FlowController {
 
                 Authentication.setAuthenticatedUserId(String.valueOf(userId));
 
-                taskService.addComment(taskId, processId, "通过, " + comment);
+                String comment2 = StringUtils.isNotEmpty(comment)? "【通过】, " + comment : "【通过】";
+                taskService.addComment(taskId, processId, comment2);
+
 
 
                 taskService.complete(taskId, map);
@@ -362,9 +367,9 @@ public class FlowController {
         try {
             map.put("A1", "24");
             Authentication.setAuthenticatedUserId(String.valueOf(userId));
-            if (StringUtils.isNotEmpty(comment)) {
-                taskService.addComment(taskId, processId, "通过, " + comment);
-            }
+            String comment2 = StringUtils.isNotEmpty(comment)? "【通过】, " + comment : "【通过】";
+            taskService.addComment(taskId, processId, comment2);
+
 
             taskService.complete(taskId, map);
             return ProjectResult.success("分管领导审核通过");
@@ -410,9 +415,9 @@ public class FlowController {
                                          @RequestParam(required = false) String comment) {
         Task nowTask = taskService.createTaskQuery().taskId(taskId).singleResult();
         Authentication.setAuthenticatedUserId(ownerId.toString());
-        if (StringUtils.isNotEmpty(comment)) {
-            taskService.addComment(taskId, nowTask.getProcessInstanceId(), "退回, " + comment);
-        }
+        String comment2 = StringUtils.isNotEmpty(comment)? "【退回】, " + comment : "【退回】";
+        taskService.addComment(taskId, nowTask.getProcessInstanceId(), comment2);
+
         String taskKey = nowTask.getTaskDefinitionKey();
 
 //        List<Execution> runExecutionList = runtimeService.createExecutionQuery()
@@ -497,27 +502,20 @@ public class FlowController {
      * @return
      */
     @GetMapping("/history/list")
-    public ActivityListResult historyList(@RequestParam(value = "processId") String processId) {
-        List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processId).activityType("userTask").finished()
-                .orderByHistoricActivityInstanceEndTime().desc().list();
+    public ActivityListResult undoneHistoryList(@RequestParam(value = "processId") String processId) {
+        List<ActivityInstance> activities = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processId)
+                .activityType("userTask")
+                .orderByActivityInstanceStartTime()
+                .desc()
+                .list();
+
 
         List<Activity> nodes = new ArrayList<>();
         try {
-            for (HistoricActivityInstance activityInstance : activities) {
-                Activity activity = new Activity();
-                String taskId = activityInstance.getTaskId();
-                Integer userId = Integer.valueOf(activityInstance.getAssignee());
-                String displayName = userService.getUserById(userId).getData().getDisplayName();
-                String comment = projectService.getComment(processId, taskId).getData();
-
-                activity.setProcessId(processId);
-                activity.setTaskId(taskId);
-                activity.setDisplayName(displayName);
-                activity.setActivityName(activityInstance.getActivityName());
-                activity.setComment(comment);
-                activity.setTime(activityInstance.getEndTime());
-                nodes.add(activity);
+            for (ActivityInstance activityInstance : activities) {
+                Activity node = makeNode(processId, activityInstance.getTaskId(), activityInstance.getAssignee(), activityInstance.getActivityName(), activityInstance.getStartTime(), activityInstance.getEndTime());
+                nodes.add(node);
             }
             return ActivityListResult.success(nodes);
         } catch (Exception e) {
@@ -527,6 +525,43 @@ public class FlowController {
 
     }
 
+
+    @GetMapping("/admin/history/list")
+    public ActivityListResult historyList(@RequestParam(value = "processId") String processId) {
+        List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(processId).activityType("userTask").finished()
+                .orderByHistoricActivityInstanceEndTime().desc().list();
+
+        List<Activity> nodes = new ArrayList<>();
+        try {
+            for (HistoricActivityInstance activityInstance : activities) {
+                Activity node = makeNode(processId, activityInstance.getTaskId(), activityInstance.getAssignee(), activityInstance.getActivityName(), activityInstance.getStartTime(), activityInstance.getEndTime());
+                nodes.add(node);
+            }
+            return ActivityListResult.success(nodes);
+        } catch (Exception e) {
+            return ActivityListResult.failure("查询流程审批历史失败");
+        }
+
+
+    }
+
+    private Activity makeNode(@RequestParam("processId") String processId,  String taskId2, String assignee, String activityName, Date startTime, Date endTime) {
+        Activity activity = new Activity();
+        String taskId = taskId2;
+        Integer userId = Integer.valueOf(assignee);
+        String displayName = userService.getUserById(userId).getData().getDisplayName();
+        String comment = projectService.getComment(processId, taskId).getData();
+
+        activity.setProcessId(processId);
+        activity.setTaskId(taskId);
+        activity.setDisplayName(displayName);
+        activity.setActivityName(activityName);
+        activity.setComment(comment);
+        activity.setStartTime(startTime);
+        activity.setEndTime(endTime);
+        return activity;
+    }
     /**
      * 生成流程图
      *

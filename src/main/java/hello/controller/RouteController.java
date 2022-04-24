@@ -94,9 +94,9 @@ public class RouteController {
         route7.setComponent("/rank/teamRank");
         route5children.add(route7);
 
-
+        Route route11 = new Route();
         if(undoneTaskURL.equals("/display/r2task")){
-            Route route11 = new Route();
+
             route11.setId(11);
             route11.setPid(1);
             route11.setName("团队数据分析");
@@ -105,7 +105,7 @@ public class RouteController {
             route11.setIcon("ChromeOutlined");
             route11.setKey("r2pivotchart");
             route11.setComponent("/rank/R2Pivot");
-            routeChildren.add(route11);
+
 
         }
 
@@ -124,6 +124,10 @@ public class RouteController {
 
         routeChildren.add(route2);
         routeChildren.add(route5);
+        if (route11.getId() != null) {
+            routeChildren.add(route11);
+        }
+
 
 
 

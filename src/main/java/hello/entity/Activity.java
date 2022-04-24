@@ -10,7 +10,8 @@ public class Activity {
     private String activityName;
     private String displayName;
     private String comment;
-    private Date time;
+    private Date endTime;
+    private Date startTime;
 
     public String getProcessId() {
         return processId;
@@ -52,11 +53,19 @@ public class Activity {
         this.comment = comment;
     }
 
-    public Date getTime() {
-        return time;
+    public Date getEndTime() {
+        return endTime;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 }
