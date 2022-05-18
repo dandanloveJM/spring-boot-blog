@@ -126,9 +126,9 @@ public class ProjectService {
 
 
     public ProjectListResult getA1ProjectsByProcessIds(List<String> processIds, String query, Integer year, Integer type, String number,
-                                                       Integer month){
+                                                       String startDate, String endDate){
         try{
-            return ProjectListResult.success(projectDao.getA1ProjectsByProcessIds(processIds, query, year, type, number, month));
+            return ProjectListResult.success(projectDao.getA1ProjectsByProcessIds(processIds, query, year, type, number, startDate, endDate));
         } catch (Exception e){
             return ProjectListResult.failure("查询失败");
         }

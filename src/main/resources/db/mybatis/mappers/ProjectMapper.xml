@@ -353,7 +353,9 @@
             from project
             inner join product p on project.process_id = p.process_id
             where
-             year(project.updated_at) = #{year} and
+            <if test="(startDate == '') or (endDate == '')">
+            year(project.updated_at) = #{year} and
+            </if>
              <if test="query != ''">
                  project.name  REGEXP #{query} and
              </if>
@@ -363,8 +365,8 @@
              <if test="number != ''">
                  project.number  REGEXP #{number} and
               </if>
-              <if test="month != null">
-                  month(project.updated_at) = #{month} and
+              <if test="(startDate != '') and (endDate != '')">
+                  project.created_at between  #{startDate} and #{endDate} and
               </if>
              project.process_id in
             <foreach collection="processIds" item="processId" index="index" open="(" separator="," close=")">

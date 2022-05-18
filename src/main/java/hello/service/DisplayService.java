@@ -312,7 +312,8 @@ public class DisplayService {
     }
 
 
-    public DisplayResult getA1AllProjects(Integer userId, String query, Integer year, Integer type, String number, Integer month) {
+    public DisplayResult getA1AllProjects(Integer userId, String query, Integer year, Integer type, String number,
+                                          String startDate, String endDate) {
         try {
             List<HistoricActivityInstance> A1AllActivities = historyService.createHistoricActivityInstanceQuery()
                     .taskAssignee(String.valueOf(userId)).orderByHistoricActivityInstanceEndTime().desc().list();
@@ -325,7 +326,7 @@ public class DisplayService {
 
             // 所有与A1有关的ProcessId 需要区分哪些是流程进行中（需要A1填写），哪些流程已结束(resetValue)
             List<String> A1AllProcessIds = A1AllActivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
-            List<Project> A1AllProjects = projectService.getA1ProjectsByProcessIds(A1AllProcessIds, query, year, type, number, month).getData();
+            List<Project> A1AllProjects = projectService.getA1ProjectsByProcessIds(A1AllProcessIds, query, year, type, number, startDate, endDate).getData();
 
             List<Project> finishedProjects = A1AllProjects.stream()
                     .filter(item -> item.getTotalProduct() != null)

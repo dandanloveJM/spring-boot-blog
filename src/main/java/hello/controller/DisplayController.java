@@ -221,7 +221,9 @@ public class DisplayController {
                                           @RequestParam Integer year,
                                           @RequestParam(required=false) Integer type,
                                           @RequestParam String number,
-                                          @RequestParam(required = false) Integer month
+
+                                          @RequestParam(required=false) String startDate,
+                                          @RequestParam(required = false) String endDate
 
     ) {
         if (query == null) {
@@ -235,7 +237,7 @@ public class DisplayController {
             number = "";
         }
 
-        return displayService.getA1AllProjects(userId, query, year, type, number, month);
+        return displayService.getA1AllProjects(userId, query, year, type, number, startDate, endDate);
     }
 
     @GetMapping("/userRank")
