@@ -96,13 +96,19 @@
              <if test="query != ''">
                 and  project.name  REGEXP #{query}
              </if>
-             and year(project.updated_at) = #{year}
+        <if test="(startDate == '') or (endDate == '')">
+            and year(project.updated_at) = #{year}
+        </if>
+
              <if test="type != null">
               and   project.type = #{type}
              </if>
              <if test="number != ''">
               and  project.number  REGEXP #{number}
              </if>
+        <if test="(startDate != '') and (endDate != '')">
+            and project.created_at between  #{startDate} and #{endDate}
+        </if>
             order by project.updated_at desc
     </select>
 

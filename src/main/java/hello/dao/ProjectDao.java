@@ -81,12 +81,14 @@ public class ProjectDao {
     }
 
     public List<Project> getProjectsByProcessIds(List<String> processIds, String query, Integer year,
-                                                 Integer type, String number){
+                                                 Integer type, String number, String startDate, String endDate){
         Map<String, Object> parameters = asMap("processIds", processIds,
                 "query", query,
                 "year", year,
                 "type", type,
-                "number", number);
+                "number", number,
+                "startDate", startDate,
+                "endDate", endDate);
         return sqlSession.selectList("getProjectsByProcessIds", parameters);
     }
 

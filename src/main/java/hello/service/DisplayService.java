@@ -57,7 +57,8 @@ public class DisplayService {
         }
     }
 
-    public List<Project> getUnfinishedProjects(Integer userId, String query, Integer year, Integer type, String number){
+    public List<Project> getUnfinishedProjects(Integer userId, String query, Integer year, Integer type, String number,
+                                               String startDate, String endDate){
         // 所有让userid填写的任务
         List<HistoricActivityInstance> AllActivities = historyService.createHistoricActivityInstanceQuery()
                 .taskAssignee(String.valueOf(userId)).orderByHistoricActivityInstanceEndTime().desc().list();
@@ -68,7 +69,7 @@ public class DisplayService {
 
         // 所有与userid有关的ProcessId 需要区分哪些是流程进行中（1.1 需要R1填写；1.2R1填完了，再走其他流程），哪些流程已结束
         List<String> R1AllProcessIds = AllActivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
-        List<Project> R1AllProjects = projectService.getProjectsByProcessIds(R1AllProcessIds, query, year, type, number).getData();
+        List<Project> R1AllProjects = projectService.getProjectsByProcessIds(R1AllProcessIds, query, year, type, number, startDate, endDate).getData();
         // 筛选出没有最终产值的Project, 就是R1 相关的 还在流程中的 Project
         List<Project> R1UnfinishedProjects = R1AllProjects.stream()
                 .filter(item -> item.getTotalProduct() == null).collect(Collectors.toList());
@@ -77,9 +78,10 @@ public class DisplayService {
 
     }
 
-    public ProjectListResult getR1UnfinishedProjectsByUserId(Integer userId, String query, Integer year, Integer type, String number) {
+    public ProjectListResult getR1UnfinishedProjectsByUserId(Integer userId, String query, Integer year, Integer type, String number,
+                                                             String startDate, String endDate) {
         try {
-            return ProjectListResult.success(getUnfinishedProjects(userId, query, year, type, number));
+            return ProjectListResult.success(getUnfinishedProjects(userId, query, year, type, number, startDate, endDate));
         } catch (Exception e) {
             return ProjectListResult.failure("程序异常");
         }
@@ -87,9 +89,10 @@ public class DisplayService {
 
     }
 
-    public ProjectListResult getUnfinishedR2Projects(Integer userId, String query, Integer year, Integer type, String number){
+    public ProjectListResult getUnfinishedR2Projects(Integer userId, String query, Integer year, Integer type, String number,
+                                                     String startDate, String endDate){
         try {
-            return ProjectListResult.success(getUnfinishedProjects(userId, query, year, type, number));
+            return ProjectListResult.success(getUnfinishedProjects(userId, query, year, type, number,startDate, endDate));
 
         } catch (Exception e) {
             return ProjectListResult.failure("程序异常");

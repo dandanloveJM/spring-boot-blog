@@ -43,7 +43,7 @@ public class ProjectController {
             processIds.add(processId);
         }
 
-        return projectService.getProjectsByProcessIds(processIds, "", 2022, null, "");
+        return projectService.getProjectsByProcessIds(processIds, "", 2022, null, "","","");
     }
 
     @GetMapping("/getProjectsByOwnerId")

@@ -116,9 +116,10 @@ public class ProjectService {
     }
 
 
-    public ProjectListResult getProjectsByProcessIds(List<String> processIds, String query, Integer year, Integer type, String number){
+    public ProjectListResult getProjectsByProcessIds(List<String> processIds, String query, Integer year, Integer type, String number,
+                                                     String startDate, String endDate){
         try{
-            return ProjectListResult.success(projectDao.getProjectsByProcessIds(processIds, query, year, type, number));
+            return ProjectListResult.success(projectDao.getProjectsByProcessIds(processIds, query, year, type, number, startDate, endDate));
         } catch (Exception e){
             return ProjectListResult.failure("查询失败");
         }

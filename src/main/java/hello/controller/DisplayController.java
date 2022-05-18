@@ -46,18 +46,20 @@ public class DisplayController {
     public ProjectListResult getR1UnifishedProjectsByUserId(Integer userId,
                                                             @RequestParam String query,
                                                             @RequestParam Integer year,
-                                                            @RequestParam(required=false) Integer type,
-                                                            @RequestParam String number) {
+                                                            @RequestParam(required = false) Integer type,
+                                                            @RequestParam String number,
+                                                            @RequestParam(required = false) String startDate,
+                                                            @RequestParam(required = false) String endDate) {
         if (query == null) {
             query = "";
         }
         if (year == null) {
             year = 2022;
         }
-        if(number == null){
+        if (number == null) {
             number = "";
         }
-        return displayService.getR1UnfinishedProjectsByUserId(userId, query, year, type, number);
+        return displayService.getR1UnfinishedProjectsByUserId(userId, query, year, type, number, startDate, endDate);
     }
 
     @ReadUserIdInSession
@@ -65,7 +67,7 @@ public class DisplayController {
     public ProjectListResult getR1FinishedProjects(Integer userId,
                                                    @RequestParam String query,
                                                    @RequestParam Integer year,
-                                                   @RequestParam(required=false) Integer type,
+                                                   @RequestParam(required = false) Integer type,
                                                    @RequestParam String number) {
         if (query == null) {
             query = "";
@@ -73,7 +75,7 @@ public class DisplayController {
         if (year == null) {
             year = 2022;
         }
-        if(number == null){
+        if (number == null) {
             number = "";
         }
         // 只展示有产值的数据
@@ -81,40 +83,41 @@ public class DisplayController {
     }
 
 
-
     @ReadUserIdInSession
     @GetMapping("/R2/unfinishedProjects")
     public ProjectListResult getR2UnfinishedProjects(Integer userId,
-                                          @RequestParam String query,
-                                          @RequestParam Integer year,
-                                          @RequestParam(required=false) Integer type,
-                                          @RequestParam String number) {
+                                                     @RequestParam String query,
+                                                     @RequestParam Integer year,
+                                                     @RequestParam(required = false) Integer type,
+                                                     @RequestParam String number,
+                                                     @RequestParam(required = false) String startDate,
+                                                     @RequestParam(required = false) String endDate) {
         if (query == null) {
             query = "";
         }
         if (year == null) {
             year = 2022;
         }
-        if(number== null){
+        if (number == null) {
             number = "";
         }
-        return displayService.getUnfinishedR2Projects(userId, query, year, type, number);
+        return displayService.getUnfinishedR2Projects(userId, query, year, type, number, startDate, endDate);
     }
 
     @ReadUserIdInSession
     @GetMapping("/R2/finishedProjects")
     public ProjectListResult getR2FinishedProjects(Integer userId,
-                                                     @RequestParam String query,
-                                                     @RequestParam Integer year,
-                                                     @RequestParam(required=false) Integer type,
-                                                     @RequestParam String number) {
+                                                   @RequestParam String query,
+                                                   @RequestParam Integer year,
+                                                   @RequestParam(required = false) Integer type,
+                                                   @RequestParam String number) {
         if (query == null) {
             query = "";
         }
         if (year == null) {
             year = 2022;
         }
-        if(number== null){
+        if (number == null) {
             number = "";
         }
         return displayService.getFinishedR2Projects(userId, query, year, type, number);
@@ -124,17 +127,17 @@ public class DisplayController {
     @ReadUserIdInSession
     @GetMapping("/R3/unfinishedProjects")
     public ProjectListResult getR3UnfinishedProjects(Integer userId,
-                                              @RequestParam String query,
-                                              @RequestParam Integer year,
-                                              @RequestParam(required=false) Integer type,
-                                              @RequestParam String number) {
+                                                     @RequestParam String query,
+                                                     @RequestParam Integer year,
+                                                     @RequestParam(required = false) Integer type,
+                                                     @RequestParam String number) {
         if (query == null) {
             query = "";
         }
         if (year == null) {
             year = 2022;
         }
-        if(number == null) {
+        if (number == null) {
             number = "";
         }
         return displayService.getUnfinishedR3Projects(userId, query, year, type, number);
@@ -144,20 +147,20 @@ public class DisplayController {
     @ReadUserIdInSession
     @GetMapping("/R3/finishedProjects")
     public ProjectListResult getR3FinishedProjects(Integer userId,
-                                          @RequestParam String query,
-                                          @RequestParam Integer year,
-                                          @RequestParam(required=false) Integer type,
-                                          @RequestParam String number) {
+                                                   @RequestParam String query,
+                                                   @RequestParam Integer year,
+                                                   @RequestParam(required = false) Integer type,
+                                                   @RequestParam String number) {
         if (query == null) {
             query = "";
         }
         if (year == null) {
             year = 2022;
         }
-        if(number == null) {
+        if (number == null) {
             number = "";
         }
-        if(userId == 45){
+        if (userId == 45) {
             return displayService.getZengtaoFinishedProjects(userId, query, year, type, number);
         } else {
             return displayService.getR3FinishedProjects(userId, query, year, type, number);
@@ -168,28 +171,9 @@ public class DisplayController {
     @ReadUserIdInSession
     @GetMapping("/R4/unfinished/projects")
     public ProjectListResult getR4UnfinishedProjects(Integer userId,
-                                          @RequestParam String query,
-                                          @RequestParam Integer year,
-                                          @RequestParam(required=false) Integer type,
-                                          @RequestParam String number) {
-        if (query == null) {
-            query = "";
-        }
-        if (year == null) {
-            year = 2022;
-        }
-        if(number == null){
-            number="";
-        }
-        return displayService.getR4UnfinishedProjects(userId, query, year, type, number);
-    }
-
-    @ReadUserIdInSession
-    @GetMapping("/R4/finished/projects")
-    public ProjectListResult getR4FinishedProjects(Integer userId,
                                                      @RequestParam String query,
                                                      @RequestParam Integer year,
-                                                     @RequestParam(required=false) Integer type,
+                                                     @RequestParam(required = false) Integer type,
                                                      @RequestParam String number) {
         if (query == null) {
             query = "";
@@ -197,8 +181,27 @@ public class DisplayController {
         if (year == null) {
             year = 2022;
         }
-        if(number == null){
-            number="";
+        if (number == null) {
+            number = "";
+        }
+        return displayService.getR4UnfinishedProjects(userId, query, year, type, number);
+    }
+
+    @ReadUserIdInSession
+    @GetMapping("/R4/finished/projects")
+    public ProjectListResult getR4FinishedProjects(Integer userId,
+                                                   @RequestParam String query,
+                                                   @RequestParam Integer year,
+                                                   @RequestParam(required = false) Integer type,
+                                                   @RequestParam String number) {
+        if (query == null) {
+            query = "";
+        }
+        if (year == null) {
+            year = 2022;
+        }
+        if (number == null) {
+            number = "";
         }
         return displayService.getR4FinishedProjects(userId, query, year, type, number);
     }
@@ -207,9 +210,9 @@ public class DisplayController {
     @GetMapping("/allProjects")
     public DisplayResult getAllProjects(@RequestParam String query,
                                         @RequestParam Integer year,
-                                        @RequestParam(required=false) Integer type,
+                                        @RequestParam(required = false) Integer type,
                                         @RequestParam String number,
-                                        @RequestParam(required=false) Integer month
+                                        @RequestParam(required = false) Integer month
     ) {
         return displayService.getAllProjects(query, year, type, number, month);
     }
@@ -219,10 +222,9 @@ public class DisplayController {
     public DisplayResult getA1AllProjects(Integer userId,
                                           @RequestParam String query,
                                           @RequestParam Integer year,
-                                          @RequestParam(required=false) Integer type,
+                                          @RequestParam(required = false) Integer type,
                                           @RequestParam String number,
-
-                                          @RequestParam(required=false) String startDate,
+                                          @RequestParam(required = false) String startDate,
                                           @RequestParam(required = false) String endDate
 
     ) {
@@ -233,7 +235,7 @@ public class DisplayController {
             year = 2022;
         }
 
-        if(number == null){
+        if (number == null) {
             number = "";
         }
 
@@ -272,11 +274,10 @@ public class DisplayController {
         List<Product> products = new ArrayList<>();
 
 
-
         for (int i = 0; i < data2.size(); i++) {
             JSONObject obj = data2.getJSONObject(i);
             Product newProduct = new Product();
-            String processId="reallocate--"+ RandomStringUtils.randomAlphanumeric(5);
+            String processId = "reallocate--" + RandomStringUtils.randomAlphanumeric(5);
             String userid = (String) obj.get("userId");
             String product = (String) obj.get("product");
             String displayName = (String) obj.get("displayName");
@@ -349,42 +350,41 @@ public class DisplayController {
     }
 
 
-
     @GetMapping("/teamPieChart")
-    public TeamPieChartsListResult getPieCharts(){
+    public TeamPieChartsListResult getPieCharts() {
         return rankService.getTeamPieChartParams();
     }
 
     @GetMapping("/barChart")
-    public TeamBarChartResult getBarChart(){
+    public TeamBarChartResult getBarChart() {
         return rankService.getBarParams();
     }
 
 
     @GetMapping("/r4types")
-    public R4TypeListResult getAllR4Types(Integer typeId, Integer userId){
+    public R4TypeListResult getAllR4Types(Integer typeId, Integer userId) {
         return r4TypeService.showAllR4Types(typeId, userId);
     }
 
     @PostMapping("/change/userId/r4type")
-    public R4TypeResult changeUserId(@RequestParam String displayName, @RequestParam Integer id){
+    public R4TypeResult changeUserId(@RequestParam String displayName, @RequestParam Integer id) {
         return r4TypeService.updateUserId(displayName, id);
     }
 
     @PostMapping("/delete/r4type")
-    public R4TypeResult deleteR4Type( @RequestParam Integer id){
+    public R4TypeResult deleteR4Type(@RequestParam Integer id) {
         return r4TypeService.deleteById(id);
     }
 
     @PostMapping("/add/r4type")
     public R4TypeResult addR4Type(@RequestParam Integer userId, @RequestParam Integer typeId,
-                                  @RequestParam String description){
+                                  @RequestParam String description) {
         return r4TypeService.addNewR4Type(userId, typeId, description);
     }
 
 
     @GetMapping("/pivot/chart")
-    public PivotParamsListResult getPivotParams(String team){
+    public PivotParamsListResult getPivotParams(String team) {
         return rankService.getPivotParams(team);
 
     }
