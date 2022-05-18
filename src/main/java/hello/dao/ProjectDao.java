@@ -138,12 +138,15 @@ public class ProjectDao {
 
     // R3 进行中的任务
     public List<Project> getUnfinishedProjectsByOwnerIds(List<Integer> ownerIds, String query,
-                                                         Integer year, Integer type, String number){
+                                                         Integer year, Integer type, String number,
+                                                         String startDate, String endDate){
         Map<String, Object> parameters = asMap("ownerIds", ownerIds,
                 "query", query,
                 "year", year,
                 "type", type,
-                "number", number);
+                "number", number,
+                "startDate", startDate,
+                "endDate", endDate);
         return sqlSession.selectList("getUnfinishedProjectsByOwnerIdsR3", parameters);
     }
 

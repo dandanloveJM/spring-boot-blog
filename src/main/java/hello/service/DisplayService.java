@@ -112,7 +112,8 @@ public class DisplayService {
     }
 
 
-    public ProjectListResult getUnfinishedR3Projects(Integer userId, String query, Integer year, Integer type, String number){
+    public ProjectListResult getUnfinishedR3Projects(Integer userId, String query, Integer year, Integer type, String number,
+                                                     String startDate, String endDate){
         List<Integer> R2IdsFindByR3 = new ArrayList<>();
 
         if(userId == 45){
@@ -126,7 +127,7 @@ public class DisplayService {
 
         try {
             // 查出来所有的projects
-            List<Project> allProjects = projectDao.getUnfinishedProjectsByOwnerIds(R2IdsFindByR3, query, year, type, number);
+            List<Project> allProjects = projectDao.getUnfinishedProjectsByOwnerIds(R2IdsFindByR3, query, year, type, number, startDate, endDate);
             List<Project> finalUnfinished = generateUnfinishedProjects(allProjects, userId, "R3");
             return ProjectListResult.success(finalUnfinished);
 
