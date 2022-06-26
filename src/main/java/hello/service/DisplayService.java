@@ -247,7 +247,7 @@ public class DisplayService {
 
 
     public ProjectListResult getR4UnfinishedProjects(Integer userId, String query, Integer year,
-    Integer type, String number) {
+    Integer type, String number, String startDate, String endDate) {
 
         // 传入R4ID,找到对应的R2ID
         List<Integer> R2IdsFindByR4 = R2R3R4Relation.R4ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
@@ -255,7 +255,7 @@ public class DisplayService {
             List<Integer> typeIdsFindByR4Id = userService.getTypeIdsByR4(userId).getData().stream().map(R4Type::getTypeId).collect(Collectors.toList());
             // 查出来所有的projects
             List<Project> allProjects = projectDao.getUnfinishedProjectsByOwnerIdsByR4(R2IdsFindByR4, typeIdsFindByR4Id,
-                    query, year, type, number);
+                    query, year, type, number, startDate, endDate);
 
 
             List<Project> finalUnfinished = generateUnfinishedProjects(allProjects, userId, "R4");

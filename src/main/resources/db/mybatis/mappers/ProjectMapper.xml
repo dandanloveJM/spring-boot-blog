@@ -324,7 +324,12 @@
                 <foreach collection="typeIds" item="typeId" index="index" open="(" separator="," close=")">
                      #{typeId}
                 </foreach>
-
+                <if test="(startDate != '') and (endDate != '')">
+                  and project.created_at between  #{startDate} and #{endDate}
+                </if>
+                <if test="(startDate == '') or (endDate == '')">
+                  and year(project.updated_at) = #{year}
+                </if>
 
                 order by project.updated_at desc
     </select>

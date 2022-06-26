@@ -154,7 +154,7 @@ public class ProjectDao {
 
     public List<Project> getUnfinishedProjectsByOwnerIdsByR4(List<Integer> R2IdsFindByR4, List<Integer> typeList,
                                                    String query, Integer year,
-    Integer type, String number) {
+    Integer type, String number, String startDate, String endDate) {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("R2Ids", R2IdsFindByR4);
         parameters.put("typeIds", typeList);
@@ -162,6 +162,8 @@ public class ProjectDao {
         parameters.put("year", year);
         parameters.put("type", type);
         parameters.put("number", number);
+        parameters.put("startDate", startDate);
+        parameters.put("endDate", endDate);
         return sqlSession.selectList("getUnfinishedProjectsByOwnerIdsByR4", parameters);
     }
 
