@@ -125,14 +125,17 @@ public class ProjectDao {
     }
 
     // R3 管理的R2的任务
-    public List<Project> getProjectsByOwnerIds(Integer userId, List<Integer> ownerIds, String query, Integer year, Integer type, String number){
+    public List<Project> getProjectsByOwnerIds(Integer userId, List<Integer> ownerIds, String query, Integer year, Integer type,
+                                               String number, String startDate, String endDate){
         Map<String, Object> parameters = asMap(
                 "userId", userId,
                 "ownerIds", ownerIds,
                 "query", query,
                 "year", year,
                 "type", type,
-                "number", number);
+                "number", number,
+                "startDate", startDate,
+                "endDate", endDate);
         return sqlSession.selectList("getProjectsByOwnerIdsR3", parameters);
     }
 
@@ -182,16 +185,30 @@ public class ProjectDao {
 
     public List<Project> getFinishedProjectsByOwnerIdsZengtao(
                                                            String query, Integer year,
-                                                           Integer type, String number){
+                                                           Integer type, String number, String startDate, String endDate){
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("query", query);
         parameters.put("year", year);
         parameters.put("type", type);
         parameters.put("number", number);
+        parameters.put("startDate", startDate);
+        parameters.put("endDate", endDate);
         return sqlSession.selectList("getFinishedProjectsByOwnerIdsZengtao", parameters);
 
     }
 
+    public List<Project> getA1FinishedProjects(String query, Integer year, Integer type, String number,
+                                               String startDate, String endDate){
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("query", query);
+        parameters.put("year", year);
+        parameters.put("type", type);
+        parameters.put("number", number);
+        parameters.put("startDate", startDate);
+        parameters.put("endDate", endDate);
+        return sqlSession.selectList("getFinishedProjectsByA1", parameters);
+
+    }
 
 
     public List<Project> getAllProjects(String query,
@@ -205,7 +222,7 @@ public class ProjectDao {
         return sqlSession.selectList("getAllProjects", parameters);
     }
 
-    public List<Project> getA1ProjectsByProcessIds(List<String> processIds, String query,
+    public List<Project> getA1UnfinishedProjectsByProcessIds(List<String> processIds, String query,
                                                    Integer year,
                                                    Integer type,
                                                    String number,
@@ -218,7 +235,7 @@ public class ProjectDao {
                 "number", number,
                 "startDate",startDate,
                 "endDate",endDate);
-        return sqlSession.selectList("getA1ProjectsByProcessIds", parameters);
+        return sqlSession.selectList("getA1UnfinishedProjectsByProcessIds", parameters);
     }
 
 

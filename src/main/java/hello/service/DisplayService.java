@@ -136,12 +136,13 @@ public class DisplayService {
         }
     }
 
-    public ProjectListResult getR3FinishedProjects(Integer userId, String query, Integer year, Integer type, String number){
+    public ProjectListResult getR3FinishedProjects(Integer userId, String query, Integer year, Integer type, String number,
+                                                   String startDate, String endDate){
         // 传入R3ID,找到对应的R2ID
         List<Integer> R2IdsFindByR3 = R2R3R4Relation.R3ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
         try {
             // R3管理的R2
-            List<Project> allProjects = projectDao.getProjectsByOwnerIds(userId, R2IdsFindByR3, query, year, type, number);
+            List<Project> allProjects = projectDao.getProjectsByOwnerIds(userId, R2IdsFindByR3, query, year, type, number, startDate, endDate);
 //            // R3参与的任务. 但不是自己管理的R2上的
 //            List<Project> participantProjects = projectDao.getFinishedProjectsByUserIdR2(userId, query, year, type, number);
 //
@@ -232,10 +233,10 @@ public class DisplayService {
     }
 
     public ProjectListResult getZengtaoFinishedProjects(Integer userId, String query, Integer year,
-                                                        Integer type, String number){
+                                                        Integer type, String number, String startDate, String endDate){
         try {
             List<Project> allProjects = projectDao.getFinishedProjectsByOwnerIdsZengtao(
-                    query, year, type, number);
+                    query, year, type, number, startDate, endDate);
 
             List<Project> finishedProjectsWithTotalSum = addTotalSum(allProjects);
             return ProjectListResult.success(finishedProjectsWithTotalSum);
@@ -284,6 +285,18 @@ public class DisplayService {
     }
 
 
+    public ProjectListResult getA1FinishedProjects(String query, Integer year, Integer type, String number, String startDate,
+                                                   String endDate){
+        try {
+            // 查出来所有的projects
+            List<Project> allProjects = projectDao.getA1FinishedProjects(query, year, type, number, startDate, endDate);
+            List<Project> finishedProjectsWithTotalSum = addTotalSum(allProjects);
+
+            return ProjectListResult.success(finishedProjectsWithTotalSum);
+        } catch (Exception e) {
+            return ProjectListResult.failure("程序异常");
+        }
+    }
 
 
 
@@ -315,6 +328,31 @@ public class DisplayService {
         }
     }
 
+    public ProjectListResult getA1UnfinishedProjects(Integer userId, String query, Integer year, Integer type, String number, String startDate,
+                                                   String endDate){
+        try {
+            List<HistoricActivityInstance> A1AllActivities = historyService.createHistoricActivityInstanceQuery()
+                    .taskAssignee(String.valueOf(userId)).orderByHistoricActivityInstanceEndTime().desc().list();
+            if (A1AllActivities.isEmpty()) {
+                return ProjectListResult.success(Collections.emptyList());
+            }
+            List<String> A1AllProcessIds = A1AllActivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
+
+
+            // 查出来所有的projects
+            List<Project> unfinishedProjects = projectDao.getA1UnfinishedProjectsByProcessIds(A1AllProcessIds,
+                    query, year, type, number, startDate, endDate);
+
+            List<Project> finalAllUnfinishedProjects = generateUnfinishedProjects(unfinishedProjects, userId,"A1");
+
+
+            return ProjectListResult.success(finalAllUnfinishedProjects);
+        } catch (Exception e) {
+            return ProjectListResult.failure("程序异常");
+        }
+    }
+
+
 
     public DisplayResult getA1AllProjects(Integer userId, String query, Integer year, Integer type, String number,
                                           String startDate, String endDate) {
@@ -330,7 +368,7 @@ public class DisplayService {
 
             // 所有与A1有关的ProcessId 需要区分哪些是流程进行中（需要A1填写），哪些流程已结束(resetValue)
             List<String> A1AllProcessIds = A1AllActivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
-            List<Project> A1AllProjects = projectService.getA1ProjectsByProcessIds(A1AllProcessIds, query, year, type, number, startDate, endDate).getData();
+            List<Project> A1AllProjects = projectService.getA1UnfinishedProjectsByProcessIds(A1AllProcessIds, query, year, type, number, startDate, endDate).getData();
 
             List<Project> finishedProjects = A1AllProjects.stream()
                     .filter(item -> item.getTotalProduct() != null)

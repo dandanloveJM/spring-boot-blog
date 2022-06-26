@@ -152,7 +152,10 @@ public class DisplayController {
                                                    @RequestParam String query,
                                                    @RequestParam Integer year,
                                                    @RequestParam(required = false) Integer type,
-                                                   @RequestParam String number) {
+                                                   @RequestParam String number,
+                                                   @RequestParam(required = false) String startDate,
+                                                   @RequestParam(required = false) String endDate
+                                                   ) {
         if (query == null) {
             query = "";
         }
@@ -163,9 +166,9 @@ public class DisplayController {
             number = "";
         }
         if (userId == 45) {
-            return displayService.getZengtaoFinishedProjects(userId, query, year, type, number);
+            return displayService.getZengtaoFinishedProjects(userId, query, year, type, number, startDate, endDate);
         } else {
-            return displayService.getR3FinishedProjects(userId, query, year, type, number);
+            return displayService.getR3FinishedProjects(userId, query, year, type, number, startDate, endDate);
         }
 
     }
@@ -222,8 +225,8 @@ public class DisplayController {
     }
 
     @ReadUserIdInSession
-    @GetMapping("/A1/Projects")
-    public DisplayResult getA1AllProjects(Integer userId,
+    @GetMapping("/A1/Finished/Projects")
+    public ProjectListResult getA1FinishedProjects(Integer userId,
                                           @RequestParam String query,
                                           @RequestParam Integer year,
                                           @RequestParam(required = false) Integer type,
@@ -243,7 +246,33 @@ public class DisplayController {
             number = "";
         }
 
-        return displayService.getA1AllProjects(userId, query, year, type, number, startDate, endDate);
+        return displayService.getA1FinishedProjects(query, year, type, number, startDate, endDate);
+    }
+
+
+    @ReadUserIdInSession
+    @GetMapping("/A1/Unfinished/Projects")
+    public ProjectListResult getA1AllProjects(Integer userId,
+                                          @RequestParam String query,
+                                          @RequestParam Integer year,
+                                          @RequestParam(required = false) Integer type,
+                                          @RequestParam String number,
+                                          @RequestParam(required = false) String startDate,
+                                          @RequestParam(required = false) String endDate
+
+    ) {
+        if (query == null) {
+            query = "";
+        }
+        if (year == null) {
+            year = 2022;
+        }
+
+        if (number == null) {
+            number = "";
+        }
+
+        return displayService.getA1UnfinishedProjects(userId, query, year, type, number, startDate, endDate);
     }
 
     @GetMapping("/userRank")

@@ -270,6 +270,12 @@
             <if test="number != ''">
             and    project.number  REGEXP #{number}
             </if>
+            <if test="(startDate != '') and (endDate != '')">
+              and project.updated_at between  #{startDate} and #{endDate}
+            </if>
+            <if test="(startDate == '') or (endDate == '')">
+               and year(project.updated_at) = #{year}
+            </if>
             order by project.updated_at DESC
     </select>
 
@@ -292,6 +298,12 @@
                 <if test="number != ''">
                 and    project.number  REGEXP #{number}
                 </if>
+        <if test="(startDate != '') and (endDate != '')">
+            and project.updated_at between  #{startDate} and #{endDate}
+        </if>
+        <if test="(startDate == '') or (endDate == '')">
+            and year(project.updated_at) = #{year}
+        </if>
                 order by project.updated_at DESC
         </select>
 
@@ -361,16 +373,44 @@
     </select>
 
 
+    <select id="getFinishedProjectsByA1" parameterType="java.util.List" resultMap="R2Projects">
+        select project.id, project.process_id, project.name, project.number, project.owner_name,
+        project.type, project.owner_id, project.attachment, project.updated_at,
+        project.total_product, project.total_percentage,
+        p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
+        from project
+        inner join product p on project.process_id = p.process_id
+        where ISNULL(project.total_product)=0
+        <if test="query != ''">
+          and   project.name  REGEXP #{query}
+        </if>
+        <if test="type != null">
+           and  project.type = #{type}
+        </if>
+        <if test="number != ''">
+           and project.number  REGEXP #{number}
+        </if>
+        <if test="(startDate != '') and (endDate != '')">
+            and project.updated_at between  #{startDate} and #{endDate}
+        </if>
+        <if test="(startDate == '') or (endDate == '')">
+            and year(project.updated_at) = #{year}
+        </if>
 
-    <select id="getA1ProjectsByProcessIds" parameterType="java.util.List" resultMap="R2Projects">
+        order by project.updated_at desc
+    </select>
+
+
+    <select id="getA1UnfinishedProjectsByProcessIds" parameterType="java.util.List" resultMap="R2Projects">
             select project.id, project.process_id, project.name, project.number, project.owner_name,
-                   project.type, project.owner_id, project.attachment, project.updated_at, project.pm_id,
+                   project.type, project.owner_id, project.attachment, project.created_at, project.updated_at, project.pm_id,
                    project.total_product, project.total_percentage,
                    p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
             from project
             inner join product p on project.process_id = p.process_id
             where
-            <if test="(startDate == '') or (endDate == '')">
+        ISNULL(project.total_product)=1 and
+        <if test="(startDate == '') or (endDate == '')">
             year(project.updated_at) = #{year} and
             </if>
              <if test="query != ''">
@@ -430,6 +470,7 @@
         <result property="ownerId" column="owner_id"/>
         <result property="ownerName" column="owner_name"/>
         <result property="attachment" column="attachment"/>
+        <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
         <result property="totalProduct" column="total_product"/>
         <result property="totalPercentage" column="total_percentage"/>
