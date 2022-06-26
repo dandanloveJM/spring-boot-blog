@@ -40,10 +40,11 @@ public class DisplayService {
         this.userService = userService;
     }
 
-    public ProjectListResult getFinishedProjectsByUserId(Integer userId, String query, Integer year, Integer type, String number) {
+    public ProjectListResult getFinishedProjectsByUserId(Integer userId, String query, Integer year, Integer type, String number,
+                                                         String startDate, String endDate) {
         try {
 
-            return ProjectListResult.success(addTotalSum(projectDao.getFinishedProjectsByOwnerId(userId, query, year, type, number)));
+            return ProjectListResult.success(addTotalSum(projectDao.getFinishedProjectsByOwnerId(userId, query, year, type, number, startDate, endDate)));
         } catch (Exception e) {
             return ProjectListResult.failure("查询失败");
         }
@@ -99,10 +100,11 @@ public class DisplayService {
         }
     }
 
-    public ProjectListResult getFinishedR2Projects(Integer userId, String query, Integer year, Integer type, String number){
+    public ProjectListResult getFinishedR2Projects(Integer userId, String query, Integer year, Integer type, String number,
+                                                   String startDate, String endDate){
         try {
             // R2上的任务
-            List<Project> result = projectDao.getFinishedProjectsByOwnerId(userId, query, year, type, number);
+            List<Project> result = projectDao.getFinishedProjectsByOwnerId(userId, query, year, type, number, startDate, endDate);
 
             List<Project> finishedProjectsWithTotalSum = addTotalSum(result);
             return ProjectListResult.success(finishedProjectsWithTotalSum);

@@ -193,6 +193,12 @@
         <if test="number != ''">
         and    project.number  REGEXP #{number}
         </if>
+        <if test="(startDate != '') and (endDate != '')">
+        and    project.updated_at between  #{startDate} and #{endDate}
+        </if>
+        <if test="(startDate == '') or (endDate == '')">
+        and    year(project.updated_at) = #{year}
+        </if>
         order by project.updated_at DESC
     </select>
 
