@@ -200,7 +200,10 @@ public class DisplayController {
                                                    @RequestParam String query,
                                                    @RequestParam Integer year,
                                                    @RequestParam(required = false) Integer type,
-                                                   @RequestParam String number) {
+                                                   @RequestParam String number,
+                                                   @RequestParam(required = false) String startDate,
+                                                   @RequestParam(required = false) String endDate
+                                                   ) {
         if (query == null) {
             query = "";
         }
@@ -210,7 +213,7 @@ public class DisplayController {
         if (number == null) {
             number = "";
         }
-        return displayService.getR4FinishedProjects(userId, query, year, type, number);
+        return displayService.getR4FinishedProjects(userId, query, year, type, number, startDate, endDate);
     }
 
     // TODO R5和ADMIN可以看全部

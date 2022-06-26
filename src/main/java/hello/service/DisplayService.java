@@ -268,14 +268,14 @@ public class DisplayService {
 
 
     public ProjectListResult getR4FinishedProjects(Integer userId, String query, Integer year,
-                                                     Integer type, String number) {
+                                                     Integer type, String number, String startDate, String endDate) {
 
         // 传入R4ID,找到对应的R2ID
         List<Integer> R2IdsFindByR4 = R2R3R4Relation.R4ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
         try {
             // 查出来所有的projects
             List<Project> allProjects = projectDao.getFinishedProjectsByOwnerIdsByR4(R2IdsFindByR4,
-                    query, year, type, number);
+                    query, year, type, number, startDate, endDate);
             List<Project> finishedProjectsWithTotalSum = addTotalSum(allProjects);
 
             return ProjectListResult.success(finishedProjectsWithTotalSum);

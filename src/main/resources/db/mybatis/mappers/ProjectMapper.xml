@@ -355,7 +355,7 @@
                 from project
                 inner join product p on project.process_id = p.process_id
                 where
-                year(project.updated_at) = #{year} and ISNULL(project.total_product)=0 and
+                ISNULL(project.total_product)=0 and
                 <if test="query != ''">
                     project.name  REGEXP #{query} and
                 </if>
@@ -364,6 +364,12 @@
                 </if>
                 <if test="number != ''">
                     project.number  REGEXP #{number} and
+                </if>
+                <if test="(startDate != '') and (endDate != '')">
+                    project.updated_at between  #{startDate} and #{endDate} and
+                </if>
+                <if test="(startDate == '') or (endDate == '')">
+                    year(project.updated_at) = #{year} and
                 </if>
                 project.owner_id in
                 <foreach collection="R2Ids" item="ownerId" index="index" open="(" separator="," close=")">
