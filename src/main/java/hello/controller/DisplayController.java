@@ -24,6 +24,7 @@ public class DisplayController {
     private final UserAddedProductService userAddedProductService;
     private final R4TypeService r4TypeService;
     private final ReallocateBonusService reallocateBonusService;
+    private final TeamMembersService teamMembersService;
 
     @Inject
     public DisplayController(ProductService productService,
@@ -31,7 +32,8 @@ public class DisplayController {
                              RankService rankService,
                              UserAddedProductService userAddedProductService,
                              R4TypeService r4TypeService,
-                             ReallocateBonusService reallocateBonusService
+                             ReallocateBonusService reallocateBonusService,
+                             TeamMembersService teamMembersService
     ) {
         this.productService = productService;
         this.displayService = displayService;
@@ -39,6 +41,7 @@ public class DisplayController {
         this.userAddedProductService = userAddedProductService;
         this.r4TypeService = r4TypeService;
         this.reallocateBonusService = reallocateBonusService;
+        this.teamMembersService = teamMembersService;
     }
 
     @ReadUserIdInSession
@@ -427,6 +430,31 @@ public class DisplayController {
     public PivotParamsListResult getPivotParams(String team) {
         return rankService.getPivotParams(team);
 
+    }
+
+    @GetMapping("/team/members")
+    public TeamMembersListResult getTeamMembers(){
+        return teamMembersService.getAllTeamMembers();
+    }
+
+    @PostMapping("update/team/members")
+    public TeamMembersListResult updateTeamMembers(@RequestParam("data") String data){
+        JSONArray data2 = JSON.parseArray(data);
+        List<TeamMembers> teamMembers = new ArrayList<>();
+
+        for (int i = 0; i < data2.size(); i++) {
+            JSONObject obj = data2.getJSONObject(i);
+            TeamMembers teamMember = new TeamMembers();
+            String teamName = (String) obj.get("teamName");
+            Double teamMemberNumber = Double.valueOf((String) obj.get("teamMembers"));
+
+            teamMember.setTeamName(teamName);
+            teamMember.setMembers(teamMemberNumber);
+
+            teamMembers.add(teamMember);
+        }
+
+        return teamMembersService.updateMembers(teamMembers);
     }
 
 

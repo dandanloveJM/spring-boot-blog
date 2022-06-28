@@ -31,5 +31,6 @@
         <mapper resource="db/mybatis/mappers/R4TypeMapper.xml"/>
         <mapper resource="db/mybatis/mappers/TeamBonusMapper.xml"/>
         <mapper resource="db/mybatis/mappers/ReallocateBonusUserMapper.xml"/>
+        <mapper resource="db/mybatis/mappers/TeamMembersMapper.xml"/>
     </mappers>
 </configuration>

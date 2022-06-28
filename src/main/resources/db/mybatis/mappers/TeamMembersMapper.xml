@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.TeamMembersMapper">
+    <select id="selectAllTeamMembers" resultType="hello.entity.TeamMembers">
+        select * from team_members
+    </select>
+
+    <update id="updateMembers">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update team_members
+            set
+            <if test="item.members > 0">
+                members=#{item.members}
+            </if>
+            where team_name=#{item.teamName}
+        </foreach>
+    </update>
+
+
+</mapper>
