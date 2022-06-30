@@ -3,7 +3,7 @@ package hello.entity;
 public class TeamMembers {
     private int id;
     private String teamName;
-    private double members;
+    private String members;
 
     public int getId() {
         return id;
@@ -21,11 +21,11 @@ public class TeamMembers {
         this.teamName = teamName;
     }
 
-    public double getMembers() {
+    public String getMembers() {
         return members;
     }
 
-    public void setMembers(double members) {
+    public void setMembers(String members) {
         this.members = members;
     }
 }

@@ -446,7 +446,7 @@ public class DisplayController {
             JSONObject obj = data2.getJSONObject(i);
             TeamMembers teamMember = new TeamMembers();
             String teamName = (String) obj.get("teamName");
-            Double teamMemberNumber = Double.valueOf((String) obj.get("teamMembers"));
+            String teamMemberNumber = obj.get("teamMembers").toString();
 
             teamMember.setTeamName(teamName);
             teamMember.setMembers(teamMemberNumber);

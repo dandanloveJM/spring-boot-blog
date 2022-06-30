@@ -376,6 +376,16 @@ public class RouteController {
         route10.setIcon("");
         route10.setKey("el_userinfo2");
 
+        Route route11= new Route();
+        route11.setId(14);
+        route11.setPid(2);
+        route11.setName("管理团队人数");
+        route11.setPath("/admin/setTeamMembers");
+        route11.setRedirect("");
+        route11.setComponent("/admin/setTeamMembers");
+        route11.setIcon("");
+        route11.setKey("el_setTeamMembers");
+
 
         route2children.add(route3);
         route2children.add(route4);
@@ -385,6 +395,7 @@ public class RouteController {
         routeChildren.add(route8);
         routeChildren.add(route9);
         routeChildren.add(route10);
+        routeChildren.add(route11);
         route.setChildren(routeChildren);
         routes.add(route);
         return routes;
