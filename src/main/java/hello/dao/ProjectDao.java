@@ -57,6 +57,17 @@ public class ProjectDao {
         return getProjectById(newProject.getId());
     }
 
+    public Project updateIsNewProject(String processId, Boolean isStep2New, Boolean isStep3New,
+                                      Boolean isStep4New, Boolean isStep5New){
+        Map<String, Object> parameters = asMap("processId", processId,
+                "isStep2New", isStep2New,
+                "isStep3New", isStep3New,
+                "isStep4New", isStep4New,
+                "isStep5New", isStep5New);
+        sqlSession.update("updateIsNew", parameters);
+        return getProjectByProcessId(processId);
+    }
+
     public Project updateTotalProductOfProject(Project newProject){
         sqlSession.update("updateTotalProductOfProject", newProject);
         return getProjectByProcessId(newProject.getProcessId());

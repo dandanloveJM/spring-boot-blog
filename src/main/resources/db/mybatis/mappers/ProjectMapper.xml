@@ -87,7 +87,10 @@
             project.updated_at,
             project.total_product,
             project.total_percentage,
-            project.pm_id
+            project.pm_id,
+            project.is_new,
+            project.is_step2_new
+
             FROM project
             where project.process_id in
             <foreach collection="processIds" item="processId" index="index" open="(" separator="," close=")">
@@ -114,9 +117,19 @@
 
     <insert id="insertProject" parameterType="hello.entity.Project" useGeneratedKeys="true"
             keyProperty="id" keyColumn="id">
-        INSERT INTO project (process_id, name, number, type, attachment, owner_id, owner_name, product_id, pm_id, created_at, updated_at )
-        VALUES (#{processId}, #{name}, #{number}, #{type}, #{attachment}, #{ownerId}, #{ownerName},#{productId}, #{pmId}, now(), now())
+        INSERT INTO project (process_id, name, number, type, attachment, owner_id, owner_name, product_id, pm_id, is_new, created_at, updated_at )
+        VALUES (#{processId}, #{name}, #{number}, #{type}, #{attachment}, #{ownerId}, #{ownerName},#{productId}, #{pmId}, #{isNew}, now(), now())
     </insert>
+
+    <update id="updateIsNew" parameterType="hello.entity.Project">
+        UPDATE project
+        SET
+        <if test="isStep2New != null">is_step2_new=0</if>
+        <if test="isStep3New != null">is_step3_new=0</if>
+        <if test="isStep4New != null">is_step4_new=0</if>
+        <if test="isStep4New != null">is_step5_new=0</if>
+        where project.process_id = #{processId}
+    </update>
 
     <update id="updateProject" parameterType="hello.entity.Project">
         UPDATE project

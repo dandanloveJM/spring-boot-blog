@@ -130,6 +130,7 @@ public class FlowController {
         project.setOwnerId(ownerId);
         project.setOwnerName(ownerName);
         project.setPmId(pmId);
+        project.setIsNew(true);
         return project;
     }
 

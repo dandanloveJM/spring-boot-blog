@@ -6,15 +6,13 @@ import com.alibaba.fastjson.JSONObject;
 import hello.entity.*;
 import hello.service.ProjectService;
 import hello.service.RankService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ProjectController {
@@ -61,5 +59,12 @@ public class ProjectController {
     public ProjectResult deleteProjectByProcessId(@RequestParam String processId){
         return projectService.deleteProject(processId);
 
+    }
+
+    @PostMapping("/update/isnew")
+    public ProjectResult updateIsNewProject(@RequestBody Map params
+                                            ){
+        return projectService.updateIsNewProject((String) params.get("processId"), (Boolean) params.get("isStep2New"),
+                (Boolean) params.get("isStep3New"), (Boolean) params.get("isStep4New"), (Boolean) params.get("isStep5New"));
     }
 }

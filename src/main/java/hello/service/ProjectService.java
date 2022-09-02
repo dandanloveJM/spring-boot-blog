@@ -81,6 +81,16 @@ public class ProjectService {
         }
     }
 
+    public ProjectResult updateIsNewProject(String processId, Boolean isStep2New, Boolean isStep3New,
+                                            Boolean isStep4New, Boolean isStep5New){
+        try {
+            return ProjectResult.success("ok", projectDao.updateIsNewProject(processId, isStep2New,
+                    isStep3New, isStep4New, isStep5New));
+        } catch (Exception e){
+            return ProjectResult.failure("修改数据失败");
+        }
+    }
+
     public ProjectResult updateTotalProductOfProject(BigDecimal newTotal, BigDecimal newRatio, String processId) throws Exception {
         Project projectInDb = projectDao.getProjectByProcessId(processId);
         if (projectInDb == null) {
