@@ -131,6 +131,10 @@ public class FlowController {
         project.setOwnerName(ownerName);
         project.setPmId(pmId);
         project.setIsNew(true);
+        project.setStep2New(true);
+        project.setStep3New(true);
+        project.setStep4New(true);
+        project.setStep5New(true);
         return project;
     }
 

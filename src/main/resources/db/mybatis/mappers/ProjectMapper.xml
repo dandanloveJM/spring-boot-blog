@@ -117,17 +117,20 @@
 
     <insert id="insertProject" parameterType="hello.entity.Project" useGeneratedKeys="true"
             keyProperty="id" keyColumn="id">
-        INSERT INTO project (process_id, name, number, type, attachment, owner_id, owner_name, product_id, pm_id, is_new, created_at, updated_at )
-        VALUES (#{processId}, #{name}, #{number}, #{type}, #{attachment}, #{ownerId}, #{ownerName},#{productId}, #{pmId}, #{isNew}, now(), now())
+        INSERT INTO project (process_id, name, number, type, attachment, owner_id, owner_name, product_id, pm_id, is_new, created_at,
+                             updated_at, is_step2_new, is_step3_new, is_step4_new, is_step5_new )
+        VALUES (#{processId}, #{name}, #{number}, #{type}, #{attachment}, #{ownerId}, #{ownerName},
+                #{productId}, #{pmId}, #{isNew}, now(), now(), 1,1,1,1)
     </insert>
 
     <update id="updateIsNew" parameterType="hello.entity.Project">
         UPDATE project
-        SET
-        <if test="isStep2New != null">is_step2_new=0</if>
-        <if test="isStep3New != null">is_step3_new=0</if>
-        <if test="isStep4New != null">is_step4_new=0</if>
-        <if test="isStep4New != null">is_step5_new=0</if>
+        <set>
+        <if test="isStep2New != null">is_step2_new=0,</if>
+        <if test="isStep3New != null">is_step3_new=0,</if>
+        <if test="isStep4New != null">is_step4_new=0,</if>
+        <if test="isStep5New != null">is_step5_new=0,</if>
+        </set>
         where project.process_id = #{processId}
     </update>
 
@@ -242,6 +245,7 @@
             select project.id, project.process_id, project.name, project.number, project.owner_name,
                    project.type, project.owner_id, project.attachment, project.updated_at,
                    project.total_product, project.total_percentage, project.pm_id,
+                   project.is_step2_new, project.is_step3_new,
                    p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
             from project
             left join product p on project.process_id = p.process_id
@@ -332,7 +336,7 @@
     <select id="getUnfinishedProjectsByOwnerIdsByR4" parameterType="java.util.List" resultMap="R2Projects">
                 select project.id, project.process_id, project.name, project.number, project.owner_name,
                        project.type, project.owner_id, project.attachment, project.updated_at,
-                       project.total_product, project.total_percentage,
+                       project.total_product, project.total_percentage, project.is_step4_new,
                        p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
                 from project
                 inner join product p on project.process_id = p.process_id
@@ -429,7 +433,7 @@
     <select id="getA1UnfinishedProjectsByProcessIds" parameterType="java.util.List" resultMap="R2Projects">
             select project.id, project.process_id, project.name, project.number, project.owner_name,
                    project.type, project.owner_id, project.attachment, project.created_at, project.updated_at, project.pm_id,
-                   project.total_product, project.total_percentage,
+                   project.total_product, project.total_percentage, project.is_step5_new,
                    p.id as product_id, p.user_id, p.display_name, p.product, p.percentage
             from project
             inner join product p on project.process_id = p.process_id
@@ -499,6 +503,10 @@
         <result property="updatedAt" column="updated_at"/>
         <result property="totalProduct" column="total_product"/>
         <result property="totalPercentage" column="total_percentage"/>
+        <result property="isStep2New" column="is_step2_new"/>
+        <result property="isStep3New" column="is_step3_new"/>
+        <result property="isStep4New" column="is_step4_new"/>
+        <result property="isStep5New" column="is_step5_new"/>
         <result property="pmId" column="pm_id"/>
         <collection property="products" ofType="hello.entity.Product">
              <id property="id" column="product_id"/>
