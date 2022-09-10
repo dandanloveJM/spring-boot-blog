@@ -2,12 +2,11 @@ package hello.service;
 
 
 import hello.dao.R4TypeDao;
-import hello.dao.UserMapper;
+import hello.dao.UserDao;
 import hello.dao.UserRankDao;
 import hello.entity.R4TypeListResult;
 import hello.entity.UserListResult;
 import hello.entity.UserResult;
-import org.apache.ibatis.session.SqlSession;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,35 +23,35 @@ import java.util.stream.Collectors;
 @Service
 public class UserService implements UserDetailsService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private UserMapper userMapper;
     private R4TypeDao r4TypeDao;
     private UserRankDao userRankDao;
+    private UserDao userDao;
 
 
     @Inject
     public UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
-                       UserMapper userMapper,
                        R4TypeDao r4TypeDao,
-                       UserRankDao userRankDao){
+                       UserRankDao userRankDao,
+                       UserDao userDao){
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.userMapper = userMapper;
         this.r4TypeDao = r4TypeDao;
         this.userRankDao = userRankDao;
+        this.userDao = userDao;
 
     }
 
     public void save(String username, String password) {
 //        userMapper.save(username, bCryptPasswordEncoder.encode(password), null);
-        userMapper.save(username, password, null);
+        userDao.save(username, password, null);
     }
 
     public void changePassword(Integer userId, String password) {
 //        userMapper.updatePassword(userId, bCryptPasswordEncoder.encode(password));
-        userMapper.updatePassword(userId, password);
+        userDao.updatePassword(userId, password);
     }
 
     public hello.entity.User getUserByUsername(String username) {
-        return userMapper.findUserByUsername(username);
+        return userDao.findUserByUsername(username);
     }
 
     @Override
@@ -63,14 +62,14 @@ public class UserService implements UserDetailsService {
         }
 
         Set<GrantedAuthority> authorities = new HashSet<>();
-        String permissionIds = userMapper.getRoleByUsername(username);
+        String permissionIds = userDao.getRoleByUsername(username);
         if (permissionIds != null){
             List<Integer> ids = Arrays.stream(permissionIds.split(","))
                     .map(Integer::valueOf)
                     .collect(Collectors.toList());
 
             for (Integer id : ids) {
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + userMapper.getPermissionById(id)));
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + userDao.getPermissionById(id)));
             }
         }
 
@@ -80,7 +79,7 @@ public class UserService implements UserDetailsService {
 
     public UserListResult getAllR1R2R3Users(){
         try {
-            return UserListResult.success("查询成功", userMapper.getAllR1R2R3Users());
+            return UserListResult.success("查询成功", userDao.getAllR1R2R3Users());
         } catch (Exception e){
             System.out.println(e);
             return UserListResult.failure("程序异常");
@@ -127,7 +126,7 @@ public class UserService implements UserDetailsService {
 
     public UserResult getUserById(Integer userId){
         try {
-            return UserResult.success("获取用户信息成功", userMapper.getUserById(userId));
+            return UserResult.success("获取用户信息成功", userDao.getUserById(userId));
         } catch (Exception e){
             return UserResult.failure("获取用户信息失败");
         }
@@ -135,7 +134,7 @@ public class UserService implements UserDetailsService {
 
     public UserListResult getAllR4Users() {
         try {
-            return UserListResult.success("查询成功", userMapper.getAllR4Users());
+            return UserListResult.success("查询成功", userDao.getAllR4Users());
         } catch (Exception e){
             System.out.println(e);
             return UserListResult.failure("程序异常");

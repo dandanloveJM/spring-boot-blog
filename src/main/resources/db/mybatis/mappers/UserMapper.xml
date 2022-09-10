@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mybatis.example.UserMapper">
+    <select id="getUserName" resultType="hello.entity.User">
+        SELECT * FROM user where username = #{username}
+    </select>
+
+    <insert id="insertUser" parameterType="hello.entity.User" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
+        INSERT INTO user (username, password, role_id, department, display_name, team_name, created_at, updated_at)
+        VALUES (#{username}, #{password}, #{roleId}, #{department}, #{displayName}, #{teamName}, now(), now())
+    </insert>
+
+    <update id="updateUser" parameterType="hello.entity.User">
+        UPDATE user
+        <set>
+            <if test="password!=null">password=#{password}</if>
+            <if test="roleId!=null">role_id=#{roleId}</if>
+            <if test="department!=null">department=#{department}</if>
+            <if test="teamName!=null">team_name=#{teamName}</if>
+        </set>
+        where user.id = #{userId}
+    </update>
+
+
+    <delete id="deleteUser" parameterType="int">
+        DELETE
+        FROM user
+        WHERE user.id = ${id}
+    </delete>
+
+    <insert id="saveUser" parameterType="hello.entity.User" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
+        Insert into `user`(username, password, avatar, created_at, updated_at)
+        values (#{username}, #{password}, #{avatar}, now(),now())
+    </insert>
+
+
+    <select id="getRolesByUsername" resultType="String">
+        SELECT permission_ids FROM user left join role on user.role_id = role.id where username=#{username}
+    </select>
+
+    <select id="getPermissionById" resultType="String">
+        SELECT name FROM permission where id=#{id}
+    </select>
+
+    <select id="getAllR1R2R3Users" resultType="hello.entity.User">
+        SELECT id, display_name FROM user where role_id in (1,2,3) order by username
+    </select>
+
+    <select id="getAllR4Users" resultType="hello.entity.User">
+        SELECT id, display_name FROM user where role_id=4 order by username
+    </select>
+
+    <select id="getUserById"  resultType="hello.entity.User">
+        SELECT id, username, role_id, department, display_name, team_name  FROM user where id=#{userId}
+    </select>
+
+    <select id="getUserByDisplayName"  resultType="hello.entity.User">
+        SELECT id, username, role_id, department, display_name, team_name FROM user where display_name=#{displayName}
+    </select>
+
+
+</mapper>
