@@ -32,7 +32,7 @@ public class UserService implements UserDetailsService {
     public UserService(BCryptPasswordEncoder bCryptPasswordEncoder,
                        R4TypeDao r4TypeDao,
                        UserRankDao userRankDao,
-                       UserDao userDao){
+                       UserDao userDao) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.r4TypeDao = r4TypeDao;
         this.userRankDao = userRankDao;
@@ -44,6 +44,18 @@ public class UserService implements UserDetailsService {
 //        userMapper.save(username, bCryptPasswordEncoder.encode(password), null);
         userDao.save(username, password, null);
     }
+
+    public UserResult addUser(String username, String displayName, String password,
+                              String teamName, String department, Integer roleId) {
+        try {
+            userDao.addUser(username, password, roleId, department, displayName, teamName);
+            return UserResult.success("查询成功", userDao.getUserByDisplayName(displayName));
+        } catch (Exception e) {
+            System.out.println(e);
+            return UserResult.failure("程序异常");
+        }
+    }
+
 
     public void changePassword(Integer userId, String password) {
 //        userMapper.updatePassword(userId, bCryptPasswordEncoder.encode(password));
@@ -57,13 +69,13 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         hello.entity.User user = getUserByUsername(username);
-        if(user == null) {
-            throw new UsernameNotFoundException(username+"不存在");
+        if (user == null) {
+            throw new UsernameNotFoundException(username + "不存在");
         }
 
         Set<GrantedAuthority> authorities = new HashSet<>();
         String permissionIds = userDao.getRoleByUsername(username);
-        if (permissionIds != null){
+        if (permissionIds != null) {
             List<Integer> ids = Arrays.stream(permissionIds.split(","))
                     .map(Integer::valueOf)
                     .collect(Collectors.toList());
@@ -77,27 +89,27 @@ public class UserService implements UserDetailsService {
         return new User(username, user.getPassword(), authorities);
     }
 
-    public UserListResult getAllR1R2R3Users(){
+    public UserListResult getAllR1R2R3Users() {
         try {
             return UserListResult.success("查询成功", userDao.getAllR1R2R3Users());
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return UserListResult.failure("程序异常");
         }
     }
 
 
-    public UserListResult getAllUsersByAdmin(String department){
+    public UserListResult getAllUsersByAdmin(String department) {
         try {
             return UserListResult.success("查询成功", userRankDao.getAllUsersByAdmin(department));
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return UserListResult.failure("程序异常");
         }
     }
 
 
-    public R4TypeListResult getAllR4Type(){
+    public R4TypeListResult getAllR4Type() {
         try {
             return R4TypeListResult.success("查询成功", r4TypeDao.getAllR4TypeData(null, null));
         } catch (Exception e) {
@@ -106,28 +118,28 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public R4TypeListResult getR4IdByTypeId(Integer typeId){
-        try{
+    public R4TypeListResult getR4IdByTypeId(Integer typeId) {
+        try {
             return R4TypeListResult.success("查询成功", r4TypeDao.getUserIdByTypeId(typeId));
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return R4TypeListResult.failure("程序异常");
         }
     }
 
-    public R4TypeListResult getTypeIdsByR4(Integer userId){
-        try{
+    public R4TypeListResult getTypeIdsByR4(Integer userId) {
+        try {
             return R4TypeListResult.success("查询成功", r4TypeDao.getTypeIdsByUserId(userId));
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return R4TypeListResult.failure("程序异常");
         }
     }
 
-    public UserResult getUserById(Integer userId){
+    public UserResult getUserById(Integer userId) {
         try {
             return UserResult.success("获取用户信息成功", userDao.getUserById(userId));
-        } catch (Exception e){
+        } catch (Exception e) {
             return UserResult.failure("获取用户信息失败");
         }
     }
@@ -135,7 +147,7 @@ public class UserService implements UserDetailsService {
     public UserListResult getAllR4Users() {
         try {
             return UserListResult.success("查询成功", userDao.getAllR4Users());
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return UserListResult.failure("程序异常");
         }

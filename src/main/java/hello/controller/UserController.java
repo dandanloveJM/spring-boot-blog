@@ -3,12 +3,10 @@ package hello.controller;
 import hello.anno.ReadUserIdInSession;
 import hello.entity.*;
 import hello.service.UserService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 @RestController
 public class UserController {
@@ -49,6 +47,16 @@ public class UserController {
     @GetMapping("/userInfo")
     public UserResult getUserInfoById(Integer userId){
         return userService.getUserById(userId);
+    }
+
+    @PostMapping("/add/user")
+    public UserResult addUser(@RequestBody Map params){
+        return userService.addUser((String) params.get("username"),
+                (String) params.get("displayName"),
+                (String) params.get("password"),
+                (String) params.get("teamName"),
+                (String) params.get("department"),
+                Integer.parseInt(params.get("roleId").toString()));
     }
 
 }

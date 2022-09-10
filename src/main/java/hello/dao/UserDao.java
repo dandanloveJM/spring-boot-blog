@@ -50,6 +50,19 @@ public class UserDao {
         sqlSession.insert("saveUser", parameters);
     }
 
+    public void addUser(String username, String password, Integer roleId, String department,
+                        String displayName, String teamName) {
+        Map<String, Object> parameters = asMap("username", username,
+                "password", password,
+                "roleId", roleId,
+                "department", department,
+                "displayName", displayName,
+                "teamName", teamName);
+        sqlSession.insert("insertUser", parameters);
+    }
+
+
+
     public void updatePassword(Integer userId, String password) {
         sqlSession.insert("updateUser", asMap("id", userId, "password", password));
     }
