@@ -1,7 +1,7 @@
 package hello.service;
 
 import hello.dao.R4TypeDao;
-import hello.dao.UserMapper;
+import hello.dao.UserDao;
 import hello.entity.R4Type;
 import hello.entity.R4TypeListResult;
 import hello.entity.R4TypeResult;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class R4TypeService {
     private final R4TypeDao r4TypeDao;
-    private final UserMapper userMapper;
+    private final UserDao userDao;
 
-    public R4TypeService(R4TypeDao r4TypeDao, UserMapper userMapper) {
+    public R4TypeService(R4TypeDao r4TypeDao, UserDao userDao) {
         this.r4TypeDao = r4TypeDao;
-        this.userMapper = userMapper;
+        this.userDao = userDao;
     }
 
     public R4TypeListResult showAllR4Types(Integer typeId, Integer userId) {
@@ -29,7 +29,7 @@ public class R4TypeService {
     public R4TypeResult updateUserId(String displayName, Integer id) {
         R4Type r4Type = new R4Type();
         r4Type.setId(id);
-        User userInDB = userMapper.getUserByDisplayName(displayName);
+        User userInDB = userDao.getUserByDisplayName(displayName);
         r4Type.setUserId(userInDB.getId());
         try {
             r4TypeDao.updateR4Type(r4Type);
