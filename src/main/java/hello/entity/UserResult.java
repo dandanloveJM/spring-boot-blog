@@ -8,6 +8,9 @@ public class UserResult extends Result<User>{
     public static UserResult success(String msg, User data){
         return new UserResult("ok", msg, data);
     }
+    public static UserResult success(String msg){
+        return new UserResult("ok", msg, null);
+    }
 
     public static UserResult failure(String msg){
         return new UserResult("fail", msg, null);

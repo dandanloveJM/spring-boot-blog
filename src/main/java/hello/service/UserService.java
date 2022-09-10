@@ -49,7 +49,17 @@ public class UserService implements UserDetailsService {
                               String teamName, String department, Integer roleId) {
         try {
             userDao.addUser(username, password, roleId, department, displayName, teamName);
-            return UserResult.success("查询成功", userDao.getUserByDisplayName(displayName));
+            return UserResult.success("删除成功", userDao.getUserByDisplayName(displayName));
+        } catch (Exception e) {
+            System.out.println(e);
+            return UserResult.failure("程序异常");
+        }
+    }
+
+    public UserResult deleteUser(Integer userId){
+        try {
+            userDao.deleteUserById(userId);
+            return UserResult.success("删除成功");
         } catch (Exception e) {
             System.out.println(e);
             return UserResult.failure("程序异常");

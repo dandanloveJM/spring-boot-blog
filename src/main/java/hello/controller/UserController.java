@@ -50,13 +50,20 @@ public class UserController {
     }
 
     @PostMapping("/add/user")
-    public UserResult addUser(@RequestBody Map params){
-        return userService.addUser((String) params.get("username"),
-                (String) params.get("displayName"),
-                (String) params.get("password"),
-                (String) params.get("teamName"),
-                (String) params.get("department"),
-                Integer.parseInt(params.get("roleId").toString()));
+    public UserResult addUser(@RequestBody Map<String, String> params){
+        return userService.addUser(params.get("username"),
+                params.get("displayName"),
+                params.get("password"),
+                params.get("teamName"),
+                params.get("department"),
+                Integer.parseInt(params.get("roleId")));
     }
+
+
+    @PostMapping("/delete/user")
+    public UserResult deleteUser(@RequestBody Map<String, String> params){
+        return userService.deleteUser(Integer.parseInt(params.get("userId")));
+    }
+
 
 }

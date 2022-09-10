@@ -61,7 +61,9 @@ public class UserDao {
         sqlSession.insert("insertUser", parameters);
     }
 
-
+    public void deleteUserById(Integer id){
+        sqlSession.insert("deleteUser", asMap("id", id));
+    }
 
     public void updatePassword(Integer userId, String password) {
         sqlSession.insert("updateUser", asMap("id", userId, "password", password));
