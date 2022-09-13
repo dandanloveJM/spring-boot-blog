@@ -5,7 +5,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -185,7 +184,8 @@ public class ProjectDao {
 
     public List<Project> getFinishedProjectsByOwnerIdsByR4(List<Integer> R2IdsFindByR4,
                                                            String query, Integer year,
-                                                           Integer type, String number, String startDate, String endDate){
+                                                           Integer type, String number, String startDate, String endDate,
+                                                           Integer page, Integer pageSize){
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("R2Ids", R2IdsFindByR4);
         parameters.put("query", query);
@@ -194,8 +194,27 @@ public class ProjectDao {
         parameters.put("number", number);
         parameters.put("startDate", startDate);
         parameters.put("endDate", endDate);
+        parameters.put("offset", (page-1)*pageSize);
+        parameters.put("limit", pageSize);
+
         return sqlSession.selectList("getFinishedProjectsByOwnerIdsByR4", parameters);
 
+    }
+
+    public int countR4Finished(List<Integer> R2IdsFindByR4,
+                               String query, Integer year,
+                               Integer type, String number, String startDate, String endDate
+                               ){
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("R2Ids", R2IdsFindByR4);
+        parameters.put("query", query);
+        parameters.put("year", year);
+        parameters.put("type", type);
+        parameters.put("number", number);
+        parameters.put("startDate", startDate);
+        parameters.put("endDate", endDate);
+        int number2 = sqlSession.selectOne("countProjectByR4", parameters);
+        return number2;
     }
 
     public List<Project> getFinishedProjectsByOwnerIdsZengtao(

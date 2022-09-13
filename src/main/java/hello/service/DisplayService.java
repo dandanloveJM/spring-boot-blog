@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -270,17 +271,45 @@ public class DisplayService {
 
 
     public ProjectListResult getR4FinishedProjects(Integer userId, String query, Integer year,
-                                                     Integer type, String number, String startDate, String endDate) {
+                                                     Integer type, String number, String startDate, String endDate,
+                                                   Integer page, Integer pageSize) {
 
         // 传入R4ID,找到对应的R2ID
         List<Integer> R2IdsFindByR4 = R2R3R4Relation.R4ToR2UserIdMap.get(userId.toString()).stream().map(Integer::valueOf).collect(Collectors.toList());
         try {
+
+
+//            List<Project> finishedProjectsWithTotalSum = addTotalSum(allProjects);
+            // 每个项目ID的重复对应表
+//            List<ProjectFrequency> frequencies = projectDao.countR4Finished(R2IdsFindByR4,
+//                    query, year, type, number,startDate, endDate);
+//            //计算真正的pagesize
+//            int realPageSizeInOriginalProjectTable = 0;
+//            int projectCount = frequencies.size();
+//            for (int i = (page-1)*pageSize; i < (Math.min(((page - 1) * pageSize + pageSize), projectCount)); i++) {
+//                realPageSizeInOriginalProjectTable += frequencies.get(i).getFrequency();
+//            }
+//            // 计算之前的offset
+//            int offsetOfLastSelect = 0;
+//            for (int i = 0; i < (page-1)*pageSize; i++) {
+//                offsetOfLastSelect += frequencies.get(i).getFrequency();
+//            }
+
             // 查出来所有的projects
             List<Project> allProjects = projectDao.getFinishedProjectsByOwnerIdsByR4(R2IdsFindByR4,
-                    query, year, type, number, startDate, endDate);
-            List<Project> finishedProjectsWithTotalSum = addTotalSum(allProjects);
+                    query, year, type, number, startDate, endDate, page, pageSize);
 
-            return ProjectListResult.success(finishedProjectsWithTotalSum);
+            int projectCount = projectDao.countR4Finished(R2IdsFindByR4,
+                    query, year, type, number, startDate, endDate);
+            int pageCount = projectCount%page == 0?  projectCount/pageSize : projectCount/pageSize+1;
+            BigDecimal sum = BigDecimal.ZERO;
+            for (Project project : allProjects) {
+                sum = sum.add(project.getTotalProduct());
+            }
+            sum= sum.setScale(0, RoundingMode.DOWN);
+
+
+            return ProjectListResult.success(allProjects, projectCount, page, pageCount,sum.intValue());
         } catch (Exception e) {
             return ProjectListResult.failure("程序异常");
         }
