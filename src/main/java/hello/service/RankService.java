@@ -220,7 +220,10 @@ public class RankService {
                     Arrays.asList("Z1", "Z2", "F1", "F2")
             );
             for (String team : teams) {
-                results.put(team, userRankDao.getTeamPieChartParams(team));
+                List<TeamPieChart> params = userRankDao.getTeamPieChartParams(team).stream().peek(item -> item.setSum(item.getSum().setScale(0, RoundingMode.UP)))
+                        .collect(Collectors.toList());
+
+                results.put(team, params);
             }
 
             return TeamPieChartsListResult.success(results);
