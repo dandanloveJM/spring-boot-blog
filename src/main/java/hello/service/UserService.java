@@ -67,6 +67,17 @@ public class UserService implements UserDetailsService {
     }
 
 
+    public UserResult updateUserInfo(hello.entity.User newUser){
+        try {
+            userDao.updateUser(newUser);
+            return UserResult.success("修改成功");
+        } catch (Exception e) {
+            System.out.println(e);
+            return UserResult.failure("程序异常");
+        }
+    }
+
+
     public void changePassword(Integer userId, String password) {
 //        userMapper.updatePassword(userId, bCryptPasswordEncoder.encode(password));
         userDao.updatePassword(userId, password);
@@ -109,9 +120,9 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public UserListResult getAllUsersByAdmin(String department) {
+    public UserListResult getAllUsersByAdmin(Integer id,  String department) {
         try {
-            return UserListResult.success("查询成功", userRankDao.getAllUsersByAdmin(department));
+            return UserListResult.success("查询成功", userRankDao.getAllUsersByAdmin(id, department));
         } catch (Exception e) {
             System.out.println(e);
             return UserListResult.failure("程序异常");

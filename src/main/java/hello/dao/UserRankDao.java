@@ -60,8 +60,10 @@ public class UserRankDao {
         return sqlSession.selectList("teamBarChart");
     }
 
-    public List<User> getAllUsersByAdmin(String department){
-        Map<String, Object> parameters =asMap("department", department);
+    public List<User> getAllUsersByAdmin(Integer id, String department){
+        Map<String, Object> parameters =asMap("department", department,
+                "id", id
+               );
         return sqlSession.selectList("getAllUsersByAdmin", parameters);
 
     }

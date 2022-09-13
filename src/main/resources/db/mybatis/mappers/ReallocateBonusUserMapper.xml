@@ -14,9 +14,14 @@
     <select id="getAllUsersByAdmin" resultMap="adminUser" >
         SELECT id, username, display_name, password, team_name, department FROM user
         where role_id in (1,2,3,4,5,6,7)
+        <if test="id != 0">
+            and user.id=#{id}
+        </if>
         <if test="department != ''">
             and user.department=#{department}
         </if>
+
+
         order by username
     </select>
 
