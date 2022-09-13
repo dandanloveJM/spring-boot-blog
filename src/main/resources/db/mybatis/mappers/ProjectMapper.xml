@@ -370,7 +370,7 @@
     </select>
 
 
- <select id="getFinishedProjectsByOwnerIdsByR4" parameterType="java.util.List" resultMap="R2Projects">
+ <select id="getFinishedProjectsByOwnerIdsByR4" parameterType="java.util.List" resultMap="R2ProjectsByR4Done">
                 select project.id, project.process_id, project.name, project.number, project.owner_name,
                        project.type, project.owner_id, project.attachment, project.updated_at,
                        project.total_product, project.total_percentage
@@ -526,6 +526,33 @@
     </select>
 
     <resultMap id="R2Projects" type="hello.entity.Project">
+        <id property="id" column="id"/>
+        <result property="processId" column="process_id"/>
+        <result property="name" column="name"/>
+        <result property="number" column="number"/>
+        <result property="type" column="type"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="ownerName" column="owner_name"/>
+        <result property="attachment" column="attachment"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="totalProduct" column="total_product"/>
+        <result property="totalPercentage" column="total_percentage"/>
+        <result property="isStep2New" column="is_step2_new"/>
+        <result property="isStep3New" column="is_step3_new"/>
+        <result property="isStep4New" column="is_step4_new"/>
+        <result property="isStep5New" column="is_step5_new"/>
+        <result property="pmId" column="pm_id"/>
+        <collection property="products" ofType="hello.entity.Product">
+            <id property="id" column="product_id"/>
+            <result property="userId" column="user_id"/>
+            <result property="displayName" column="display_name"/>
+            <result property="product" column="product"/>
+            <result property="percentage" column="percentage"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="R2ProjectsByR4Done" type="hello.entity.Project">
         <id property="id" column="id"/>
         <result property="processId" column="process_id"/>
         <result property="name" column="name"/>

@@ -33,7 +33,7 @@ public class ProjectService {
             List<Project> projects = projectDao.getProjects(page, pageSize, userId);
             int count = projectDao.count(userId);
             int pageCount = count%pageSize == 0 ? count/pageSize : count/pageSize+1;
-            return ProjectListResult.success(projects, count, page, pageCount);
+            return ProjectListResult.success(projects, count, page, pageCount,0);
         } catch (Exception e) {
             return ProjectListResult.failure("系统异常");
         }
