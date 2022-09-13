@@ -16,12 +16,15 @@
     <update id="updateUser" parameterType="hello.entity.User">
         UPDATE user
         <set>
-            <if test="password!=null">password=#{password}</if>
-            <if test="roleId!=null">role_id=#{roleId}</if>
-            <if test="department!=null">department=#{department}</if>
-            <if test="teamName!=null">team_name=#{teamName}</if>
+            updated_at=now(),
+            <if test="username!=null">username=#{username},</if>
+            <if test="displayName!=null">display_name=#{displayName},</if>
+            <if test="password!=null">password=#{password},</if>
+            <if test="roleId!=0">role_id=#{roleId},</if>
+            <if test="department!=null">department=#{department},</if>
+            <if test="teamName!=null">team_name=#{teamName},</if>
         </set>
-        where user.id = #{userId}
+        where user.id = #{id}
     </update>
 
 

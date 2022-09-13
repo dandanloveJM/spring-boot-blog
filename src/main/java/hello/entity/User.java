@@ -17,7 +17,7 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @JsonProperty("updatedAt")
     ZonedDateTime updatedAt;
-//    @JsonIgnore
+//  @JsonIgnore
     String password;
     int roleId;
     String displayName;
