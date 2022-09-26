@@ -140,6 +140,12 @@
         where project.id = #{id}
     </update>
 
+    <update id="updateProjectTime" parameterType="hello.entity.Project">
+        UPDATE project
+        SET updated_at=now()
+        where project.process_id = #{processId}
+    </update>
+
     <update id="updateTotalProductOfProject" parameterType="hello.entity.Project">
             UPDATE project
             SET total_product=#{totalProduct}, total_percentage=#{totalPercentage}, updated_at=now()
@@ -365,7 +371,6 @@
                 <if test="(startDate == '') or (endDate == '')">
                   and year(project.updated_at) = #{year}
                 </if>
-
                 order by project.updated_at desc
     </select>
 
@@ -490,12 +495,7 @@
         order by project.updated_at DESC
     </select>
 
-<select id="getProductByProcessId" parameterType="String" resultType="hello.entity.Product">
-    select id, user_id, display_name, product, percentage
-    from product
-    where product.process_id =#{processId}
 
-</select>
 
     <select id="countProjectByR4" resultType="int">
         select COUNT(project.id)
