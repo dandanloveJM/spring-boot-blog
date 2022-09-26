@@ -291,6 +291,7 @@ public class FlowController {
                     DBResult = productService.modifyProducts(products);
                 }
 
+                projectService.updateProjectTime(processId);
                 taskService.addComment(taskId, processId, "【通过】");
                 taskService.complete(taskId, map);
                 return DBResult;
@@ -341,10 +342,8 @@ public class FlowController {
                 Authentication.setAuthenticatedUserId(String.valueOf(userId));
 
                 String comment2 = StringUtils.isNotEmpty(comment)? "【通过】, " + comment : "【通过】";
+                projectService.updateProjectTime(processId);
                 taskService.addComment(taskId, processId, comment2);
-
-
-
                 taskService.complete(taskId, map);
                 return ProductListResult.success("室主任审核通过");
             }
@@ -374,8 +373,7 @@ public class FlowController {
             Authentication.setAuthenticatedUserId(String.valueOf(userId));
             String comment2 = StringUtils.isNotEmpty(comment)? "【通过】, " + comment : "【通过】";
             taskService.addComment(taskId, processId, comment2);
-
-
+            projectService.updateProjectTime(processId);
             taskService.complete(taskId, map);
             return ProjectResult.success("分管领导审核通过");
         } catch (Exception e) {
@@ -403,6 +401,7 @@ public class FlowController {
             Authentication.setAuthenticatedUserId("24");
             ProductResult results = updateProducts(processId, newTotal, newRatio, finalTotal);
             taskService.addComment(taskId, processId, "设置产值成功");
+            projectService.updateProjectTime(processId);
             taskService.complete(taskId, map);
             return results;
         } catch (Exception e) {

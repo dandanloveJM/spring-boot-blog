@@ -56,6 +56,10 @@ public class ProjectDao {
         return getProjectById(newProject.getId());
     }
 
+    public void updateProjectTime(String processId){
+        sqlSession.update("updateProjectTime", processId);
+    }
+
     public Project updateIsNewProject(String processId, Boolean isStep2New, Boolean isStep3New,
                                       Boolean isStep4New, Boolean isStep5New){
         Map<String, Object> parameters = asMap("processId", processId,

@@ -109,17 +109,10 @@ public class ProjectService {
     }
 
 
-    public ProjectResult updatePmId(Integer pmId, String ownerName, String processId) throws Exception {
-        Project projectInDb = projectDao.getProjectByProcessId(processId);
-        if (projectInDb == null) {
-            return ProjectResult.failure("项目不存在");
-        }
-
-        Project newProject = new Project();
-        newProject.setPmId(pmId);
-        newProject.setOwnerName(ownerName);
+    public ProjectResult updateProjectTime(String processId) throws Exception {
         try{
-            return ProjectResult.success("更新项目长", projectDao.updatePmId(newProject) );
+            projectDao.updateProjectTime(processId);
+            return ProjectResult.success("更新项目成功");
         } catch (Exception e) {
             throw new Exception("程序异常");
         }
