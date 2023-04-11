@@ -2,14 +2,15 @@ package hello.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import hello.entity.*;
+import hello.configuration.GlobalConfig;
+import hello.entity.CommentResult;
+import hello.entity.ProjectListResult;
+import hello.entity.ProjectResult;
 import hello.service.ProjectService;
 import hello.service.RankService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class ProjectController {
             processIds.add(processId);
         }
 
-        return projectService.getProjectsByProcessIds(processIds, "", 2022, null, "","","");
+        return projectService.getProjectsByProcessIds(processIds, "", GlobalConfig.CURRENT_YEAR, null, "","","");
     }
 
     @GetMapping("/getProjectsByOwnerId")

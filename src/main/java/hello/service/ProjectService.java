@@ -1,5 +1,6 @@
 package hello.service;
 
+import hello.configuration.GlobalConfig;
 import hello.dao.CommentMapper;
 import hello.dao.ProductDao;
 import hello.dao.ProjectDao;
@@ -49,7 +50,7 @@ public class ProjectService {
 
     public ProjectListResult getProjectsByOwnerId(Integer ownerId){
         try{
-            return ProjectListResult.success(projectDao.getUnfinishedProjectsByR2(ownerId, "", 2022, null, ""));
+            return ProjectListResult.success(projectDao.getUnfinishedProjectsByR2(ownerId, "", GlobalConfig.CURRENT_YEAR, null, ""));
         } catch (Exception e) {
             return ProjectListResult.failure("程序异常");
         }
@@ -160,7 +161,7 @@ public class ProjectService {
             projectDao.deleteProjectByProcessId(processId);
             projectDao.deleteProcessRecord(processId);
             productDao.deleteProductsByProcessId(processId);
-            List<TeamRank> teamBonus = rankService.getTeamBonus(2022).getData();
+            List<TeamRank> teamBonus = rankService.getTeamBonus(GlobalConfig.CURRENT_YEAR).getData();
             rankService.updateTeamBonusByCalculating(teamBonus);
 
             return ProjectResult.success("删除项目成功");

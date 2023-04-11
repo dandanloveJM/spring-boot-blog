@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hello.anno.ReadUserIdInSession;
+import hello.configuration.GlobalConfig;
 import hello.entity.*;
 import hello.service.*;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -57,7 +58,7 @@ public class DisplayController {
             query = "";
         }
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
         if (number == null) {
             number = "";
@@ -78,7 +79,7 @@ public class DisplayController {
             query = "";
         }
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
         if (number == null) {
             number = "";
@@ -101,7 +102,7 @@ public class DisplayController {
             query = "";
         }
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
         if (number == null) {
             number = "";
@@ -122,7 +123,7 @@ public class DisplayController {
             query = "";
         }
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
         if (number == null) {
             number = "";
@@ -144,7 +145,7 @@ public class DisplayController {
             query = "";
         }
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
         if (number == null) {
             number = "";
@@ -167,7 +168,7 @@ public class DisplayController {
             query = "";
         }
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
         if (number == null) {
             number = "";
@@ -193,7 +194,7 @@ public class DisplayController {
             query = "";
         }
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
         if (number == null) {
             number = "";
@@ -217,7 +218,7 @@ public class DisplayController {
             query = "";
         }
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
         if (number == null) {
             number = "";
@@ -251,7 +252,7 @@ public class DisplayController {
             query = "";
         }
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
 
         if (number == null) {
@@ -277,7 +278,7 @@ public class DisplayController {
             query = "";
         }
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
 
         if (number == null) {
@@ -290,7 +291,7 @@ public class DisplayController {
     @GetMapping("/userRank")
     public UserRankListResult getUserRank(Integer year, String team) {
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
         return rankService.getUserRanks(year, team);
 //        return userAddedProductService.getAllAddedProducts();
@@ -299,7 +300,7 @@ public class DisplayController {
     @GetMapping("/teamRank")
     public TeamRankListResult getTeamRank(Integer year) {
         if (year == null) {
-            year = 2022;
+            year = GlobalConfig.CURRENT_YEAR;
         }
         return rankService.getTeamRank(year);
     }

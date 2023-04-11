@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.thoughtworks.qdox.model.expression.Add;
 import hello.anno.ReadUserIdInSession;
+import hello.configuration.GlobalConfig;
 import hello.entity.*;
 import hello.service.*;
 import hello.utils.R2R3R4Relation;
@@ -485,7 +486,7 @@ public class FlowController {
 
 
 
-            List<TeamRank> teamBonus = rankService.getTeamBonus(2022).getData();
+            List<TeamRank> teamBonus = rankService.getTeamBonus(GlobalConfig.CURRENT_YEAR).getData();
             rankService.updateTeamBonusByCalculating(teamBonus);
 
 
