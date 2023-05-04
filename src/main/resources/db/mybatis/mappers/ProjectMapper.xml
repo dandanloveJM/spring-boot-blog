@@ -470,6 +470,11 @@
             order by project.updated_at DESC
    </select>
 
+    <select id="getProductByProcessIdForPage" parameterType="String" resultType="hello.entity.Product">
+        select id, user_id, display_name, product, percentage
+        from product
+        where product.process_id =#{processId}
+    </select>
 
 <select id="getAllProjects" resultMap="R2Projects">
         select project.id, project.process_id, project.name, project.number, project.owner_name,
@@ -570,7 +575,7 @@
         <result property="isStep4New" column="is_step4_new"/>
         <result property="isStep5New" column="is_step5_new"/>
         <result property="pmId" column="pm_id"/>
-        <collection property="products" ofType="hello.entity.Product" select="getProductByProcessId" column="process_id">
+        <collection property="products" ofType="hello.entity.Product" select="getProductByProcessIdForPage" column="process_id">
         </collection>
     </resultMap>
 
