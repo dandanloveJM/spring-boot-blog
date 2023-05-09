@@ -176,7 +176,7 @@ public class FlowController {
         }
         Boolean isValidFile = file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/png");
 
-        if(!isValidFile){
+        if (!isValidFile) {
             return ProjectResult.failure("只能上传jpeg, jpg, png格式的图片");
         }
 
@@ -201,7 +201,7 @@ public class FlowController {
         UploadResult uploadResult = this.uploadService.store(file);
         if (uploadResult.getStatus().equals("ok")) {
             //String url = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + context.getWebServer().getPort() + "/files/";
-            String url = "http://121.41.9.16:"+context.getWebServer().getPort() + "/files/";
+            String url = "http://121.41.9.16:" + context.getWebServer().getPort() + "/files/";
 
             attachmentURL = url + uploadResult.getMsg();
         }
@@ -263,7 +263,7 @@ public class FlowController {
             String percentage = (String) data2.getJSONObject(i).get("percentage");
             productSum += Integer.parseInt(percentage);
         }
-        if (productSum > 100){
+        if (productSum > 100) {
             return ProductListResult.failure("比例不能超过100");
         }
 
@@ -319,7 +319,6 @@ public class FlowController {
         }
 
 
-
         try {
             Project projectInDB = projectService.getProjectByProcessId(processId).getData();
             String ownerId = projectInDB.getOwnerId().toString();
@@ -344,7 +343,7 @@ public class FlowController {
 
                 Authentication.setAuthenticatedUserId(String.valueOf(userId));
 
-                String comment2 = StringUtils.isNotEmpty(comment)? "【通过】, " + comment : "【通过】";
+                String comment2 = StringUtils.isNotEmpty(comment) ? "【通过】, " + comment : "【通过】";
                 projectService.updateProjectTime(processId);
                 taskService.addComment(taskId, processId, comment2);
                 taskService.complete(taskId, map);
@@ -373,10 +372,10 @@ public class FlowController {
 
         try {
             Authentication.setAuthenticatedUserId(String.valueOf(userId));
-            String comment2 = StringUtils.isNotEmpty(comment)? "【通过】, " + comment : "【通过】";
+            String comment2 = StringUtils.isNotEmpty(comment) ? "【通过】, " + comment : "【通过】";
             taskService.addComment(taskId, processId, comment2);
             // A1UserIDS是"24,85"
-            String A1UserIDS = userService.getA1Users().getData().stream().map(item->item.getId().toString()).collect(Collectors.joining(","));
+            String A1UserIDS = userService.getA1Users().getData().stream().map(item -> item.getId().toString()).collect(Collectors.joining(","));
             variables.put("candidateUsers", A1UserIDS);
             projectService.updateProjectTime(processId);
             taskService.complete(taskId, variables);
@@ -397,7 +396,7 @@ public class FlowController {
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
-        if(task.getAssignee() != null) {
+        if (task.getAssignee() != null) {
             throw new RuntimeException("已经被赋予产值");
         }
 
@@ -430,7 +429,7 @@ public class FlowController {
                                          @RequestParam(required = false) String comment) {
         Task nowTask = taskService.createTaskQuery().taskId(taskId).singleResult();
         Authentication.setAuthenticatedUserId(ownerId.toString());
-        String comment2 = StringUtils.isNotEmpty(comment)? "【退回】, " + comment : "【退回】";
+        String comment2 = StringUtils.isNotEmpty(comment) ? "【退回】, " + comment : "【退回】";
         taskService.addComment(taskId, nowTask.getProcessInstanceId(), comment2);
 
         String taskKey = nowTask.getTaskDefinitionKey();
@@ -493,7 +492,6 @@ public class FlowController {
         try {
             projectService.updateTotalProductOfProject(newTotal, newRatio, processId);
             productService.updateProducts(finalTotal, processId);
-
 
 
             List<TeamRank> teamBonus = rankService.getTeamBonus(GlobalConfig.CURRENT_YEAR).getData();
@@ -561,13 +559,13 @@ public class FlowController {
 
     }
 
-    private Activity makeNode(@RequestParam("processId") String processId,  String taskId2, String assignee, String activityName, Date startTime, Date endTime) {
+    private Activity makeNode(@RequestParam("processId") String processId, String taskId2, String assignee, String activityName, Date startTime, Date endTime) {
         Activity activity = new Activity();
 
         String displayName = Optional.ofNullable(assignee)
                 .map(Integer::valueOf)
                 .map(userService::getUserById)
-                .map(item->item.getData().getDisplayName())
+                .map(item -> item.getData().getDisplayName())
                 .orElse("待定");
 
         String comment = projectService.getComment(processId, taskId2).getData();
@@ -581,8 +579,6 @@ public class FlowController {
         activity.setEndTime(endTime);
         return activity;
     }
-
-
 
 
     /**
