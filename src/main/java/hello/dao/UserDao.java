@@ -85,6 +85,9 @@ public class UserDao {
         return sqlSession.selectList("getAllR1R2R3Users");
     }
 
+    public List<User> getAllA1Users(){
+        return sqlSession.selectList("getA1Users");
+    }
     public List<User> getAllR4Users(){
         return sqlSession.selectList("getAllR4Users");
     }

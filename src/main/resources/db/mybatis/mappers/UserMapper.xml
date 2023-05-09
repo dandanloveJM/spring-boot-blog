@@ -44,6 +44,10 @@
         SELECT permission_ids FROM user left join role on user.role_id = role.id where username=#{username}
     </select>
 
+    <select id="getA1Users" resultType="hello.entity.User">
+        SELECT id, display_name FROM user where role_id=6 order by username
+    </select>
+
     <select id="getPermissionById" resultType="String">
         SELECT name FROM permission where id=#{id}
     </select>
