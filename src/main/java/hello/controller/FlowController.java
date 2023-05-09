@@ -15,6 +15,8 @@ import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.web.bind.annotation.*;
@@ -363,19 +365,21 @@ public class FlowController {
                                        @RequestParam String processId,
                                        @RequestParam(required = false) String comment) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> variables = new HashMap<>();
 
         if (task == null) {
             return ProjectResult.failure("流程不存在");
         }
 
         try {
-            map.put("A1", "24");
             Authentication.setAuthenticatedUserId(String.valueOf(userId));
             String comment2 = StringUtils.isNotEmpty(comment)? "【通过】, " + comment : "【通过】";
             taskService.addComment(taskId, processId, comment2);
+            // A1UserIDS是"24,85"
+            String A1UserIDS = userService.getA1Users().getData().stream().map(item->item.getId().toString()).collect(Collectors.joining(","));
+            variables.put("candidateUsers", A1UserIDS);
             projectService.updateProjectTime(processId);
-            taskService.complete(taskId, map);
+            taskService.complete(taskId, variables);
             return ProjectResult.success("分管领导审核通过");
         } catch (Exception e) {
             return ProjectResult.failure("程序异常");
@@ -384,13 +388,17 @@ public class FlowController {
 
     }
 
+    @ReadUserIdInSession
     @PostMapping("fillValue")
-    public ProductResult fillValue(@RequestParam String taskId, @RequestParam String processId,
+    public ProductResult fillValue(Integer userId, @RequestParam String taskId, @RequestParam String processId,
                                    @RequestParam String total, @RequestParam String ratio) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         Map<String, Object> map = new HashMap<>();
         if (task == null) {
             throw new RuntimeException("流程不存在");
+        }
+        if(task.getAssignee() != null) {
+            throw new RuntimeException("已经被赋予产值");
         }
 
 
@@ -399,12 +407,14 @@ public class FlowController {
         BigDecimal finalTotal = newTotal.multiply(newRatio).divide(BigDecimal.valueOf(10000), RoundingMode.DOWN);
 
         try {
-            Authentication.setAuthenticatedUserId("24");
+            taskService.claim(taskId, userId.toString());
+            Authentication.setAuthenticatedUserId(userId.toString());
             ProductResult results = updateProducts(processId, newTotal, newRatio, finalTotal);
             taskService.addComment(taskId, processId, "设置产值成功");
             projectService.updateProjectTime(processId);
             taskService.complete(taskId, map);
             return results;
+
         } catch (Exception e) {
             return ProductResult.failure("财务更新产值失败");
         }
@@ -553,13 +563,17 @@ public class FlowController {
 
     private Activity makeNode(@RequestParam("processId") String processId,  String taskId2, String assignee, String activityName, Date startTime, Date endTime) {
         Activity activity = new Activity();
-        String taskId = taskId2;
-        Integer userId = Integer.valueOf(assignee);
-        String displayName = userService.getUserById(userId).getData().getDisplayName();
-        String comment = projectService.getComment(processId, taskId).getData();
+
+        String displayName = Optional.ofNullable(assignee)
+                .map(Integer::valueOf)
+                .map(userService::getUserById)
+                .map(item->item.getData().getDisplayName())
+                .orElse("待定");
+
+        String comment = projectService.getComment(processId, taskId2).getData();
 
         activity.setProcessId(processId);
-        activity.setTaskId(taskId);
+        activity.setTaskId(taskId2);
         activity.setDisplayName(displayName);
         activity.setActivityName(activityName);
         activity.setComment(comment);
@@ -567,6 +581,10 @@ public class FlowController {
         activity.setEndTime(endTime);
         return activity;
     }
+
+
+
+
     /**
      * 生成流程图
      *
