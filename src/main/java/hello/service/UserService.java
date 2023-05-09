@@ -119,6 +119,14 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    public UserListResult getA1Users(){
+        try {
+            return UserListResult.success("查询成功", userDao.getAllA1Users());
+        } catch (Exception e) {
+            System.out.println(e);
+            return UserListResult.failure("程序异常");
+        }
+    }
 
     public UserListResult getAllUsersByAdmin(Integer id,  String department) {
         try {
