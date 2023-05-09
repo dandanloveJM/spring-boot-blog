@@ -8,8 +8,12 @@ import hello.entity.*;
 import hello.utils.R2R3R4Relation;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.runtime.ActivityInstance;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.TaskQuery;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -26,12 +30,14 @@ public class DisplayService {
     private final HistoryService historyService;
     private final ProjectService projectService;
     private final UserService userService;
+    private final TaskService taskService;
 
     @Inject
     public DisplayService(ProductDao productDao, ProjectDao projectDao,
                           RuntimeService runtimeService,
                           HistoryService historyService,
                           ProjectService projectService,
+                          TaskService taskService,
                           UserService userService) {
         this.productDao = productDao;
         this.projectDao = projectDao;
@@ -39,6 +45,8 @@ public class DisplayService {
         this.historyService = historyService;
         this.projectService = projectService;
         this.userService = userService;
+        this.taskService = taskService;
+
     }
 
     public ProjectListResult getFinishedProjectsByUserId(Integer userId, String query, Integer year, Integer type, String number,
@@ -362,13 +370,16 @@ public class DisplayService {
     public ProjectListResult getA1UnfinishedProjects(Integer userId, String query, Integer year, Integer type, String number, String startDate,
                                                    String endDate){
         try {
-            List<HistoricActivityInstance> A1AllActivities = historyService.createHistoricActivityInstanceQuery()
-                    .taskAssignee(String.valueOf(userId)).orderByHistoricActivityInstanceEndTime().desc().list();
-            if (A1AllActivities.isEmpty()) {
+
+            TaskQuery taskQuery = taskService.createTaskQuery()
+                    .taskCandidateOrAssigned(userId.toString())
+                    .orderByTaskCreateTime().desc();
+            List<Task> tasks = taskQuery.list();
+
+            List<String> A1AllProcessIds = tasks.stream().map(TaskInfo::getProcessInstanceId).collect(Collectors.toList());
+            if (tasks.isEmpty()) {
                 return ProjectListResult.success(Collections.emptyList());
             }
-            List<String> A1AllProcessIds = A1AllActivities.stream().map(HistoricActivityInstance::getProcessInstanceId).collect(Collectors.toList());
-
 
             // 查出来所有的projects
             List<Project> unfinishedProjects = projectDao.getA1UnfinishedProjectsByProcessIds(A1AllProcessIds,
