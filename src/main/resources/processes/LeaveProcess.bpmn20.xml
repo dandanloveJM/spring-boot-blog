@@ -22,8 +22,8 @@
         <userTask id="R4check" name="R4审核" flowable:formFieldValidation="true"
                   flowable:assignee="${R4}"
                   />
-        <userTask id="A1fill" name="A1填写产值" flowable:formFieldValidation="true"
-                  flowable:assignee="${A1}"/>
+        <userTask id="A1fill" name="A1填写产值" flowable:formFieldValidation="true" flowable:candidateUsers="${candidateUsers}"
+        />
         <sequenceFlow id="flow5" sourceRef="R4check" targetRef="A1fill"/>
         <endEvent id="end"/>
         <sequenceFlow id="flow6" sourceRef="A1fill" targetRef="end"/>
