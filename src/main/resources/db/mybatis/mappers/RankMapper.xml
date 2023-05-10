@@ -87,7 +87,7 @@
      from project
               left join product p on project.process_id = p.process_id
      left join user u on p.user_id = u.id
-     where ISNULL(project.total_product)=0 and u.department=#{team}
+     where ISNULL(project.total_product)=0 and u.department=#{team} and year(project.updated_at)=YEAR(CURRENT_DATE())
      group by display_name
 
      </select>
